@@ -1,4 +1,4 @@
-package com.example.ryan.audioplayer;
+package com.example.administrator.audioplayer;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

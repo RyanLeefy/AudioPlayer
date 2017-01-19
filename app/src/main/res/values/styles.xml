@@ -8,4 +8,18 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+   <!-- 右往左滑出效果 -->
+    <style name="dialog_anim_slide_left" mce_bogus="1" parent="android:Animation">
+        <item name="android:windowExitAnimation">@anim/dialog_exit_slide_left</item>
+    </style>
+    <!--下往上滑出效果 -->
+    <style name="dialog_anim_slide_up" mce_bogus="1" parent="android:Animation">
+        <item name="android:windowExitAnimation">@anim/dialog_exit_slide_up</item>
+    </style>
+    <!-- 淡出效果 -->
+    <style name="dialog_anim_fade_out" mce_bogus="1" parent="android:Animation">
+        <item name="android:windowExitAnimation">@anim/dialog_exit_fade_out</item>
+    </style>
+
 </resources>
