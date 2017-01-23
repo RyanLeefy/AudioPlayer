@@ -1,14 +1,13 @@
 package com.example.administrator.audioplayer.activity;
 
 import android.os.Handler;
-import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -17,13 +16,12 @@ import android.widget.ListView;
 
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.LeftMenuItemAdapter;
-import com.example.administrator.audioplayer.adapter.PagerAdapter;
+import com.example.administrator.audioplayer.adapter.MainPagerAdapter;
 import com.example.administrator.audioplayer.fragment.MusicFragment;
 import com.example.administrator.audioplayer.fragment.NetFragment;
 import com.example.administrator.audioplayer.widget.SplashScreen;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -33,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Handler mHandler = new Handler();
 
-    private ImageView img_net, img_music, img_search;
+    private ImageView img_menu,img_net, img_music, img_search;
     private ViewPager viewPager;
 
     private DrawerLayout drawer;
@@ -51,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        img_menu = (ImageView) findViewById(R.id.bar_menu);
         img_net = (ImageView) findViewById(R.id.bar_net);
         img_music = (ImageView) findViewById(R.id.bar_music);
         img_search = (ImageView) findViewById(R.id.bar_search);
@@ -69,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setToolbar();  //初始化toolbar
         setViewPager();  //初始化viewpager
+        setListener();  //初始化监听事件
         setUpDrawer();  //初始化drawer
     }
 
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
-        toolbar.setNavigationIcon(R.drawable.actionbar_menu);
+        //toolbar.setNavigationIcon(R.drawable.actionbar_menu);
         //ActionBar ab = getSupportActionBar();
 
         //ab.setDisplayHomeAsUpEnabled(true);
@@ -95,11 +95,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NetFragment netFragment = new NetFragment();
         MusicFragment musicFragment = new MusicFragment();
 
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragment(netFragment);
-        pagerAdapter.addFragment(musicFragment);
+        MainPagerAdapter mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
+        mainPagerAdapter.addFragment(netFragment);
+        mainPagerAdapter.addFragment(musicFragment);
 
-        viewPager.setAdapter(pagerAdapter);
+        viewPager.setAdapter(mainPagerAdapter);
         viewPager.setCurrentItem(0);
         img_net.setSelected(true);
 
@@ -120,6 +120,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+
+    }
+
+    private void setListener() {
+        img_menu.setOnClickListener(this);
         img_net.setOnClickListener(this);
         img_music.setOnClickListener(this);
         img_search.setOnClickListener(this);
@@ -167,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     //改变图标的颜色
     private void switchTabs(int position) {
         for(int i = 0; i < tabs.size(); i++) {
@@ -183,6 +187,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.bar_menu:
+                drawer.openDrawer(GravityCompat.START);
             case R.id.bar_net:
                 viewPager.setCurrentItem(0);
                 break;

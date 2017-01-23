@@ -11,30 +11,30 @@ import java.util.List;
  * Created by on 2017/1/22.
  */
 
-public class PagerAdapter extends FragmentPagerAdapter {
+public class MainPagerAdapter extends FragmentPagerAdapter {
 
-    private List<Fragment> list = new ArrayList<>();
+    private List<Fragment> fragment_list = new ArrayList<>();
 
-    public PagerAdapter(FragmentManager fm) {
+    public MainPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
-    public PagerAdapter(FragmentManager fm, List<Fragment> list) {
+    public MainPagerAdapter(FragmentManager fm, List<Fragment> list) {
         super(fm);
-        this.list = list;
+        this.fragment_list = list;
     }
 
     public void addFragment(Fragment fragment) {
-        list.add(fragment);
+        fragment_list.add(fragment);
     }
 
     @Override
     public Fragment getItem(int position) {
-        return list.get(position);
+        return fragment_list.get(position);
     }
 
     @Override
     public int getCount() {
-        return list.size();
+        return fragment_list.size();
     }
 }
