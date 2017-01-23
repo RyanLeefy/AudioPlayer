@@ -62,7 +62,7 @@ public class LeftMenuItemAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ItemViewTag itemViewTag;
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.layout_listitem_leftmenu, parent, false);
+            convertView = mInflater.inflate(R.layout.list_item_leftmenu, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.img_leftmenu_icon);
             TextView textView = (TextView) convertView.findViewById(R.id.tv_leftmenu_name);
             itemViewTag = new ItemViewTag(icon, textView);

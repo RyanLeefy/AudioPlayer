@@ -7,5 +7,7 @@
     <color name="green">#FF26F107</color>
 
 
+    <color name="expand_color">#ffe6e8e9</color>
     <color name="text_color">#FF000000</color>
+    <color name="count_color">#696969</color>
 </resources>
