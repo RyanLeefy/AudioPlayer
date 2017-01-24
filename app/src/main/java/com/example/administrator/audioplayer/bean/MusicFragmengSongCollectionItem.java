@@ -8,12 +8,19 @@ package com.example.administrator.audioplayer.bean;
 
 public class MusicFragmengSongCollectionItem {
 
-    private long id;
+    private long id;   //暂无用，以后用于区分
+    private String cover_uri;      //封面图片Uri,fresco设置图片要用URI
     private String name;    //歌单名字
     private int songCount;  //歌的数量
 
     //private String albumArt;
     //private String author;
+
+    public MusicFragmengSongCollectionItem(int cover, String name, int songCount) {
+        this.cover_uri = "res:/" + cover;
+        this.name = name;
+        this.songCount = songCount;
+    }
 
 
     public String getName() {
@@ -30,6 +37,14 @@ public class MusicFragmengSongCollectionItem {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getCover_uri() {
+        return cover_uri;
+    }
+
+    public void setCover_uri(int cover) {
+        this.cover_uri = "res:/" + cover;
     }
 
     public int getSongCount() {

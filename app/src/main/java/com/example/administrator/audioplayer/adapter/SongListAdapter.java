@@ -1,20 +1,30 @@
 package com.example.administrator.audioplayer.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.MainActivity;
+import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,6 +35,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
     private Context mContext;
     private LayoutInflater mInflater;
+    private PopupWindow popupWindow;
 
     private List<MusicFragmentHeaderItem> headerItemsList;
     private List<MusicFragmentExpandItem> expandItemsList;
@@ -37,6 +48,12 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
     //全部item的集合，包括header，扩展栏，还有所有歌单，因为全在一个RecycleView里面控制，所以用一个全部item的集合来控制不同的显示
     private List allItems = new ArrayList();
+
+
+    //点击回调
+    private OnHeaderItemClickListener onHeaderItemClickListener;
+    private OnExpandItemClickListener onExpandItemClickListener;
+    private OnSongCollectionItemClickListener onSongCollectionItemClickListener;
 
 
     /**
@@ -60,8 +77,17 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
         this.create_songCollectionItemsList = create_songCollectionItemsList;
         this.collect_songCollectionItemsList = collect_songCollectionItemsList;
 
-        songCollectionItemsList.addAll(create_songCollectionItemsList);
-        songCollectionItemsList.addAll(collect_songCollectionItemsList);
+        if(create_songCollectionItemsList != null) {
+            songCollectionItemsList.addAll(create_songCollectionItemsList);
+        }
+        if(collect_songCollectionItemsList != null) {
+            songCollectionItemsList.addAll(collect_songCollectionItemsList);
+        }
+
+        allItems.addAll(headerItemsList);
+        allItems.add(expandItemsList.get(0));
+        allItems.addAll(create_songCollectionItemsList);
+        allItems.add(expandItemsList.get(1));
 
     }
 
@@ -76,6 +102,19 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
     public void setSongCollectionItemsList(List<MusicFragmengSongCollectionItem> songCollectionItemsList) {
         this.songCollectionItemsList = songCollectionItemsList;
     }
+
+    public void setOnHeaderItemClickListener(OnHeaderItemClickListener listener) {
+        this.onHeaderItemClickListener = listener;
+    }
+
+    public void setOnExpandItemClickListener(OnExpandItemClickListener listener) {
+        this.onExpandItemClickListener = listener;
+    }
+
+    public void setOnSongCollectionItemClickListener(OnSongCollectionItemClickListener listener) {
+        this.onSongCollectionItemClickListener = listener;
+    }
+
 
     @Override
     public ItemViewTag onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -95,31 +134,76 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
 
     @Override
-    public void onBindViewHolder(ItemViewTag holder, int position) {
-        //设置数据
+    public void onBindViewHolder(final ItemViewTag holder, final int position) {
+        //设置数据以及回调点击事件
         switch (getItemViewType(position)) {
             //header
             case 0:
-                //holder.icon.setImageResource();
-                holder.title.setText("本地音乐");
-                holder.count.setText("0");
+                MusicFragmentHeaderItem musicFragmentHeaderItem = (MusicFragmentHeaderItem) allItems.get(position);
+                holder.icon.setImageResource(musicFragmentHeaderItem.getIcon());
+                holder.title.setText(musicFragmentHeaderItem.getTitle());
+                holder.count.setText("(" + musicFragmentHeaderItem.getCount() + ")");
+                //回调点击事件
+                if(onHeaderItemClickListener != null) {
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onHeaderItemClickListener.onItemClick(holder.itemView, position);
+                        }
+                    });
+                }
+
                 break;
             //歌单
             case 1:
-               //holder.cover.setImageURI();
-               holder.name.setText("我喜欢的音乐");
-               holder.songcount.setText("0");
-               holder.songcollectionmore.setImageResource(R.drawable.list_icn_more);
+                MusicFragmengSongCollectionItem create_songCollectionItems = (MusicFragmengSongCollectionItem) allItems.get(position);
+                holder.cover.setImageURI(Uri.parse(create_songCollectionItems.getCover_uri()));
+                holder.name.setText(create_songCollectionItems.getName());
+                holder.songcount.setText(create_songCollectionItems.getSongCount() + "首");
+                holder.songcollectionmore.setImageResource(R.drawable.list_icn_more);
+
+                //回调点击事件
+                if(onSongCollectionItemClickListener != null) {
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onSongCollectionItemClickListener.onItemClick(holder.itemView, position);
+                        }
+                    });
+                    holder.songcollectionmore.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onSongCollectionItemClickListener.onMoreClick(holder.itemView, position);
+                        }
+                    });
+                }
                 break;
             //扩展栏-创建的歌单
             case 2:
                 holder.arrow.setImageResource(R.drawable.list_icn_arr_right);
-                holder.type.setText("创建的歌单");
+                holder.type.setText(expandItemsList.get(0).getTitle());
+                holder.songcollectioncount.setText("(" +expandItemsList.get(0).getSongCollectionCount() + ")");
+                //回调点击事件
+                if(onExpandItemClickListener != null) {
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onExpandItemClickListener.onItemClick(holder.itemView, position);
+                        }
+                    });
+                    holder.more.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onExpandItemClickListener.onMoreClick(holder.itemView, position);
+                        }
+                    });
+                }
                 break;
             //扩展栏-收藏的歌单
             case 3:
                 holder.arrow.setImageResource(R.drawable.list_icn_arr_right);
-                holder.type.setText("收藏的歌单");
+                holder.type.setText(expandItemsList.get(1).getTitle());
+                holder.songcollectioncount.setText("(" + expandItemsList.get(1).getSongCollectionCount() + ")");
                 break;
 
         }
@@ -128,7 +212,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
     @Override
     public int getItemCount() {
-        return 0;
+        return allItems == null ? 0 : allItems.size();
     }
 
 
@@ -156,54 +240,20 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
     }
 
 
-
-    private void setHeaderItemListener(ItemViewTag holder, int position) {
-        switch (position) {
-            //
-            case 0:
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-                break;
-            //
-            case 1:
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-                break;
-            //
-            case 2:
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-                break;
-            //
-            case 3:
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-                break;
-        }
+    //回调接口
+    public interface OnHeaderItemClickListener
+    {
+        void onItemClick(View view, int position);
     }
-
-    private void setExpandItemListener(int position) {
-
+    public interface OnExpandItemClickListener
+    {
+        void onItemClick(View view, int position);
+        void onMoreClick(View view, int position);
     }
-
-    private void setSongCollectionItemListener(int position){
-
+    public interface OnSongCollectionItemClickListener
+    {
+        void onItemClick(View view, int position);
+        void onMoreClick(View view, int position);
     }
 
 
@@ -212,12 +262,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
 
 
-
-
-    static class ItemViewTag extends RecyclerView.ViewHolder{
-        protected TextView title, count, type, name, songcount;
-        protected ImageView icon, arrow, more, songcollectionmore;
-        protected SimpleDraweeView cover;
+    public static class ItemViewTag extends RecyclerView.ViewHolder{
+        public TextView title, count, type, songcollectioncount, name, songcount;
+        public ImageView icon, arrow, more, songcollectionmore;
+        public SimpleDraweeView cover;
 
 
         public ItemViewTag(View itemView) {
@@ -230,6 +278,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
             //ExpandItem
             arrow = (ImageView) itemView.findViewById(R.id.img_arrow_expanditem);
             type = (TextView) itemView.findViewById(R.id.tv_title_expanditem);
+            songcollectioncount = (TextView) itemView.findViewById(R.id.tv_count_expanditem);
             more = (ImageView) itemView.findViewById(R.id.img_more_expanditem);
 
             //SongCollectionItem

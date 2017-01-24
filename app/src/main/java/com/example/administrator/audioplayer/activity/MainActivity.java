@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //用来保存两个导航图片，进行切换
     private ArrayList<ImageView> tabs = new ArrayList<>();
 
+    private MusicFragment musicFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tabs.add(img_music);
 
         NetFragment netFragment = new NetFragment();
-        MusicFragment musicFragment = new MusicFragment();
+        musicFragment = new MusicFragment();
 
         MainPagerAdapter mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mainPagerAdapter.addFragment(netFragment);
@@ -200,4 +202,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
+    @Override
+    public void onBackPressed(){
+        if(musicFragment.onBackPressed()) {
+            //返回true表示fragment关闭popupwindow，这里不用退出activity
+        } else {
+            //返回false表示fragment没有popupwindow，这里推出activity
+            super.onBackPressed();
+        }
+    }
+
 }

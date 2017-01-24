@@ -10,6 +10,13 @@ public class MusicFragmentHeaderItem {
     private String title;   //标题
     private int count;    //数量
 
+    public MusicFragmentHeaderItem(int icon, String title, int count) {
+        this.icon = icon;
+        this.title = title;
+        this.count = count;
+    }
+
+
     public int getCount() {
         return count;
     }
