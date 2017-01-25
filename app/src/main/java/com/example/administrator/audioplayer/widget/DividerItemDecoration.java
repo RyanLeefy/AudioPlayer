@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
@@ -26,7 +27,10 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private int mOrientation;
 
+    private Context mContext;
+
     public DividerItemDecoration(Context context, int orientation) {
+        mContext = context;
         TypedArray a = context.obtainStyledAttributes(ATTRS);
         mDivider = a.getDrawable(0);
         a.recycle();
@@ -60,19 +64,28 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             final View child = parent.getChildAt(i);
             SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag)parent.getChildViewHolder(child);
 
-
+            //最后一个头部headerItem不画分割线
             if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0 && i == 3) {
                 //left = parent.getPaddingLeft() + itemViewTag.icon.getWidth() +  itemViewTag.icon.getPaddingLeft();
                 continue;
             }
-
+            //其他头部headerItem画分隔线
             if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0) {
                 left = parent.getPaddingLeft() + itemViewTag.icon.getWidth() +  itemViewTag.icon.getPaddingLeft();
                 //continue;
             }
 
+            //如果是创建的最后一个歌单和收藏的最后一个歌单则不画下面的分割线
+            if ((parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1
+                    && i < childCount - 1
+                    && parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(parent.getChildAt(i + 1))) == 3)
+                    || (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 && (i == childCount - 1)) ) {
+                //left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  itemViewTag.cover.getPaddingLeft();
+                continue;
+            }
+            //其他歌单画分割线
             if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 ) {
-                left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  itemViewTag.cover.getPaddingLeft();
+                left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  dip2px(20);
                 //continue;
             }
 
@@ -131,5 +144,13 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
         }
     }
+
+    //dp转px
+    public int dip2px(float dipVlue) {
+        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
+        float sDensity = metrics.density;
+        return (int) (dipVlue * sDensity + 0.5F);//+0.5表示四舍五入
+    }
+
 
 }

@@ -1,30 +1,21 @@
 package com.example.administrator.audioplayer.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.activity.MainActivity;
-import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,16 +26,6 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
     private Context mContext;
     private LayoutInflater mInflater;
-    private PopupWindow popupWindow;
-
-    private List<MusicFragmentHeaderItem> headerItemsList;
-    private List<MusicFragmentExpandItem> expandItemsList;
-    //所有歌单
-    private List<MusicFragmengSongCollectionItem> songCollectionItemsList = new ArrayList<>();
-    //创建的歌单
-    private List<MusicFragmengSongCollectionItem> create_songCollectionItemsList;
-    //收藏的歌单
-    private List<MusicFragmengSongCollectionItem> collect_songCollectionItemsList;
 
     //全部item的集合，包括header，扩展栏，还有所有歌单，因为全在一个RecycleView里面控制，所以用一个全部item的集合来控制不同的显示
     private List allItems = new ArrayList();
@@ -56,51 +37,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
     private OnSongCollectionItemClickListener onSongCollectionItemClickListener;
 
 
-    /**
-     *
-     * @param context
-     * @param headerItemsList
-     * @param expandItemsList
-     * @param create_songCollectionItemsList
-     * @param collect_songCollectionItemsList
-     */
-    public SongListAdapter(Context context,
-                           List<MusicFragmentHeaderItem> headerItemsList,
-                           List<MusicFragmentExpandItem> expandItemsList,
-                           List<MusicFragmengSongCollectionItem> create_songCollectionItemsList,
-                           List<MusicFragmengSongCollectionItem> collect_songCollectionItemsList) {
-
+    public SongListAdapter(Context context, List allItems) {
         mContext = context;
         mInflater = LayoutInflater.from(mContext);
-        this.headerItemsList = headerItemsList;
-        this.expandItemsList = expandItemsList;
-        this.create_songCollectionItemsList = create_songCollectionItemsList;
-        this.collect_songCollectionItemsList = collect_songCollectionItemsList;
-
-        if(create_songCollectionItemsList != null) {
-            songCollectionItemsList.addAll(create_songCollectionItemsList);
-        }
-        if(collect_songCollectionItemsList != null) {
-            songCollectionItemsList.addAll(collect_songCollectionItemsList);
-        }
-
-        allItems.addAll(headerItemsList);
-        allItems.add(expandItemsList.get(0));
-        allItems.addAll(create_songCollectionItemsList);
-        allItems.add(expandItemsList.get(1));
-
-    }
-
-    public void setHeaderItemsList(List<MusicFragmentHeaderItem> headerItemsList) {
-        this.headerItemsList = headerItemsList;
-    }
-
-    public void setExpandItemsList(List<MusicFragmentExpandItem> expandItemsList) {
-        this.expandItemsList = expandItemsList;
-    }
-
-    public void setSongCollectionItemsList(List<MusicFragmengSongCollectionItem> songCollectionItemsList) {
-        this.songCollectionItemsList = songCollectionItemsList;
+        this.allItems = allItems;
     }
 
     public void setOnHeaderItemClickListener(OnHeaderItemClickListener listener) {
@@ -113,6 +53,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
     public void setOnSongCollectionItemClickListener(OnSongCollectionItemClickListener listener) {
         this.onSongCollectionItemClickListener = listener;
+    }
+
+    public void updateAdapter(List allItems) {
+       this.allItems = allItems;
     }
 
 
@@ -139,10 +83,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
         switch (getItemViewType(position)) {
             //header
             case 0:
-                MusicFragmentHeaderItem musicFragmentHeaderItem = (MusicFragmentHeaderItem) allItems.get(position);
-                holder.icon.setImageResource(musicFragmentHeaderItem.getIcon());
-                holder.title.setText(musicFragmentHeaderItem.getTitle());
-                holder.count.setText("(" + musicFragmentHeaderItem.getCount() + ")");
+                MusicFragmentHeaderItem headerItem = (MusicFragmentHeaderItem) allItems.get(position);
+                holder.icon.setImageResource(headerItem.getIcon());
+                holder.title.setText(headerItem.getTitle());
+                holder.count.setText("(" + headerItem.getCount() + ")");
                 //回调点击事件
                 if(onHeaderItemClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +96,6 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                         }
                     });
                 }
-
                 break;
             //歌单
             case 1:
@@ -178,17 +121,18 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                     });
                 }
                 break;
-            //扩展栏-创建的歌单
-            case 2:
+            default:
+                //扩展栏 两个扩展栏视图都是一样的 不同的东西在外部添加点击事件的时候区分
+                MusicFragmentExpandItem expandItem = (MusicFragmentExpandItem) allItems.get(position);
                 holder.arrow.setImageResource(R.drawable.list_icn_arr_right);
-                holder.type.setText(expandItemsList.get(0).getTitle());
-                holder.songcollectioncount.setText("(" +expandItemsList.get(0).getSongCollectionCount() + ")");
+                holder.type.setText(expandItem.getTitle());
+                holder.songcollectioncount.setText("(" +expandItem.getSongCollectionCount() + ")");
                 //回调点击事件
                 if(onExpandItemClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onExpandItemClickListener.onItemClick(holder.itemView, position);
+                            onExpandItemClickListener.onItemClick(holder, position);
                         }
                     });
                     holder.more.setOnClickListener(new View.OnClickListener() {
@@ -199,16 +143,9 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                     });
                 }
                 break;
-            //扩展栏-收藏的歌单
-            case 3:
-                holder.arrow.setImageResource(R.drawable.list_icn_arr_right);
-                holder.type.setText(expandItemsList.get(1).getTitle());
-                holder.songcollectioncount.setText("(" + expandItemsList.get(1).getSongCollectionCount() + ")");
-                break;
-
         }
-
     }
+
 
     @Override
     public int getItemCount() {
@@ -230,15 +167,17 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
         if (allItems.get(position) instanceof MusicFragmengSongCollectionItem) {
             return 1;
         }
-        //如果是扩展栏--创建的歌单，返回type为2
         if (allItems.get(position) instanceof MusicFragmentExpandItem) {
+            //如果是扩展栏--创建的歌单，返回type为2
             if (((MusicFragmentExpandItem) allItems.get(position)).getType() == MusicFragmentExpandItem.TYPE_CREATE)
                 return 2;
+            else {
+                //如果是扩展栏--收藏的歌单，返回type为3
+                return 3;
+            }
         }
-        //如果是扩展栏--收藏的歌单，返回type为3
-        return 3;
+        return -1;
     }
-
 
     //回调接口
     public interface OnHeaderItemClickListener
@@ -247,7 +186,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
     }
     public interface OnExpandItemClickListener
     {
-        void onItemClick(View view, int position);
+        void onItemClick(RecyclerView.ViewHolder holder, int position);
         void onMoreClick(View view, int position);
     }
     public interface OnSongCollectionItemClickListener
@@ -259,14 +198,15 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
 
 
 
-
-
-
     public static class ItemViewTag extends RecyclerView.ViewHolder{
         public TextView title, count, type, songcollectioncount, name, songcount;
         public ImageView icon, arrow, more, songcollectionmore;
         public SimpleDraweeView cover;
 
+        //创建歌单栏展开否
+        public boolean createdExpanded = true;
+        //收藏歌单栏展开否
+        public boolean collectExpanded = true;
 
         public ItemViewTag(View itemView) {
             super(itemView);
