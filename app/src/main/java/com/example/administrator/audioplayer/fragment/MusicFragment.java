@@ -1,11 +1,9 @@
 package com.example.administrator.audioplayer.fragment;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.LinearInterpolator;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -45,6 +45,15 @@ public class MusicFragment extends MyFragment {
     private Context mContext;
     private LayoutInflater mInflater;
     private PopupWindow popupWindow;
+
+
+    //所有数据源，即需要放入recycleview中的所有item
+    private List allItems;
+
+
+    //收藏歌单栏展开否
+    public boolean collectExpanded = true;
+
 
 
     @Override
@@ -80,7 +89,7 @@ public class MusicFragment extends MyFragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
-
+        //TODO 获取并填充数据
         //先获取Header数据，Expand数据，create歌单数据和collect歌单数据
         //初始化SongListAdapter,
         //recyclerView.setAdapter();
@@ -93,21 +102,31 @@ public class MusicFragment extends MyFragment {
                         new MusicFragmentHeaderItem(R.drawable.music_icn_download, "下载管理", 0),
                         new MusicFragmentHeaderItem(R.drawable.music_icn_artist, "我的歌手", 0)));
 
-        List<MusicFragmentExpandItem> expandItemList = new ArrayList<>(
-                Arrays.asList(new MusicFragmentExpandItem(1, "创建的歌单",1),
-                        new MusicFragmentExpandItem(2, "收藏的歌单",0)));
 
-        List<MusicFragmengSongCollectionItem> songCollectionItems = new ArrayList<>();
-        songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我喜欢的音乐", 0));
 
-        final List allItems = new ArrayList();
+        final List<MusicFragmengSongCollectionItem> create_songCollectionItems = new ArrayList<>();
+        create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我喜欢的音乐", 0));
+        create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "粤语歌单", 0));
+
+        final List<MusicFragmengSongCollectionItem> collect_songCollectionItems = new ArrayList<>();
+        collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我收藏的音乐", 0));
+        collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "英文歌", 0));
+
+        final List<MusicFragmentExpandItem> expandItemList = new ArrayList<>(
+                Arrays.asList(new MusicFragmentExpandItem(MusicFragmentExpandItem.TYPE_CREATE, "创建的歌单", create_songCollectionItems.size()),
+                        new MusicFragmentExpandItem(MusicFragmentExpandItem.TYPE_COLLECT, "收藏的歌单", collect_songCollectionItems.size())));
+
+        allItems = new ArrayList();
         allItems.addAll(headerItemList);
         allItems.add(expandItemList.get(0));
-        allItems.addAll(songCollectionItems);
+        allItems.addAll(create_songCollectionItems);
         allItems.add(expandItemList.get(1));
+        allItems.addAll(collect_songCollectionItems);
 
 
-        SongListAdapter adapter = new SongListAdapter(mContext, headerItemList,expandItemList,songCollectionItems,null);
+        final SongListAdapter adapter = new SongListAdapter(mContext, allItems);
+
+        //给headeritem添加点击事件
         adapter.setOnHeaderItemClickListener(new SongListAdapter.OnHeaderItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -131,46 +150,134 @@ public class MusicFragment extends MyFragment {
                 }
             }
         });
-
+        //给expanditem添加点击事件
         adapter.setOnExpandItemClickListener(new SongListAdapter.OnExpandItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void onItemClick(RecyclerView.ViewHolder holder, int position) {
 
+                SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag)holder;
+                ObjectAnimator anim = ObjectAnimator.ofFloat(itemViewTag.arrow, "rotation", 90, 0);
+                anim.setDuration(100);
+                anim.setRepeatCount(0);
+                anim.setInterpolator(new LinearInterpolator());
+
+                if (itemViewTag.getItemViewType() == 2) {            //判断类型，创建的歌单
+                        //已展开则合上
+                    if (itemViewTag.createdExpanded) {
+                        anim.start();
+                        //TODO 刷新列表
+                        allItems.removeAll(create_songCollectionItems);
+                        //adapter.removeCollecteSongList(collect_songCollectionItems);
+                        itemViewTag.createdExpanded = false;
+                    } else {
+                        //未展开则展开
+                        //TODO 刷新列表
+                        anim.reverse();
+                        //这里要分情况，分收藏的歌单是否打开
+                        //若打开了，则要先去掉收藏的歌单，最后再添加上  否则不用处理收藏的歌单
+                        //这里根据本地的collectExpanded变量来进行判断，因为无法获取到下一个expanditem里面的collectExpanded状态
+                        if(collectExpanded) {
+                            allItems.removeAll(collect_songCollectionItems);
+                            allItems.remove(expandItemList.get(1));
+                            allItems.addAll(create_songCollectionItems);
+                            allItems.add(expandItemList.get(1));
+                            allItems.addAll(collect_songCollectionItems);
+                        } else {
+                            allItems.remove(expandItemList.get(1));
+                            allItems.addAll(create_songCollectionItems);
+                            allItems.add(expandItemList.get(1));
+                        }
+                        itemViewTag.createdExpanded = true;
+                    }
+                } else if (itemViewTag.getItemViewType() == 3) {     //判断类型，收藏的歌单
+                    //已展开则合上
+                    //此处把collectExpanded状态存至本地变量中
+                    collectExpanded = itemViewTag.collectExpanded;
+                    if (collectExpanded) {
+                        anim.start();
+                        //TODO 刷新列表
+                        allItems.removeAll(collect_songCollectionItems);
+                        itemViewTag.collectExpanded = false;
+                        //同步本地状态
+                        collectExpanded = false;
+                    } else {
+                        //未展开则展开
+                        anim.reverse();
+                        //TODO 刷新列表
+                        allItems.addAll(collect_songCollectionItems);
+                        itemViewTag.collectExpanded = true;
+                        //同步本地状态
+                        collectExpanded = true;
+                    }
+                }
+                adapter.updateAdapter(allItems);   //更新数据
+                adapter.notifyDataSetChanged();    //刷新界面
             }
 
             @Override
             public void onMoreClick(View view, int position) {
                 LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.popupwindow_menu_songlistmore, null);
-                ShowPopUpWindow(view, layout);
+
                 TextView popuptitle = (TextView) layout.findViewById(R.id.tv_title_popupwindow);
                 ListView popuplistview = (ListView) layout.findViewById(R.id.ls_songlistmore_popupwindow);
+
+                //添加弹窗菜单数据源
                 MusicFragmentExpandItem musicFragmentExpandItem = (MusicFragmentExpandItem) allItems.get(position);
                 popuptitle.setText(musicFragmentExpandItem.getTitle());
-                PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(mContext,
+                final PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(mContext,
                         Arrays.asList(new LeftMenuItem(R.drawable.popupwindow_menu_createlist, "创建新歌单")));
                 popuplistview.setAdapter(adapter);
+                //添加弹窗菜单点击事件
+                popuplistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        //点击创建新歌单
+                        if(position == 0) {
+                            Toast.makeText(mContext, "创建新歌单", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                //初始化并弹出popupWindow
+                ShowPopUpWindow(view, layout);
             }
         });
-
+        //给歌单添加点击事件
         adapter.setOnSongCollectionItemClickListener(new SongListAdapter.OnSongCollectionItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 //跳转到歌单里面
-                Toast.makeText(mContext, "进入歌单",Toast.LENGTH_SHORT).show();
+                MusicFragmengSongCollectionItem songCollectionItem = (MusicFragmengSongCollectionItem)allItems.get(position);
+                Toast.makeText(mContext, "进入歌单:" + songCollectionItem.getName(),Toast.LENGTH_SHORT).show();
             }
             @Override
-            public void onMoreClick(View view, int position){
+            public void onMoreClick(View view, final int position){
                 LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.popupwindow_menu_songlistmore, null);
-                ShowPopUpWindow(view, layout);
+
                 TextView popuptitle = (TextView) layout.findViewById(R.id.tv_title_popupwindow);
                 ListView popuplistview = (ListView) layout.findViewById(R.id.ls_songlistmore_popupwindow);
+
+                //添加弹窗菜单数据源
                 MusicFragmengSongCollectionItem create_songCollectionItems = (MusicFragmengSongCollectionItem) allItems.get(position);
                 popuptitle.setText("歌单:  " + create_songCollectionItems.getName());
                 PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(mContext,
                         Arrays.asList( new LeftMenuItem(R.drawable.popupwindow_menu_delete, "删除"),
                                 new LeftMenuItem(R.drawable.popupwindow_menu_manage, "编辑歌单信息")));
                 popuplistview.setAdapter(adapter);
-
+                //添加弹窗菜单点击事件
+                popuplistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View childview, int childposition, long id) {
+                        //点击创建新歌单
+                        MusicFragmengSongCollectionItem songCollectionItem = (MusicFragmengSongCollectionItem)allItems.get(position);
+                        if(childposition == 0) {
+                            Toast.makeText(mContext, "删除:" + songCollectionItem.getName(), Toast.LENGTH_SHORT).show();
+                        } else if (childposition == 1) {
+                            Toast.makeText(mContext, "编辑歌单信息:" + songCollectionItem.getName(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                //初始化并弹出popupWindow
+                ShowPopUpWindow(view, layout);
             }
         });
 
