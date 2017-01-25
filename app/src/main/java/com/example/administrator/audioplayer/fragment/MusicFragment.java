@@ -2,6 +2,7 @@ package com.example.administrator.audioplayer.fragment;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.LocalMusicActivity;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
@@ -133,6 +135,8 @@ public class MusicFragment extends MyFragment {
                 switch (position) {
                     case 0:
                         //跳转到LocalMusicActivity
+                        Intent i = new Intent(mContext, LocalMusicActivity.class);
+                        startActivity(i);
                         Toast.makeText(mContext, "本地播放", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
