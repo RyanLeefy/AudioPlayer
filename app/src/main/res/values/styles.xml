@@ -23,4 +23,10 @@
         <item name="android:windowExitAnimation">@anim/dialog_exit_fade_out</item>
     </style>
 
+    <!-- 底部弹窗菜单动画 -->
+    <style name="Popupwindow">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+
 </resources>
