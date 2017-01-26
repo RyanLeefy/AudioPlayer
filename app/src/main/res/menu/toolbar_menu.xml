@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/actionbar_search"
+        android:title="搜索"
+        android:icon="@drawable/actionbar_search"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/actionbar_scanitem"
+        android:title="扫描本地歌曲"
+        android:icon="@drawable/actionbar_scan"
+        app:showAsAction="never" />
+</menu>
