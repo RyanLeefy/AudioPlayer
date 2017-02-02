@@ -16,11 +16,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
+import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Method;
 
@@ -29,6 +29,7 @@ public class LocalMusicFragment extends Fragment {
 
     private Callback callback;
     private LayoutInflater mInflater;
+    private View view;
 
     public LocalMusicFragment() {
         // Required empty public constructor
@@ -48,10 +49,10 @@ public class LocalMusicFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mInflater = inflater;
-        View view =  inflater.inflate(R.layout.fragment_local_music, container, false);
+        view =  inflater.inflate(R.layout.fragment_local_music, container, false);
 
 
-        setToolbar(view);
+        setToolbar();
 
         RecycleViewWithEmptyView rv = (RecycleViewWithEmptyView) view.findViewById(R.id.rv_local_music_fragment);
         View emptyview = mInflater.inflate(R.layout.nomusic_emptyview_recycleview, container, false);
@@ -82,21 +83,40 @@ public class LocalMusicFragment extends Fragment {
     }
 
 
-    private void setToolbar(View view) {
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+    public void setToolbar() {
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.tb_local_music_fragment);
         toolbar.setTitle("本地播放");
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
+
+        //toolbar.inflateMenu(R.menu.toolbar_menu);
+        //toolbar.setNavigationIcon(R.drawable.toolbar_back);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().finish();
+            }
+        });
+
+
+        callback.initToolbar(toolbar);
+
+        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
+
 
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.actionbar_search:
+                        callback.showLocalSearchFragment();
                         Toast.makeText(getActivity(), "search", Toast.LENGTH_SHORT).show();
                         break;
+                    //case android.R.id.home:
+                    //   Logger.d("music home");
+                    //   getActivity().finish();
                 }
                 return true;
             }
@@ -105,11 +125,28 @@ public class LocalMusicFragment extends Fragment {
     }
 
 
+/*
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+            case R.id.actionbar_search:
+                callback.showLocalSearchFragment();
+                break;
+            case android.R.id.home:
+                Logger.d("music home");
+                getActivity().finish();
+        }
+        return true;
+    }
+*/
+
 
 
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.toolbar_menu, menu);
         super.onCreateOptionsMenu(menu,inflater);
     }
@@ -145,5 +182,6 @@ public class LocalMusicFragment extends Fragment {
     public interface Callback {
         // TODO: Update argument type and name
         void showLocalSearchFragment();
+        void initToolbar(Toolbar toolbar);
     }
 }

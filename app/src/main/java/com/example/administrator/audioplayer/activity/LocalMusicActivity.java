@@ -36,9 +36,10 @@ public class LocalMusicActivity extends AppCompatActivity
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.localmusic_fragment_container, localMusicFragment);
-        transaction.add(R.id.localmusic_fragment_container, localSearchFragment);
-        transaction.hide(localSearchFragment);
+        //transaction.add(R.id.localmusic_fragment_container, localSearchFragment);
+        //transaction.hide(localSearchFragment);
         transaction.commit();
+
 
     }
 
@@ -48,19 +49,32 @@ public class LocalMusicActivity extends AppCompatActivity
         if (type == 1) {
             if(localMusicFragment != null) {
                 fragmentManager.beginTransaction().show(localMusicFragment).commit();
+                localMusicFragment.setToolbar();
+                //fragmentManager.beginTransaction().replace(R.id.localmusic_fragment_container, localMusicFragment).commit();
             }
+
             if(localSearchFragment != null) {
                 fragmentManager.beginTransaction().hide(localSearchFragment).commit();
+                //fragmentManager.beginTransaction().replace(R.id.localmusic_fragment_container, localSearchFragment).commit();
             }
         } else if (type == 2) {
             if(localSearchFragment != null) {
-                fragmentManager.beginTransaction().show(localSearchFragment).commit();
-                //transaction.show(localSearchFragment);
+                //fragmentManager.beginTransaction().add(R.id.localmusic_fragment_container, localSearchFragment)
+                //.hide(localMusicFragment).commit();
+                //fragmentManager.beginTransaction().show(localSearchFragment).commit();
+                //localSearchFragment.setToolbar();
+                fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.localmusic_fragment_container, localSearchFragment).commit();
+
+                //transaction.show( localSearchFragment);
             }
+
+            /*
             if(localMusicFragment != null) {
                 fragmentManager.beginTransaction().hide(localMusicFragment).commit();
+                //fragmentManager.beginTransaction().replace(R.id.localmusic_fragment_container, localMusicFragment).commit();
+
                 //transaction.hide(localMusicFragment);
-            }
+            }*/
         }
     }
 
@@ -69,11 +83,16 @@ public class LocalMusicActivity extends AppCompatActivity
         ShowFragment(2);
     }
 
+
     @Override
     public void showLocalMusicFragment() {
         ShowFragment(1);
     }
 
+    @Override
+    public void initToolbar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+    }
 
 
 

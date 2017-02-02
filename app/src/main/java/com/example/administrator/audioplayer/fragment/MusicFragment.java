@@ -3,8 +3,11 @@ package com.example.administrator.audioplayer.fragment;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +33,7 @@ import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionIte
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +44,7 @@ import java.util.List;
  * Created on 2017/1/22.
  */
 
-public class MusicFragment extends MyFragment {
+public class MusicFragment extends Fragment {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
@@ -311,9 +315,10 @@ public class MusicFragment extends MyFragment {
 
         //popupwindow获取焦点，点击其他地方消失
         popupWindow.setFocusable(true);
-        popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
+        //popupWindow.setOutsideTouchable(true);
 
-        backgroundAlpha(0.7f);
+        popupWindow.setBackgroundDrawable(new ColorDrawable());
+
 
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -322,6 +327,9 @@ public class MusicFragment extends MyFragment {
                 backgroundAlpha(1f);
             }
         });
+
+        backgroundAlpha(0.7f);
+        popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
     }
 
 
@@ -336,17 +344,4 @@ public class MusicFragment extends MyFragment {
         getActivity().getWindow().setAttributes(lp);
     }
 
-
-    //在activity中的onBackPress()中调用
-    @Override
-    public boolean onBackPressed() {
-        //可以关闭popupwindow的话返回true，否则返回false
-        if (popupWindow != null && popupWindow.isShowing()) {
-            popupWindow.dismiss();
-            backgroundAlpha(1f);
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

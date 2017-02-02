@@ -20,6 +20,7 @@ import com.example.administrator.audioplayer.adapter.MainPagerAdapter;
 import com.example.administrator.audioplayer.fragment.MusicFragment;
 import com.example.administrator.audioplayer.fragment.NetFragment;
 import com.example.administrator.audioplayer.widget.SplashScreen;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
@@ -203,14 +204,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onBackPressed(){
-        if(musicFragment.onBackPressed()) {
-            //返回true表示fragment关闭popupwindow，这里不用退出activity
-        } else {
-            //返回false表示fragment没有popupwindow，这里推出activity
-            super.onBackPressed();
-        }
-    }
 
 }

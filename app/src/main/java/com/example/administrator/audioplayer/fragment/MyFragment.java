@@ -7,5 +7,5 @@ import android.support.v4.app.Fragment;
  * Created on 2017/1/24.
  */
 public abstract class MyFragment extends Fragment {
-    public abstract boolean onBackPressed();
+
 }
