@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,10 +21,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
 import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class LocalMusicFragment extends Fragment {
@@ -51,14 +57,22 @@ public class LocalMusicFragment extends Fragment {
         mInflater = inflater;
         view =  inflater.inflate(R.layout.fragment_local_music, container, false);
 
-
         setToolbar();
 
         RecycleViewWithEmptyView rv = (RecycleViewWithEmptyView) view.findViewById(R.id.rv_local_music_fragment);
-        View emptyview = mInflater.inflate(R.layout.nomusic_emptyview_recycleview, container, false);
+
+        //View emptyview = mInflater.inflate(R.layout.nomusic_emptyview_recycleview, container, false);
+        View emptyview = view.findViewById(R.id.id_empty_view);
+        rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rv.setHasFixedSize(true);
+        //rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+
+        List list = new ArrayList<>();
+        //list.add("1");
+        //list.add("2");
+        LocalMusicAdapter adapter = new LocalMusicAdapter(getActivity(), list);
+        rv.setAdapter(adapter);
         rv.setEmptyView(emptyview);
-
-
 
         return view;
     }
@@ -87,45 +101,14 @@ public class LocalMusicFragment extends Fragment {
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.tb_local_music_fragment);
         toolbar.setTitle("本地播放");
 
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
-        //toolbar.inflateMenu(R.menu.toolbar_menu);
-        //toolbar.setNavigationIcon(R.drawable.toolbar_back);
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().finish();
-            }
-        });
-
-
-        callback.initToolbar(toolbar);
-
-        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-
-
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.actionbar_search:
-                        callback.showLocalSearchFragment();
-                        Toast.makeText(getActivity(), "search", Toast.LENGTH_SHORT).show();
-                        break;
-                    //case android.R.id.home:
-                    //   Logger.d("music home");
-                    //   getActivity().finish();
-                }
-                return true;
-            }
-        });
 
     }
 
 
-/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -134,14 +117,10 @@ public class LocalMusicFragment extends Fragment {
                 callback.showLocalSearchFragment();
                 break;
             case android.R.id.home:
-                Logger.d("music home");
                 getActivity().finish();
         }
         return true;
     }
-*/
-
-
 
 
     @Override
@@ -182,6 +161,5 @@ public class LocalMusicFragment extends Fragment {
     public interface Callback {
         // TODO: Update argument type and name
         void showLocalSearchFragment();
-        void initToolbar(Toolbar toolbar);
     }
 }

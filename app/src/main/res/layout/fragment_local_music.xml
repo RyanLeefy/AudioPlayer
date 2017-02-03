@@ -18,12 +18,20 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
 
-    <com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView
-        android:layout_below="@+id/tb_local_music_fragment"
-        android:id="@+id/rv_local_music_fragment"
-        android:layout_width="match_parent"
+    <RelativeLayout
         android:layout_height="match_parent"
-        />
+        android:layout_width="match_parent"
+        android:layout_below="@+id/tb_local_music_fragment">
 
+        <com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView
+            android:id="@+id/rv_local_music_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/id_empty_view"
+            layout="@layout/nomusic_emptyview_recycleview"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

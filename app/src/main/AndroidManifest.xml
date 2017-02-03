@@ -26,8 +26,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activity.LocalMusicActivity" />
-        <activity android:name=".activity.ScanMusicActivity" />
+        <activity android:name=".activity.LocalMusicActivity"
+            android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".activity.RecentActivity" />
         <activity android:name=".activity.DownActivity" />
         <activity android:name=".activity.MyArtistActivity"></activity>

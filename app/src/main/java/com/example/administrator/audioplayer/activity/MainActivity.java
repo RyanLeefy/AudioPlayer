@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //用来保存两个导航图片，进行切换
     private ArrayList<ImageView> tabs = new ArrayList<>();
 
-    private MusicFragment musicFragment;
 
 
     @Override
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tabs.add(img_music);
 
         NetFragment netFragment = new NetFragment();
-        musicFragment = new MusicFragment();
+        MusicFragment musicFragment = new MusicFragment();
 
         MainPagerAdapter mainPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mainPagerAdapter.addFragment(netFragment);

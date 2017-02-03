@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 /**
+ * 适用于在同一activity中不同fragment中使用不同toolbar
  * Created on 2017/2/2 0002.
  */
 

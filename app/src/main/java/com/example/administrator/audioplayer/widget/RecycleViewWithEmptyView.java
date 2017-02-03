@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.orhanobut.logger.Logger;
+
 /**
  * 自定义RecycleView,重写AdapterDataObserver，监听数据的变动，重写setAdapter，为adapter设置该该Observer
  * Created on 2017/1/26.
@@ -33,11 +35,11 @@ public class RecycleViewWithEmptyView extends RecyclerView {
     };
 
     public RecycleViewWithEmptyView(Context context) {
-        this(context, null);
+        super(context, null);
     }
 
     public RecycleViewWithEmptyView(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs, 0);
     }
 
     public RecycleViewWithEmptyView(Context context, @Nullable AttributeSet attrs, int defStyle) {
@@ -65,9 +67,11 @@ public class RecycleViewWithEmptyView extends RecyclerView {
     }
 
     private void checkIfEmpty() {
+        Logger.d("check");
         if (emptyView != null && getAdapter() != null) {
             final boolean emptyViewVisible =
                     getAdapter().getItemCount() == 0;
+            Logger.d("check" + getAdapter().getItemCount());
             emptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
             setVisibility(emptyViewVisible ? GONE : VISIBLE);
         }

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
+import com.example.administrator.audioplayer.Iview.ILocalMusicView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
@@ -14,7 +15,7 @@ import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
  * 本地音乐界面
  */
 public class LocalMusicActivity extends AppCompatActivity
-        implements LocalMusicFragment.Callback, LocalSearchFragment.Callback {
+        implements ILocalMusicView, LocalMusicFragment.Callback, LocalSearchFragment.Callback {
 
 
     private FragmentTransaction transaction;
@@ -36,8 +37,6 @@ public class LocalMusicActivity extends AppCompatActivity
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.localmusic_fragment_container, localMusicFragment);
-        //transaction.add(R.id.localmusic_fragment_container, localSearchFragment);
-        //transaction.hide(localSearchFragment);
         transaction.commit();
 
 
@@ -48,33 +47,13 @@ public class LocalMusicActivity extends AppCompatActivity
     public void ShowFragment(int type) {
         if (type == 1) {
             if(localMusicFragment != null) {
-                fragmentManager.beginTransaction().show(localMusicFragment).commit();
-                localMusicFragment.setToolbar();
-                //fragmentManager.beginTransaction().replace(R.id.localmusic_fragment_container, localMusicFragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.localmusic_fragment_container, localMusicFragment).commit();
             }
 
-            if(localSearchFragment != null) {
-                fragmentManager.beginTransaction().hide(localSearchFragment).commit();
-                //fragmentManager.beginTransaction().replace(R.id.localmusic_fragment_container, localSearchFragment).commit();
-            }
         } else if (type == 2) {
             if(localSearchFragment != null) {
-                //fragmentManager.beginTransaction().add(R.id.localmusic_fragment_container, localSearchFragment)
-                //.hide(localMusicFragment).commit();
-                //fragmentManager.beginTransaction().show(localSearchFragment).commit();
-                //localSearchFragment.setToolbar();
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.localmusic_fragment_container, localSearchFragment).commit();
-
-                //transaction.show( localSearchFragment);
             }
-
-            /*
-            if(localMusicFragment != null) {
-                fragmentManager.beginTransaction().hide(localMusicFragment).commit();
-                //fragmentManager.beginTransaction().replace(R.id.localmusic_fragment_container, localMusicFragment).commit();
-
-                //transaction.hide(localMusicFragment);
-            }*/
         }
     }
 
@@ -88,12 +67,6 @@ public class LocalMusicActivity extends AppCompatActivity
     public void showLocalMusicFragment() {
         ShowFragment(1);
     }
-
-    @Override
-    public void initToolbar(Toolbar toolbar) {
-        setSupportActionBar(toolbar);
-    }
-
 
 
 }

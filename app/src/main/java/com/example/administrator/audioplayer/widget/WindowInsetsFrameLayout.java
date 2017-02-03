@@ -11,6 +11,9 @@ import android.widget.FrameLayout;
  * Created by  on 2017/2/3 0003.
  */
 
+/**
+ * 暂时无用
+ */
 public class WindowInsetsFrameLayout extends FrameLayout {
     public WindowInsetsFrameLayout(Context context) {
         super(context);
