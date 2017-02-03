@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
 
@@ -15,7 +16,7 @@ import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
  * 本地音乐界面
  */
 public class LocalMusicActivity extends AppCompatActivity
-        implements ILocalMusicView, LocalMusicFragment.Callback, LocalSearchFragment.Callback {
+        implements LocalMusicFragment.Callback, LocalSearchFragment.Callback {
 
 
     private FragmentTransaction transaction;

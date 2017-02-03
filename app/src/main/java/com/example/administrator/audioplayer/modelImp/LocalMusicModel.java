@@ -10,6 +10,7 @@ import com.example.administrator.audioplayer.Imodel.ILocalMusicModel;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.utils.MyCompositeSubscription;
+import com.orhanobut.logger.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,10 +49,14 @@ public class LocalMusicModel implements ILocalMusicModel{
     public void getLocalMusic(Subscriber<List<MusicInfo>> subscriber) {
         Observable observable = Observable.create(new Observable.OnSubscribe<List>() {
             @Override
-            public void call(Subscriber<? super List> subscriber ) {
+            public void call(Subscriber<? super List> subscriber) {
+                Logger.d("call");
                 subscriber.onNext(ScanLocalMusic());
                 subscriber.onCompleted();
+                Logger.d("aftercompleted");
             }
+
+
         });
 
         mSubscriptions = MyCompositeSubscription.getNewCompositeSubIfUnsubscribed(mSubscriptions);

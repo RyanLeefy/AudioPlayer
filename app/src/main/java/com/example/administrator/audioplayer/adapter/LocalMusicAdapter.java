@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.bean.MusicInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +67,8 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 break;
            //歌曲item
             case 1:
-                ((MusicItemViewHolder) holder).mainTitle.setText("我是歌曲名字");
-                ((MusicItemViewHolder) holder).title.setText("歌手名字");
+                ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(position - 1)).getMusicName());
+                ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(position - 1)).getArtist());
                 break;
             default:
 

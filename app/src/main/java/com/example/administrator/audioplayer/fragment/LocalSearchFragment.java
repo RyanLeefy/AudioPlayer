@@ -37,8 +37,8 @@ public class LocalSearchFragment extends Fragment implements SearchView.OnQueryT
     private SearchView mSearchView;
     private InputMethodManager mImm;
     private Callback callback;
-    private LayoutInflater mInflater;
     private View view;
+    private RecycleViewWithEmptyView rv;
 
     public LocalSearchFragment() {
         // Required empty public constructor
@@ -58,7 +58,6 @@ public class LocalSearchFragment extends Fragment implements SearchView.OnQueryT
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mInflater = inflater;
         view =  inflater.inflate(R.layout.fragment_local_search, container, false);
 
         setToolbar();
@@ -71,7 +70,7 @@ public class LocalSearchFragment extends Fragment implements SearchView.OnQueryT
         mSearchView.setIconifiedByDefault(false);
 
 
-        RecycleViewWithEmptyView rv = (RecycleViewWithEmptyView) view.findViewById(R.id.rv_local_search_fragment);
+        rv = (RecycleViewWithEmptyView) view.findViewById(R.id.rv_local_search_fragment);
         //View emptyview = inflater.inflate(R.layout.nomusic_emptyview_recycleview, container, false);
         View emptyview = view.findViewById(R.id.id_empty_view);
         rv.setEmptyView(emptyview);

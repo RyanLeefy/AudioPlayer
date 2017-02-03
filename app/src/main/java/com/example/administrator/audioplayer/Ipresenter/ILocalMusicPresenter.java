@@ -5,6 +5,6 @@ package com.example.administrator.audioplayer.Ipresenter;
  */
 
 public interface ILocalMusicPresenter {
-    void onCreate();
+    void onCreateView();
     void onDestroy();
 }
