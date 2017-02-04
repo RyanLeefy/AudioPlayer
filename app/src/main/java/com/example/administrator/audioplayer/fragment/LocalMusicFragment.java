@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
@@ -36,6 +37,18 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
     public LocalMusicFragment() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Callback) {
+            callback = (Callback) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -68,20 +81,6 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
 
         return view;
     }
-
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Callback) {
-            callback = (Callback) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
 
 
 
@@ -145,15 +144,38 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
         super.onPrepareOptionsMenu(menu);
     }
 
-    @Override
-    public void setAdapter(LocalMusicAdapter adapter) {
-        rv.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void setAdapter(LocalMusicAdapter adapter) {
+       //获取回来的adapter先设置监听事件，然后再设置给recycleView
+        adapter.setOnPlayAllItemClickListener(new LocalMusicAdapter.OnPlayAllItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Toast.makeText(getActivity(), "播放全部", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onMoreClick(View view, int position) {
+                Toast.makeText(getActivity(), "更多", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        adapter.setOnMusicItemClickListener(new LocalMusicAdapter.OnMusicItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                //获取点击的MusicInfo实体类((LocalMusicAdapter)rv.getAdapter()).getItem(position)
+                //调用presenter的方法，播放该实体代表的歌曲
+                Toast.makeText(getActivity(), ((LocalMusicAdapter)rv.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onMoreClick(View view, int position) {
+                Toast.makeText(getActivity(), ((LocalMusicAdapter)rv.getAdapter()).getItem(position).getMusicName() + "more", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        rv.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

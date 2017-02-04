@@ -35,7 +35,16 @@ public class LocalSearchFragment extends BaseFragment implements ILocalSearchVie
         // Required empty public constructor
     }
 
-
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Callback) {
+            callback = (Callback) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -43,7 +52,6 @@ public class LocalSearchFragment extends BaseFragment implements ILocalSearchVie
         //菜单生效
         setHasOptionsMenu(true);
     }
-
 
 
     @Override
@@ -103,23 +111,6 @@ public class LocalSearchFragment extends BaseFragment implements ILocalSearchVie
 
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Callback) {
-            callback = (Callback) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        callback = null;
-    }
-
-    @Override
     public boolean onQueryTextSubmit(String query) {
         onQueryTextChange(query);
         return true;
@@ -150,8 +141,27 @@ public class LocalSearchFragment extends BaseFragment implements ILocalSearchVie
 
     @Override
     public void setAdapter(LocalMusicAdapter adapter) {
+        //获取回来的adapter先设置监听事件，然后再设置给recycleView
+        adapter.setOnMusicItemClickListener(new LocalMusicAdapter.OnMusicItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onMoreClick(View view, int position) {
+
+            }
+        });
+
         rv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callback = null;
     }
 
     public interface Callback {

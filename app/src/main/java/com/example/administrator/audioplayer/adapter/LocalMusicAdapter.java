@@ -27,8 +27,11 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     final static int ITEM = 1;
     private Context mContext;
     private LayoutInflater mInflater;
-    private List mList;
+    private List<MusicInfo> mList;
 
+
+    private OnPlayAllItemClickListener onPlayAllItemClickListener;
+    private OnMusicItemClickListener onMusicItemClickListener;
 
 
     public LocalMusicAdapter(Context context, List list) {
@@ -42,6 +45,18 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mInflater = LayoutInflater.from(mContext);
         mList = list;
         HasPlayItem = hasPlayItem;
+    }
+
+    public void setOnPlayAllItemClickListener(OnPlayAllItemClickListener onPlayAllItemClickListener) {
+        this.onPlayAllItemClickListener = onPlayAllItemClickListener;
+    }
+
+    public void setOnMusicItemClickListener(OnMusicItemClickListener onMusicItemClickListener) {
+        this.onMusicItemClickListener = onMusicItemClickListener;
+    }
+
+    public void updateAdapter(List list) {
+        this.mList = list;
     }
 
 
@@ -61,12 +76,25 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         switch (getItemViewType(position)) {
             //播放全部item
             case 0:
                 ((PlayAllItemViewHolder) holder).textView.setText("(共" + mList.size() + "首)");
-
+                if(onPlayAllItemClickListener != null) {
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onPlayAllItemClickListener.onItemClick(holder.itemView, position);
+                        }
+                    });
+                    ((PlayAllItemViewHolder) holder).select.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onPlayAllItemClickListener.onMoreClick(holder.itemView, position);
+                        }
+                    });
+                }
 
                 //select跳转到选择activity
                 /*
@@ -82,16 +110,32 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 break;
            //歌曲item
             case 1:
+                //判断有没有播放全部的item
+                int realPosition;
                 if(HasPlayItem) {
-                    ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(position - 1)).getMusicName());
-                    ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(position - 1)).getArtist());
+                    realPosition = position - 1;
                 } else {
-                    ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(position)).getMusicName());
-                    ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(position)).getArtist());
+                    realPosition = position;
+                }
+
+                ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(realPosition)).getMusicName());
+                ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(realPosition)).getArtist());
+                if(onMusicItemClickListener != null) {
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onMusicItemClickListener.onItemClick(holder.itemView, position);
+                        }
+                    });
+                    ((MusicItemViewHolder) holder).moreOverflow.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onMusicItemClickListener.onMoreClick(holder.itemView, position);
+                        }
+                    });
                 }
                 break;
             default:
-
                 break;
         }
     }
@@ -118,6 +162,29 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else {
             return position == FIRST_ITEM ? FIRST_ITEM : ITEM;
         }
+    }
+
+    public MusicInfo getItem(int position) {
+        int realPosition;
+        if(HasPlayItem) {
+            realPosition = position - 1;
+        } else {
+            realPosition = position;
+        }
+        return mList.get(realPosition);
+    }
+
+
+    //回调接口
+    public interface OnPlayAllItemClickListener
+    {
+        void onItemClick(View view, int position);
+        void onMoreClick(View view, int position);
+    }
+    public interface OnMusicItemClickListener
+    {
+        void onItemClick(View view, int position);
+        void onMoreClick(View view, int position);
     }
 
 
