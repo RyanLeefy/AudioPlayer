@@ -10,10 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 
 /**
- * Created by lipuyusx on 2017/1/24.
+ * Created by on 2017/1/24.
  */
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
@@ -62,41 +63,59 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
-            SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag)parent.getChildViewHolder(child);
 
-            //最后一个头部headerItem不画分割线
-            if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0 && i == 3) {
-                //left = parent.getPaddingLeft() + itemViewTag.icon.getWidth() +  itemViewTag.icon.getPaddingLeft();
-                continue;
+            //根据不同的视图画不同的线
+
+            //MusicFragment里面线
+            if(parent.getChildViewHolder(child) instanceof SongListAdapter.ItemViewTag) {
+                SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag)parent.getChildViewHolder(child);
+
+                //最后一个头部headerItem不画分割线
+                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0 && i == 3) {
+                    //left = parent.getPaddingLeft() + itemViewTag.icon.getWidth() +  itemViewTag.icon.getPaddingLeft();
+                    continue;
+                }
+                //其他头部headerItem画分隔线
+                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0) {
+                    left = parent.getPaddingLeft() + itemViewTag.icon.getWidth() +  itemViewTag.icon.getPaddingLeft();
+                    //continue;
+                }
+
+                //如果是创建的最后一个歌单和收藏的最后一个歌单则不画下面的分割线
+                if ((parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1
+                        && i < childCount - 1
+                        && parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(parent.getChildAt(i + 1))) == 3)
+                        || (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 && (i == childCount - 1)) ) {
+                    //left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  itemViewTag.cover.getPaddingLeft();
+                    continue;
+                }
+                //其他歌单画分割线
+                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 ) {
+                    left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  dip2px(20);
+                    //continue;
+                }
+                //创建的歌单expanditem不画线
+                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 2 ) {
+                    //left = parent.getPaddingLeft();
+                    continue;
+                }
+                //收藏的歌单expanditem不画线
+                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 3 ) {
+                    //left = parent.getPaddingLeft();
+                    continue;
+                }
             }
-            //其他头部headerItem画分隔线
-            if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0) {
-                left = parent.getPaddingLeft() + itemViewTag.icon.getWidth() +  itemViewTag.icon.getPaddingLeft();
-                //continue;
+            //本地播放里面第一个播放全部的item
+            if(parent.getChildViewHolder(child) instanceof LocalMusicAdapter.PlayAllItemViewHolder) {
+                left = parent.getPaddingLeft();
+            }
+            //本地播放里面其他歌曲item
+            if(parent.getChildViewHolder(child) instanceof LocalMusicAdapter.MusicItemViewHolder) {
+                LocalMusicAdapter.MusicItemViewHolder viewHolder = (LocalMusicAdapter.MusicItemViewHolder)parent.getChildViewHolder(child);
+                left = parent.getPaddingLeft() + dip2px(13);
             }
 
-            //如果是创建的最后一个歌单和收藏的最后一个歌单则不画下面的分割线
-            if ((parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1
-                    && i < childCount - 1
-                    && parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(parent.getChildAt(i + 1))) == 3)
-                    || (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 && (i == childCount - 1)) ) {
-                //left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  itemViewTag.cover.getPaddingLeft();
-                continue;
-            }
-            //其他歌单画分割线
-            if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 ) {
-                left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  dip2px(20);
-                //continue;
-            }
 
-            if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 2 ) {
-                //left = parent.getPaddingLeft();
-                continue;
-            }
-            if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 3 ) {
-                //left = parent.getPaddingLeft();
-                continue;
-            }
 
             android.support.v7.widget.RecyclerView v = new android.support.v7.widget.RecyclerView(parent.getContext());
             final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child

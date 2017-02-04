@@ -1,16 +1,12 @@
 package com.example.administrator.audioplayer.fragment;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
@@ -27,14 +22,11 @@ import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
 import com.example.administrator.audioplayer.presenterImp.LocalMusicPresenter;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
-import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 
-public class LocalMusicFragment extends Fragment implements ILocalMusicView {
+public class LocalMusicFragment extends BaseFragment implements ILocalMusicView {
 
     private Callback callback;
     private View view;
@@ -57,25 +49,18 @@ public class LocalMusicFragment extends Fragment implements ILocalMusicView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         view =  inflater.inflate(R.layout.fragment_local_music, container, false);
 
         setToolbar();
 
         rv = (RecycleViewWithEmptyView) view.findViewById(R.id.rv_local_music_fragment);
 
-        //View emptyview = mInflater.inflate(R.layout.nomusic_emptyview_recycleview, container, false);
         View emptyview = view.findViewById(R.id.id_empty_view);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
         rv.setHasFixedSize(true);
-        //rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
-        //List list = new ArrayList<>();
-        //list.add("1");
-        //list.add("2");
-        //LocalMusicAdapter adapter = new LocalMusicAdapter(getActivity(), list);
-
-        rv.setAdapter(null);
+        //rv.setAdapter(null);
         rv.setEmptyView(emptyview);
 
         presenter = new LocalMusicPresenter(this);
@@ -97,11 +82,7 @@ public class LocalMusicFragment extends Fragment implements ILocalMusicView {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        callback = null;
-    }
+
 
 
     public void setToolbar() {
@@ -167,8 +148,18 @@ public class LocalMusicFragment extends Fragment implements ILocalMusicView {
     @Override
     public void setAdapter(LocalMusicAdapter adapter) {
         rv.setAdapter(adapter);
-        rv.notify();
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callback = null;
     }
 
 

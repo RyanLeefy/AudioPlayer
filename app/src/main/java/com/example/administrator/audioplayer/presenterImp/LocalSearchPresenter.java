@@ -1,12 +1,12 @@
 package com.example.administrator.audioplayer.presenterImp;
 
-import com.example.administrator.audioplayer.Imodel.ILocalMusicModel;
-import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
-import com.example.administrator.audioplayer.Iview.ILocalMusicView;
+import com.example.administrator.audioplayer.Imodel.ILocalSearchModel;
+import com.example.administrator.audioplayer.Ipresenter.ILocalSearchPresenter;
+import com.example.administrator.audioplayer.Iview.ILocalSearchView;
 import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
-import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
+import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
+import com.example.administrator.audioplayer.modelImp.LocalSearchModel;
 import com.orhanobut.logger.Logger;
 
 import java.util.List;
@@ -17,22 +17,23 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by on 2017/2/3.
+ * Created by on 2017/2/4.
  */
 
-public class LocalMusicPresenter implements ILocalMusicPresenter {
+public class LocalSearchPresenter implements ILocalSearchPresenter {
 
-    private ILocalMusicView view;   //localmusicfragment传进来
-    private ILocalMusicModel model;
+    private ILocalSearchView view;   //localsearchfragment传进来
+    private ILocalSearchModel model;
 
-
-    public LocalMusicPresenter(ILocalMusicView view) {
+    public LocalSearchPresenter(ILocalSearchView view) {
         this.view = view;
-        model = new LocalMusicModel();
+        model = new LocalSearchModel();
     }
 
+
     @Override
-    public void onCreateView() {
+    public void performSearch(final String queryString) {
+        //从本地音乐里面搜索
         //用Rxjava进行异步处理
         //第一步创建Subscriber
         //第二步创建Observable
@@ -40,7 +41,6 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
         Subscriber<List<MusicInfo>> subscriber = new Subscriber<List<MusicInfo>>() {
             @Override
             public void onCompleted() {
-
             }
 
             @Override
@@ -49,10 +49,8 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
             }
 
             @Override
-            public void onNext(List list) {
-                //设置adapter，刷新界面
-                Logger.d(list.size());
-                LocalMusicAdapter adapter = new LocalMusicAdapter(((LocalMusicFragment)view).getActivity(), list, true);
+            public void onNext(List<MusicInfo> musicInfos) {
+                LocalMusicAdapter adapter = new LocalMusicAdapter(((LocalSearchFragment) view).getActivity(), musicInfos);
                 view.setAdapter(adapter);
             }
         };
@@ -61,16 +59,17 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
         Observable observable = Observable.create(new Observable.OnSubscribe<List>() {
             @Override
             public void call(Subscriber<? super List> subscriber) {
-                subscriber.onNext(model.getLocalMusic());
+                subscriber.onNext(model.searchLocalMusic(queryString));
                 subscriber.onCompleted();
             }
         });
 
-        ((LocalMusicFragment)view).addSubscription(
+        ((LocalSearchFragment)view).addSubscription((
                 observable.subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber));
+                .subscribe(subscriber)));
+
     }
 
 

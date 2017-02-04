@@ -30,7 +30,7 @@
 
         <include
             android:id="@+id/id_empty_view"
-            layout="@layout/nomusic_emptyview_recycleview"/>
+            layout="@layout/nolocalmusic_emptyview_recycleview"/>
 
     </RelativeLayout>
 

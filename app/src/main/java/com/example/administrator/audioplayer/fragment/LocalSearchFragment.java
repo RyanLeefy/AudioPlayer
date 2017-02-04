@@ -1,44 +1,35 @@
 package com.example.administrator.audioplayer.fragment;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.administrator.audioplayer.Ipresenter.ILocalSearchPresenter;
+import com.example.administrator.audioplayer.Iview.ILocalSearchView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.presenterImp.LocalSearchPresenter;
+import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
-import com.orhanobut.logger.Logger;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 
-public class LocalSearchFragment extends Fragment implements SearchView.OnQueryTextListener {
+public class LocalSearchFragment extends BaseFragment implements ILocalSearchView, SearchView.OnQueryTextListener {
 
     private SearchView mSearchView;
-    private InputMethodManager mImm;
+    //private InputMethodManager mImm;
     private Callback callback;
     private View view;
     private RecycleViewWithEmptyView rv;
+    private ILocalSearchPresenter presenter;
 
     public LocalSearchFragment() {
         // Required empty public constructor
@@ -62,6 +53,8 @@ public class LocalSearchFragment extends Fragment implements SearchView.OnQueryT
 
         setToolbar();
 
+        //mImm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
         mSearchView = (SearchView) view.findViewById(R.id.sv_local_search_fragment);
         mSearchView.setQueryHint("搜索本地歌曲");
         mSearchView.setOnQueryTextListener(this);
@@ -71,20 +64,17 @@ public class LocalSearchFragment extends Fragment implements SearchView.OnQueryT
 
 
         rv = (RecycleViewWithEmptyView) view.findViewById(R.id.rv_local_search_fragment);
-        //View emptyview = inflater.inflate(R.layout.nomusic_emptyview_recycleview, container, false);
+
         View emptyview = view.findViewById(R.id.id_empty_view);
-        rv.setEmptyView(emptyview);
+
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
         rv.setHasFixedSize(true);
-        rv.setHasFixedSize(true);
-        //rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
-        List list = new ArrayList<>();
-        //list.add("1");
-        //list.add("2");
-        LocalMusicAdapter adapter = new LocalMusicAdapter(getActivity(), list);
-        rv.setAdapter(adapter);
         rv.setEmptyView(emptyview);
+        rv.setAdapter(null);
+
+        presenter = new LocalSearchPresenter(this);
 
         return view;
     }
@@ -131,18 +121,22 @@ public class LocalSearchFragment extends Fragment implements SearchView.OnQueryT
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Toast.makeText(getActivity(), "submit", Toast.LENGTH_SHORT).show();
-        hideInputManager();
+        onQueryTextChange(query);
         return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
         Toast.makeText(getActivity(), "textchange", Toast.LENGTH_SHORT).show();
-        return false;
+        if(newText == null || newText.length() == 0) {
+            rv.setAdapter(null);
+        } else {
+            presenter.performSearch(newText);
+        }
+        return true;
     }
 
-
+    /*
     public void hideInputManager() {
         if (mSearchView != null) {
             if (mImm != null) {
@@ -152,6 +146,12 @@ public class LocalSearchFragment extends Fragment implements SearchView.OnQueryT
 
 
         }
+    }*/
+
+    @Override
+    public void setAdapter(LocalMusicAdapter adapter) {
+        rv.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     public interface Callback {

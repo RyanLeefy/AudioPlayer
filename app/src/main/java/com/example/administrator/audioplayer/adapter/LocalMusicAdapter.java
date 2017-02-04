@@ -21,11 +21,15 @@ import java.util.List;
 
 public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+
+    private boolean HasPlayItem = false;
     final static int FIRST_ITEM = 0;
     final static int ITEM = 1;
     private Context mContext;
     private LayoutInflater mInflater;
     private List mList;
+
+
 
     public LocalMusicAdapter(Context context, List list) {
         mContext = context;
@@ -33,15 +37,26 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mList = list;
     }
 
+    public LocalMusicAdapter(Context context, List list, boolean hasPlayItem) {
+        mContext = context;
+        mInflater = LayoutInflater.from(mContext);
+        mList = list;
+        HasPlayItem = hasPlayItem;
+    }
 
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == FIRST_ITEM) {
-            return new PlayAllItemViewHolder(mInflater.inflate(R.layout.list_item_playallitem, parent, false));
-        }
-        else {
+        //先判断有无playitem
+        if(!HasPlayItem) {
             return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false));
+        } else {
+            if (viewType == FIRST_ITEM) {
+                return new PlayAllItemViewHolder(mInflater.inflate(R.layout.list_item_playallitem, parent, false));
+            }
+            else {
+                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false));
+            }
         }
     }
 
@@ -67,8 +82,13 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 break;
            //歌曲item
             case 1:
-                ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(position - 1)).getMusicName());
-                ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(position - 1)).getArtist());
+                if(HasPlayItem) {
+                    ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(position - 1)).getMusicName());
+                    ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(position - 1)).getArtist());
+                } else {
+                    ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(position)).getMusicName());
+                    ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(position)).getArtist());
+                }
                 break;
             default:
 
@@ -83,20 +103,27 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
         else if (mList.isEmpty()) {
             return 0;
-        } else return  mList.size() + 1;
+        } else if(HasPlayItem) {
+            return  mList.size() + 1;
+        } else {
+            return mList.size();
+        }
     }
 
     //判断布局类型
     @Override
     public int getItemViewType(int position) {
-        return position == FIRST_ITEM ? FIRST_ITEM : ITEM;
-
+        if(!HasPlayItem) {
+            return ITEM;
+        } else {
+            return position == FIRST_ITEM ? FIRST_ITEM : ITEM;
+        }
     }
 
 
 
     //播放全部Item的Holder
-    static class PlayAllItemViewHolder extends RecyclerView.ViewHolder {
+    public static class PlayAllItemViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
         ImageView select;
 
@@ -109,10 +136,10 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
 
     //MusicItem的Holder
-    static class MusicItemViewHolder extends RecyclerView.ViewHolder{
+    public static class MusicItemViewHolder extends RecyclerView.ViewHolder{
 
         ImageView playState,moreOverflow;
-        TextView mainTitle, title;
+        public TextView mainTitle, title;
 
         public MusicItemViewHolder(View view) {
             super(view);
