@@ -12,11 +12,14 @@
         <item name="colorPrimary">@color/colorPrimary</item>
 
         <!--状态栏的颜色，v19设置透明后需要设置颜色，v21透明后为toolbar的颜色？？-->
-        <item name="colorPrimaryDark">@color/color_blue</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
 
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:textColorPrimary">@color/white</item>
+
+        <!-- 取消activity的进入退出动画，原来是右到左进入，左到右退出 -->
+        <item name="android:windowAnimationStyle">@style/NoAnimation</item>
     </style>
 
 

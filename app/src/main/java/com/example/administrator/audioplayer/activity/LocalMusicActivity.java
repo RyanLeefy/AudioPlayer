@@ -15,7 +15,7 @@ import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
 /**
  * 本地音乐界面
  */
-public class LocalMusicActivity extends AppCompatActivity
+public class LocalMusicActivity extends BaseActivity
         implements LocalMusicFragment.Callback, LocalSearchFragment.Callback {
 
 

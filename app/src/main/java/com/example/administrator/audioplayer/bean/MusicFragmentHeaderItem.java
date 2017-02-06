@@ -1,7 +1,7 @@
 package com.example.administrator.audioplayer.bean;
 
 /**
- * Created by lipuyusx on 2017/1/23.
+ * Created by on 2017/1/23.
  */
 
 public class MusicFragmentHeaderItem {

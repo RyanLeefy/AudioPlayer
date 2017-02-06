@@ -7,8 +7,11 @@ import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
+import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.orhanobut.logger.Logger;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import rx.Observable;
@@ -24,6 +27,8 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
 
     private ILocalMusicView view;   //localmusicfragment传进来
     private ILocalMusicModel model;
+
+    private List<MusicInfo> mList;
 
 
     public LocalMusicPresenter(ILocalMusicView view) {
@@ -52,6 +57,7 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
             public void onNext(List list) {
                 //设置adapter，刷新界面
                 Logger.d(list.size());
+                mList = list;
                 LocalMusicAdapter adapter = new LocalMusicAdapter(((LocalMusicFragment)view).getActivity(), list, true);
                 view.setAdapter(adapter);
             }
@@ -71,6 +77,24 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subscriber));
+    }
+
+    @Override
+    public void pefromMusicClick(int position) {
+        if(position == 0) {
+
+        } else {
+            long[] list = new long[mList.size()];
+            HashMap<Long, MusicInfo> infos = new HashMap();
+            for (int i = 0; i < mList.size(); i++) {
+                MusicInfo info = mList.get(i);
+                list[i] = info.getSongId();
+                info.setIslocal(true);
+                //info.albumData = MusicUtils.getAlbumArtUri(info.albumId) + "";
+                infos.put(list[i], mList.get(i));
+            }
+            MusicPlayer.playAll(infos, list, position - 1, false);
+        }
     }
 
 

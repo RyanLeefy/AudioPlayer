@@ -28,7 +28,7 @@ import java.util.ArrayList;
 /**
  * 主界面
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private Handler mHandler = new Handler();
 
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         final SplashScreen mSplashScreen = new SplashScreen(this);
         mSplashScreen.show(R.drawable.art_login_bg, SplashScreen.FADE_OUT);
 

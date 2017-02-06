@@ -20,11 +20,14 @@ import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.presenterImp.LocalMusicPresenter;
+import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 
 public class LocalMusicFragment extends BaseFragment implements ILocalMusicView {
@@ -165,6 +168,9 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
             public void onItemClick(View view, int position) {
                 //获取点击的MusicInfo实体类((LocalMusicAdapter)rv.getAdapter()).getItem(position)
                 //调用presenter的方法，播放该实体代表的歌曲
+
+                presenter.pefromMusicClick(position);
+
                 Toast.makeText(getActivity(), ((LocalMusicAdapter)rv.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
             }
 

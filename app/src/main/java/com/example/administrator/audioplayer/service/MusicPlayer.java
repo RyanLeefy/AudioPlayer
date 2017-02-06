@@ -6,12 +6,23 @@ package com.example.administrator.audioplayer.service;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.IBinder;
+import android.os.RemoteException;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.example.administrator.audioplayer.bean.MusicInfo;
+
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.WeakHashMap;
 
 /**
@@ -28,6 +39,7 @@ public class MusicPlayer {
     //绑定映射，用于解绑
     private static WeakHashMap<Context, ServiceBinder> mConnectionMap = new WeakHashMap<Context, ServiceBinder>();
 
+    private static final long[] sEmptyList = new long[0];
 
 
     //初始化，绑定服务,多次调用不会重复绑定
@@ -62,6 +74,254 @@ public class MusicPlayer {
         if (mConnectionMap.isEmpty()) {
             mService = null;
         }
+    }
+
+
+
+    public static final boolean isPlaying() {
+        if (mService != null) {
+            return mService.isPlaying();
+        }
+        return false;
+    }
+
+
+    public static void playOrPause() {
+        try {
+            if (mService != null) {
+                if (mService.isPlaying()) {
+                    mService.pause();
+                } else {
+                    mService.play();
+                }
+            }
+        } catch (final Exception ignored) {
+        }
+    }
+
+
+    public static synchronized void playAll(final HashMap<Long, MusicInfo> infos, final long[] list, int position, final boolean forceShuffle) {
+        if (list == null || list.length == 0 || mService == null) {
+            return;
+        }
+        try {
+            if (forceShuffle) {
+                mService.setShuffleMode(MediaService.SHUFFLE_NORMAL);
+            }
+            final long currentId = mService.getAudioId();
+            long playId = list[position];
+            Log.e("currentId", currentId + "");
+            final int currentQueuePosition = getQueuePosition();
+            if (position != -1) {
+                final long[] playlist = getQueue();
+                if (Arrays.equals(list, playlist)) {
+                    if (currentQueuePosition == position && currentId == list[position]) {
+                        mService.play();
+                        return;
+                    } else {
+                        mService.setQueuePosition(position);
+                        return;
+                    }
+
+                }
+            }
+            if (position < 0) {
+                position = 0;
+            }
+            mService.open(infos, list, forceShuffle ? -1 : position);
+            mService.play();
+            Log.e("time", System.currentTimeMillis() + "");
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+    public static void playNext(Context context, final HashMap<Long, MusicInfo> map, final long[] list) {
+        if (mService == null) {
+            return;
+        }
+        try {
+            int current = -1;
+            long[] result = list;
+
+            for (int i = 0; i < list.length; i++) {
+                if (MusicPlayer.getCurrentAudioId() == list[i]) {
+                    current = i;
+                } else {
+                    MusicPlayer.removeTrack(list[i]);
+                }
+            }
+
+//            if( current != -1){
+//                ArrayList lists = new ArrayList();
+//                for(int i = 0; i<list.length;i++){
+//                    if(i != current){
+//                        lists.add(list[i]);
+//                    }
+//                }
+//                result = new long[list.length - 1];
+//                for(int i = 0;i<lists.size();i++){
+//                     result[i] = (long) lists.get(i);
+//                }
+//            }
+
+            mService.enqueue(list, map, MediaService.NEXT);
+
+            //Toast.makeText(context, R.string.next_play, Toast.LENGTH_SHORT).show();
+        } catch (final RemoteException ignored) {
+        }
+    }*/
+
+    public static final long position() {
+        if (mService != null) {
+            return mService.position();
+        }
+        return 0;
+    }
+
+    public static final long duration() {
+        if (mService != null) {
+            return mService.duration();
+        }
+        return 0;
+    }
+
+    public static String getPath() {
+        if (mService == null) {
+            return null;
+        }
+        try {
+            return mService.getPath();
+
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
+
+    public static void stop() {
+        try {
+            mService.stop();
+        } catch (Exception e) {
+
+        }
+    }
+
+
+    public static void next() {
+        try {
+            if (mService != null) {
+                mService.next();
+            }
+        } catch (final RemoteException ignored) {
+        }
+    }
+
+    /**
+     * 获取歌曲名字
+     * @return
+     */
+    public static final String getTrackName() {
+        if (mService != null) {
+            return mService.getTrackName();
+        }
+        return null;
+    }
+
+    /**
+     * 获取歌手名字
+     * @return
+     */
+    public static final String getArtistName() {
+        if (mService != null) {
+            return mService.getArtistName();
+        }
+        return null;
+    }
+
+    /**
+     * 获取封面地址
+     * @return
+     */
+    public static final String getAlbumPath() {
+        if (mService != null) {
+            return mService.getAlbumPath();
+        }
+        return null;
+    }
+
+
+    public static final int getSongCountForAlbumInt(final Context context, final long id) {
+        int songCount = 0;
+        if (id == -1) {
+            return songCount;
+        }
+
+        Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, id);
+        Cursor cursor = context.getContentResolver().query(uri,
+                new String[]{MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS}, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            if (!cursor.isAfterLast()) {
+                if (!cursor.isNull(0)) {
+                    songCount = cursor.getInt(0);
+                }
+            }
+            cursor.close();
+            cursor = null;
+        }
+
+        return songCount;
+    }
+
+    public static final String getReleaseDateForAlbum(final Context context, final long id) {
+        if (id == -1) {
+            return null;
+        }
+        Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, id);
+        Cursor cursor = context.getContentResolver().query(uri, new String[]{
+                MediaStore.Audio.AlbumColumns.FIRST_YEAR
+        }, null, null, null);
+        String releaseDate = null;
+        if (cursor != null) {
+            cursor.moveToFirst();
+            if (!cursor.isAfterLast()) {
+                releaseDate = cursor.getString(0);
+            }
+            cursor.close();
+            cursor = null;
+        }
+        return releaseDate;
+    }
+
+    public static void seek(final long position) {
+        if (mService != null) {
+            mService.seek(position);
+        }
+    }
+
+    public static final int getQueuePosition() {
+        if (mService != null) {
+            return mService.getQueuePosition();
+        }
+        return 0;
+    }
+
+    public static final long[] getQueue() {
+        if (mService != null) {
+            return mService.getQueue();
+        } else {
+        }
+
+        return sEmptyList;
+    }
+
+    public static final int getQueueSize() {
+        if (mService != null) {
+            return mService.getQueueSize();
+        }
+        return 0;
     }
 
 
