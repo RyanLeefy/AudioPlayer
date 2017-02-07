@@ -18,6 +18,7 @@ import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.orhanobut.logger.Logger;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -25,9 +26,13 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * activity基类，连接与解绑服务, 管理CompositeSubscription，Subscriber的生命周期
  * 默认显示底部PlayBar栏，对应的activity布局中要有bottom_container底部栏
- * 若不需要显示的调用showQuickControl(false)隐藏这个栏
+ * 若不需要显示的调用重写showQuickControl(boolean)方法并让方法为空即可
  *
  * TODO 不需要显示的activity布局，到时候新加一个标志位，如果标注位为false就不加载fragment的视图，以免报错
+ * TODO 要在播放列表为空的时候不加载底部PlayBar栏，不然进去PlayingActivity没有东西显示
+ *
+ * 在baseActivity中注册receiver，统一监听各种播放状态的改变事件，然后对接口进行操作
+ * 所有的其他需要具体实现的页面实现该接口
  */
 
 public class BaseActivity extends AppCompatActivity {
@@ -37,6 +42,8 @@ public class BaseActivity extends AppCompatActivity {
     private BottomPlayBarFragment fragment;   //底部播放条
 
     private PlaybackStatus mPlaybackStatus; //receiver 接受播放状态变化等
+
+    private ArrayList<MusicStateListener> mMusicListener = new ArrayList<>();  //用来存储
 
 
 
@@ -52,7 +59,7 @@ public class BaseActivity extends AppCompatActivity {
 
 
 
-
+        //注册接收的动作
         IntentFilter f = new IntentFilter();
         f.addAction(MediaService.PLAYSTATE_CHANGED);
         f.addAction(MediaService.META_CHANGED);
@@ -66,12 +73,13 @@ public class BaseActivity extends AppCompatActivity {
         //f.addAction(IConstants.PLAYLIST_COUNT_CHANGED);
         f.addAction(MediaService.MUSIC_LODING);
 
+
+        mPlaybackStatus = new PlaybackStatus(this);
+
+        //默认显示底部播放栏
         showQuickControl(true);
 
-        if(fragment != null) {
-            mPlaybackStatus = new PlaybackStatus(fragment);
-        }
-
+        //注册receiver
         registerReceiver(mPlaybackStatus, new IntentFilter(f));
     }
 
@@ -98,6 +106,44 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * 歌曲切换，在需要的activity中具体实现
+     */
+    public void updateTrack() {}
+
+
+    /**
+     * 刷新歌词，在需要的activity中具体实现
+     */
+    public void updateLrc() {}
+
+
+
+    /**
+     * 更新歌曲状态信息，在需要的fragment中具体实现
+     */
+    public void updateTrackInfo() {
+        for (final MusicStateListener listener : mMusicListener) {
+            if (listener != null) {
+                listener.reloadAdapter();
+                listener.updateTrackInfo();
+            }
+        }
+    }
+
+    /**
+     * fragment界面刷新，在需要的fragment中具体实现
+     */
+    public void refreshUI() {
+        for (final MusicStateListener listener : mMusicListener) {
+            if (listener != null) {
+                listener.reloadAdapter();
+            }
+        }
+
+    }
+
+
 
     public void addSubscription(Subscription subscription) {
         if (mSubscriptions != null) {
@@ -110,6 +156,10 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
         //解除绑定
         unbindService();
+
+        //解除接受广播
+        unregisterReceiver(mPlaybackStatus);
+
         //取消所有Subscriber
         if (mSubscriptions != null) {
             mSubscriptions.clear();
@@ -124,23 +174,26 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * 注册receiver接受各种播放状态的改变
+     */
     private final static class PlaybackStatus extends BroadcastReceiver {
 
-        private final WeakReference<BottomPlayBarFragment> mReference;
+        private final WeakReference<BaseActivity> mReference;
 
 
-        public PlaybackStatus(final BottomPlayBarFragment fragment) {
-            mReference = new WeakReference<>(fragment);
+        public PlaybackStatus(final BaseActivity baseActivity) {
+            mReference = new WeakReference<>(baseActivity);
         }
 
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
-            BottomPlayBarFragment bottomPlayBarFragment = mReference.get();
-            if (bottomPlayBarFragment != null) {
+            BaseActivity baseActivity = mReference.get();
+            if (baseActivity != null) {
                 if (action.equals(MediaService.META_CHANGED)) {
-                    bottomPlayBarFragment.updateTrackInfo();
+                    baseActivity.updateTrackInfo();
 
                 } else if (action.equals(MediaService.PLAYSTATE_CHANGED)) {
 
@@ -173,6 +226,26 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
+    public void setMusicStateListenerListener(final MusicStateListener status) {
+        if (status == this) {
+            throw new UnsupportedOperationException("Override the method, don't add a listener");
+        }
+
+        if (status != null) {
+            mMusicListener.add(status);
+        }
+    }
+
+    public void removeMusicStateListenerListener(final MusicStateListener status) {
+        if (status != null) {
+            mMusicListener.remove(status);
+        }
+    }
+
+
+    /**
+     * fragment中要实现的回调接口，用于在播放状态改变时候做出相应操作
+     */
     public interface MusicStateListener {
 
         /**
@@ -180,9 +253,6 @@ public class BaseActivity extends AppCompatActivity {
          */
         void updateTrackInfo();
 
-        void updateTime();
-
-        void changeTheme();
 
         void reloadAdapter();
     }

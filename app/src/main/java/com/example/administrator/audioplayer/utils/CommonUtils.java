@@ -1,6 +1,8 @@
 package com.example.administrator.audioplayer.utils;
 
+import android.content.Context;
 import android.os.Build;
+import android.util.DisplayMetrics;
 
 /**
  * Created by lipuyusx on 2017/2/6.
@@ -29,6 +31,27 @@ public class CommonUtils {
     //API16
     public static boolean isJellyBean() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    }
+
+
+
+    //dp转px
+    public static int dip2px(Context context,float dipVlue) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        float sDensity = metrics.density;
+        return (int) (dipVlue * sDensity + 0.5F);//+0.5表示四舍五入
+    }
+
+
+    //把时间转换为00：00格式
+    public static String makeTimeString(long milliSecs) {
+        StringBuffer sb = new StringBuffer();
+        long m = milliSecs / (60 * 1000);
+        sb.append(m < 10 ? "0" + m : m);
+        sb.append(":");
+        long s = (milliSecs % (60 * 1000)) / 1000;
+        sb.append(s < 10 ? "0" + s : s);
+        return sb.toString();
     }
 
 

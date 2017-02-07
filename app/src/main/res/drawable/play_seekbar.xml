@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--播放进度条样式 -->
+<layer-list
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--进度条背景 -->
+    <item android:id="@android:id/background">
+        <nine-patch android:src="@drawable/play_plybar_bg" />
+    </item>
+    <!--进度条第二层颜色 -->
+    <item android:id="@android:id/secondaryProgress">
+        <scale android:scaleWidth="100%">
+            <nine-patch android:src="@drawable/play_plybar_ready" />
+        </scale>
+    </item>
+    <!--进度条顶层颜色 -->
+    <item android:id="@android:id/progress">
+        <scale android:scaleWidth="100%">
+            <nine-patch android:src="@drawable/play_plybar_red" />
+        </scale>
+    </item>
+</layer-list>

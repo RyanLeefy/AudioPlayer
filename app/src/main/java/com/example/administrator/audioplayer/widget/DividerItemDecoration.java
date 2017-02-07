@@ -10,8 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
+import com.example.administrator.audioplayer.utils.CommonUtils;
 
 /**
  * Created by on 2017/1/24.
@@ -91,7 +93,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
                 }
                 //其他歌单画分割线
                 if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 ) {
-                    left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  dip2px(20);
+                    left = parent.getPaddingLeft() + itemViewTag.cover.getWidth() +  CommonUtils.dip2px(MyApplication.getContext(), 20);
                     //continue;
                 }
                 //创建的歌单expanditem不画线
@@ -112,7 +114,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             //本地播放里面其他歌曲item
             if(parent.getChildViewHolder(child) instanceof LocalMusicAdapter.MusicItemViewHolder) {
                 LocalMusicAdapter.MusicItemViewHolder viewHolder = (LocalMusicAdapter.MusicItemViewHolder)parent.getChildViewHolder(child);
-                left = parent.getPaddingLeft() + dip2px(13);
+                left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 13);
             }
 
 
@@ -164,12 +166,6 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-    //dp转px
-    public int dip2px(float dipVlue) {
-        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        float sDensity = metrics.density;
-        return (int) (dipVlue * sDensity + 0.5F);//+0.5表示四舍五入
-    }
 
 
 }

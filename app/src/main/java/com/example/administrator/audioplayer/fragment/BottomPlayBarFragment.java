@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.PlayingActivity;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.utils.GlobalHandler;
 import com.facebook.common.logging.FLog;
@@ -141,6 +142,8 @@ public class BottomPlayBarFragment extends BaseFragment {
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                PlayingActivity.startActivity(MyApplication.getContext());
                 /*
                 Intent intent = new Intent(MainApplication.context, PlayingActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -245,6 +248,10 @@ public class BottomPlayBarFragment extends BaseFragment {
     }
 
 
+    /**
+     * 重写父类updateTrackInfo()方法，供BaseActivity调用，刷新底部播放栏
+     */
+    @Override
     public void updateTrackInfo() {
         updateNowplayingCard();
         updateState();

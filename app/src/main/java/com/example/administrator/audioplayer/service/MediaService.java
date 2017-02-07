@@ -1947,6 +1947,7 @@ public class MediaService extends Service {
         }
     }
 
+
     public String getAlbumPath() {
         synchronized (this) {
             if (mCursor == null) {

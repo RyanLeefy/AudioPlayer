@@ -244,9 +244,17 @@ public class MusicPlayer {
      * 获取封面地址
      * @return
      */
+
     public static final String getAlbumPath() {
         if (mService != null) {
             return mService.getAlbumPath();
+        }
+        return null;
+    }
+
+    public static final String[] getAlbumPathAll() {
+        if (mService != null) {
+            return mService.getAlbumPathAll();
         }
         return null;
     }
@@ -323,6 +331,13 @@ public class MusicPlayer {
         }
         return 0;
     }
+
+    public static void setQueuePosition(final int position) {
+        if (mService != null) {
+            mService.setQueuePosition(position);
+        }
+    }
+
 
 
     //
