@@ -288,7 +288,6 @@ public class PlayingActivity extends BaseActivity {
                     isNextOrPreSetPage = false;
                     return;
                 } else {
-
                     if (!isNextOrPreSetPage) {
                         if (pPosition < MusicPlayer.getQueuePosition() + 1) {
 //                            HandlerUtil.getInstance(PlayingActivity.this).postDelayed(new Runnable() {
@@ -425,7 +424,7 @@ public class PlayingActivity extends BaseActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case PRE_MUSIC:
-                    //MusicPlayer.previous(PlayingActivity.this, true);
+                    MusicPlayer.previous();
                     break;
                 case NEXT_MUSIC:
                     MusicPlayer.next();

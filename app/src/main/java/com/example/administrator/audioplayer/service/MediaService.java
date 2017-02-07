@@ -2393,7 +2393,7 @@ public class MediaService extends Service {
         }
     }
 
-    /*
+
     public void prev(boolean forcePrevious) {
         synchronized (this) {
 
@@ -2446,10 +2446,12 @@ public class MediaService extends Service {
         }
     }
 
+
     private void openCurrent() {
         openCurrentAndMaybeNext(false, false);
     }
 
+    /*
     public void moveQueueItem(int index1, int index2) {
         synchronized (this) {
             if (index1 >= mPlaylist.size()) {

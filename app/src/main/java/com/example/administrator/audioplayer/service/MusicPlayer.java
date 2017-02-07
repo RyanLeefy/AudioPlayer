@@ -218,6 +218,23 @@ public class MusicPlayer {
         }
     }
 
+    /*
+    public static void previous(final Context context, final boolean force) {
+        final Intent previous = new Intent(context, MediaService.class);
+        if (force) {
+            previous.setAction(MediaService.PREVIOUS_FORCE_ACTION);
+        } else {
+            previous.setAction(MediaService.PREVIOUS_ACTION);
+        }
+        context.startService(previous);
+    }*/
+
+    public static void previous() {
+       if(mService != null) {
+           mService.prev(true);
+       }
+    }
+
     /**
      * 获取歌曲名字
      * @return

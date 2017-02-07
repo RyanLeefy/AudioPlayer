@@ -11,6 +11,8 @@ import com.example.administrator.audioplayer.bean.MusicInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.administrator.audioplayer.modelImp.LocalMusicModel.FILTER_DURATION;
+import static com.example.administrator.audioplayer.modelImp.LocalMusicModel.FILTER_SIZE;
 
 
 /**
@@ -43,13 +45,15 @@ public class LocalSearchModel implements ILocalSearchModel {
     }
 
     public Cursor makeSongCursor(String selection, String[] paramArrayOfString) {
-        String selectionStatement = "title != ''";
+        StringBuilder selectionStatement = new StringBuilder("title != ''");
+        selectionStatement.append(" and " + MediaStore.Audio.Media.SIZE + " > " + FILTER_SIZE);
+        selectionStatement.append(" and " + MediaStore.Audio.Media.DURATION + " > " + FILTER_DURATION);
         // final String songSortOrder = PreferencesUtility.getInstance(context).getSongSortOrder();
 
         if (!TextUtils.isEmpty(selection)) {
-            selectionStatement = selectionStatement + " AND " + selection;
+            selectionStatement.append(" AND " + selection);
         }
-        Cursor cursor = MyApplication.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "title", "artist", "album", "duration", "track", "artist_id", "album_id"}, selectionStatement, paramArrayOfString, null);
+        Cursor cursor = MyApplication.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "title", "artist", "album", "duration", "track", "artist_id", "album_id"}, selectionStatement.toString(), paramArrayOfString, null);
 
         return cursor;
     }
