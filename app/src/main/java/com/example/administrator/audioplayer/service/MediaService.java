@@ -89,52 +89,43 @@ public class MediaService extends Service {
 
 
     private static final String TAG = "MediaService";
-    public static final String PLAYSTATE_CHANGED = "com.wm.remusic.playstatechanged";
-    public static final String POSITION_CHANGED = "com.wm.remusic.positionchanged";
-    public static final String META_CHANGED = "com.wm.remusic.metachanged";
-    public static final String PLAYLIST_ITEM_MOVED = "com.wm.remusic.mmoved";
-    public static final String QUEUE_CHANGED = "com.wm.remusic.queuechanged";
-    public static final String PLAYLIST_CHANGED = "com.wm.remusic.playlistchanged";
-    public static final String REPEATMODE_CHANGED = "com.wm.remusic.repeatmodechanged";
-    public static final String SHUFFLEMODE_CHANGED = "com.wm.remusic.shufflemodechanged";
-    public static final String TRACK_ERROR = "com.wm.remusic.trackerror";
-    public static final String TIMBER_PACKAGE_NAME = "com.wm.remusic";
+    public static final String PLAYSTATE_CHANGED = "playstatechanged";
+    public static final String POSITION_CHANGED = "positionchanged";
+    public static final String META_CHANGED = "metachanged";
+    public static final String PLAYLIST_ITEM_MOVED = "mmoved";
+    public static final String QUEUE_CHANGED = "queuechanged";
+    public static final String PLAYLIST_CHANGED = "playlistchanged";
+    public static final String REPEATMODE_CHANGED = "repeatmodechanged";
+    public static final String SHUFFLEMODE_CHANGED = "shufflemodechanged";
+    public static final String TRACK_ERROR = "trackerror";
+    public static final String TIMBER_PACKAGE_NAME = "com.example.administrator.audioplay";
     public static final String MUSIC_PACKAGE_NAME = "com.android.music";
-    public static final String SERVICECMD = "com.wm.remusic.musicservicecommand";
-    public static final String TOGGLEPAUSE_ACTION = "com.wm.remusic.togglepause";
-    public static final String PAUSE_ACTION = "com.wm.remusic.pause";
-    public static final String STOP_ACTION = "com.wm.remusic.stop";
-    public static final String PREVIOUS_ACTION = "com.wm.remusic.previous";
-    public static final String PREVIOUS_FORCE_ACTION = "com.wm.remusic.previous.force";
-    public static final String NEXT_ACTION = "com.wm.remusic.next";
-    public static final String MUSIC_CHANGED = "com.wm.remusi.change_music";
-    public static final String REPEAT_ACTION = "com.wm.remusic.repeat";
-    public static final String SHUFFLE_ACTION = "com.wm.remusic.shuffle";
+    public static final String SERVICECMD = "musicservicecommand";
+    public static final String TOGGLEPAUSE_ACTION = "togglepause";
+    public static final String PAUSE_ACTION = "pause";
+    public static final String STOP_ACTION = "stop";
+    public static final String PREVIOUS_ACTION = "previous";
+    public static final String NEXT_ACTION = "next";
+    public static final String REPEAT_ACTION = "repeat";
+    public static final String SHUFFLE_ACTION = "shuffle";
     public static final String FROM_MEDIA_BUTTON = "frommediabutton";
-    public static final String REFRESH = "com.wm.remusic.refresh";
-    public static final String LRC_UPDATED = "com.wm.remusic.updatelrc";
-    public static final String UPDATE_LOCKSCREEN = "com.wm.remusic.updatelockscreen";
-    public static final String CMDNAME = "command";
-    public static final String CMDTOGGLEPAUSE = "togglepause";
-    public static final String CMDSTOP = "stop";
-    public static final String CMDPAUSE = "pause";
-    public static final String CMDPLAY = "play";
-    public static final String CMDPREVIOUS = "previous";
-    public static final String CMDNEXT = "next";
-    public static final String CMDNOTIF = "buttonId";
-    public static final String TRACK_PREPARED = "com.wm.remusic.prepared";
-    public static final String TRY_GET_TRACKINFO = "com.wm.remusic.gettrackinfo";
-    public static final String BUFFER_UP = "com.wm.remusic.bufferup";
-    public static final String LOCK_SCREEN = "com.wm.remusic.lock";
-    public static final String SEND_PROGRESS = "com.wm.remusic.progress";
-    public static final String MUSIC_LODING = "com.wm.remusic.loading";
-    private static final String SHUTDOWN = "com.wm.remusic.shutdown";
-    public static final String SETQUEUE = "com.wm.remusic.setqueue";
+    public static final String REFRESH = "refresh";
+    public static final String LRC_UPDATED = "updatelrc";
+    public static final String UPDATE_LOCKSCREEN = "updatelockscreen";
+  
+    
+    public static final String TRACK_PREPARED = "prepared";
+    public static final String TRY_GET_TRACKINFO = "gettrackinfo";
+    public static final String BUFFER_UP = "bufferup";
+    public static final String LOCK_SCREEN = "lock";
+    public static final String SEND_PROGRESS = "progress";
+    public static final String MUSIC_LODING = "loading";
+    private static final String SHUTDOWN = "shutdown";
+    public static final String SETQUEUE = "setqueue";
     public static final int NEXT = 2;
     public static final int LAST = 3;
     public static final int SHUFFLE_NONE = 0;
     public static final int SHUFFLE_NORMAL = 1;
-    public static final int SHUFFLE_AUTO = 2;
     public static final int REPEAT_NONE = 2;
     public static final int REPEAT_CURRENT = 1;
     public static final int REPEAT_ALL = 2;
@@ -151,7 +142,6 @@ public class MediaService extends Service {
     private static final int FADEDOWN = 6;
     private static final int FADEUP = 7;
     private static final int IDLE_DELAY = 5 * 60 * 1000;
-    private static final long REWIND_INSTEAD_PREVIOUS_THRESHOLD = 3000;
 
 
     private static final String[] PROJECTION = new String[]{
@@ -193,6 +183,8 @@ public class MediaService extends Service {
     private boolean mQueueIsSaveable = true;
     private boolean mPausedByTransientLossOfFocus = false;
 
+
+    //在Android5.0之后新增了MediaSession，可以在系统锁屏那显示歌曲唱片和控制歌曲状态
     private MediaSession mSession;
 
     private ComponentName mMediaButtonReceiverComponent;
@@ -233,7 +225,7 @@ public class MediaService extends Service {
     private static Handler mUrlHandler;
     private static Handler mLrcHandler;
     //private MediaPlayerProxy mProxy;
-    public static final String LRC_PATH = "/remusic/lrc/";
+    public static final String LRC_PATH = "/audioplay/lrc/";
     private long mLastSeekPos = 0;
     //private RequestPlayUrl mRequestUrl;
     //private RequestLrc mRequestLrc;
@@ -292,7 +284,7 @@ public class MediaService extends Service {
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final String command = intent.getStringExtra(CMDNAME);
+
 
             Log.d(TAG, "onreceive" + intent.toURI());
             handleCommandIntent(intent);
@@ -317,6 +309,8 @@ public class MediaService extends Service {
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
+
+        //判断系统版本，如果大于5.0则初始化MediaSession，在系统锁屏处显示封面和操作
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setUpMediaSession();
         }
@@ -337,7 +331,6 @@ public class MediaService extends Service {
         filter.addAction(STOP_ACTION);
         filter.addAction(NEXT_ACTION);
         filter.addAction(PREVIOUS_ACTION);
-        filter.addAction(PREVIOUS_FORCE_ACTION);
         filter.addAction(REPEAT_ACTION);
         filter.addAction(SHUFFLE_ACTION);
         filter.addAction(TRY_GET_TRACKINFO);
@@ -407,8 +400,12 @@ public class MediaService extends Service {
         return true;
     }
 
+
+    /**
+     * 初始化MediaSession，在系统锁屏处显示唱片和操作
+     */
     private void setUpMediaSession() {
-        mSession = new MediaSession(this, "remusic");
+        mSession = new MediaSession(this, "audioplay");
         mSession.setCallback(new MediaSession.Callback() {
             @Override
             public void onPause() {
@@ -428,12 +425,12 @@ public class MediaService extends Service {
 
             @Override
             public void onSkipToNext() {
-                //gotoNext(true);
+                gotoNext(true);
             }
 
             @Override
             public void onSkipToPrevious() {
-                //prev(false);
+                prev();
             }
 
             @Override
@@ -444,6 +441,7 @@ public class MediaService extends Service {
                 releaseServiceUiAndStop();
             }
         });
+        //设置通过回调来处理控制命令
         mSession.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
     }
 
@@ -533,28 +531,25 @@ public class MediaService extends Service {
 
     private void handleCommandIntent(Intent intent) {
         final String action = intent.getAction();
-        final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
+        //final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
-        if (D) Log.d(TAG, "handleCommandIntent: action = " + action + ", command = " + command);
+        if (D) Log.d(TAG, "handleCommandIntent: action = " + action);
 
-        if (CMDNEXT.equals(command) || NEXT_ACTION.equals(action)) {
+        if (NEXT_ACTION.equals(action)) {
             //gotoNext(true);
-        } else if (CMDPREVIOUS.equals(command) || PREVIOUS_ACTION.equals(action)
-                || PREVIOUS_FORCE_ACTION.equals(action)) {
-            //prev(PREVIOUS_FORCE_ACTION.equals(action));
-        } else if (CMDTOGGLEPAUSE.equals(command) || TOGGLEPAUSE_ACTION.equals(action)) {
+        } else if (PREVIOUS_ACTION.equals(action)) {
+            prev();
+        } else if (TOGGLEPAUSE_ACTION.equals(action)) {
             if (isPlaying()) {
                 pause();
                 mPausedByTransientLossOfFocus = false;
             } else {
                 play();
             }
-        } else if (CMDPAUSE.equals(command) || PAUSE_ACTION.equals(action)) {
+        } else if (PAUSE_ACTION.equals(action)) {
             pause();
             mPausedByTransientLossOfFocus = false;
-        } else if (CMDPLAY.equals(command)) {
-            play();
-        } else if (CMDSTOP.equals(command) || STOP_ACTION.equals(action)) {
+        } else if (STOP_ACTION.equals(action)) {
             pause();
             mPausedByTransientLossOfFocus = false;
             seek(0);
@@ -1169,9 +1164,6 @@ public class MediaService extends Service {
             if (D)
                 Log.e(TAG, "Getting the next position resulted did not get a result when it should have");
             return -1;
-        } else if (mShuffleMode == SHUFFLE_AUTO) {
-            doAutoShuffleUpdate();
-            return mPlayPos + 1;
         } else {
             if (mPlayPos >= mPlaylist.size() - 1) {
                 if (mRepeatMode == REPEAT_NONE && !force) {
@@ -1206,81 +1198,6 @@ public class MediaService extends Service {
         } else {
             mPlayer.setNextDataSource(null);
         }
-    }
-
-    private boolean makeAutoShuffleList() {
-        Cursor cursor = null;
-        try {
-            cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{
-                            MediaStore.Audio.Media._ID
-                    }, MediaStore.Audio.Media.IS_MUSIC + "=1", null, null);
-            if (cursor == null || cursor.getCount() == 0) {
-                return false;
-            }
-            final int len = cursor.getCount();
-            final long[] list = new long[len];
-            for (int i = 0; i < len; i++) {
-                cursor.moveToNext();
-                list[i] = cursor.getLong(0);
-            }
-            mAutoShuffleList = list;
-            return true;
-        } catch (final RuntimeException e) {
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-                cursor = null;
-            }
-        }
-        return false;
-    }
-
-    private void doAutoShuffleUpdate() {
-        boolean notify = false;
-        if (mPlayPos > 10) {
-            removeTracks(0, mPlayPos - 9);
-            notify = true;
-        }
-        final int toAdd = 7 - (mPlaylist.size() - (mPlayPos < 0 ? -1 : mPlayPos));
-        for (int i = 0; i < toAdd; i++) {
-            int lookback = mHistory.size();
-            int idx = -1;
-            while (true) {
-                idx = mShuffler.nextInt(mAutoShuffleList.length);
-                if (!wasRecentlyUsed(idx, lookback)) {
-                    break;
-                }
-                lookback /= 2;
-            }
-            mHistory.add(idx);
-            if (mHistory.size() > MAX_HISTORY_SIZE) {
-                mHistory.remove(0);
-            }
-            mPlaylist.add(new MusicTrack(mAutoShuffleList[idx], -1));
-            notify = true;
-        }
-        if (notify) {
-            notifyChange(QUEUE_CHANGED);
-        }
-    }
-
-    private boolean wasRecentlyUsed(final int idx, int lookbacksize) {
-        if (lookbacksize == 0) {
-            return false;
-        }
-        final int histsize = mHistory.size();
-        if (histsize < lookbacksize) {
-            lookbacksize = histsize;
-        }
-        final int maxidx = histsize - 1;
-        for (int i = 0; i < lookbacksize; i++) {
-            final long entry = mHistory.get(maxidx - i);
-            if (entry == idx) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void sendUpdateBuffer(int progress) {
@@ -1330,7 +1247,7 @@ public class MediaService extends Service {
             //mSongPlayCount.bumpSongCount(getAudioId());
 
         } else if (what.equals(QUEUE_CHANGED)) {
-            Intent intent1 = new Intent("com.wm.remusic.emptyplaylist");
+            Intent intent1 = new Intent("emptyplaylist");
             intent.putExtra("showorhide", "show");
             sendBroadcast(intent1);
             //saveQueue(true);
@@ -1435,8 +1352,8 @@ public class MediaService extends Service {
 //        PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), 0,
 //                new Intent(this.getApplicationContext(), PlayingActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         final Intent nowPlayingIntent = new Intent();
-        //nowPlayingIntent.setAction("com.wm.remusic.LAUNCH_NOW_PLAYING_ACTION");
-        nowPlayingIntent.setComponent(new ComponentName("com.wm.remusic", "com.wm.remusic.activity.PlayingActivity"));
+        //nowPlayingIntent.setAction("LAUNCH_NOW_PLAYING_ACTION");
+        nowPlayingIntent.setComponent(new ComponentName("com.example.administrator.audioplay", "activity.PlayingActivity"));
         nowPlayingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent clickIntent = PendingIntent.getBroadcast(this, 0, nowPlayingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent click = PendingIntent.getActivity(this, 0, nowPlayingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -1809,21 +1726,8 @@ public class MediaService extends Service {
             }
 
             mShuffleMode = shufflemode;
-            if (mShuffleMode == SHUFFLE_AUTO) {
-                if (makeAutoShuffleList()) {
-                    mPlaylist.clear();
-                    doAutoShuffleUpdate();
-                    mPlayPos = 0;
-                    openCurrentAndNext();
-                    play();
-                    notifyChange(META_CHANGED);
-                    return;
-                } else {
-                    mShuffleMode = SHUFFLE_NONE;
-                }
-            } else {
-                setNextTrack();
-            }
+            setNextTrack();
+
             //saveQueue(false);
             notifyChange(SHUFFLEMODE_CHANGED);
         }
@@ -1896,9 +1800,7 @@ public class MediaService extends Service {
             openCurrentAndNext();
             play();
             notifyChange(META_CHANGED);
-            if (mShuffleMode == SHUFFLE_AUTO) {
-                doAutoShuffleUpdate();
-            }
+
         }
     }
 
@@ -2235,9 +2137,9 @@ public class MediaService extends Service {
 
             mPlaylistInfo = infos;
             Logger.d( TAG, mPlaylistInfo.toString());
-            if (mShuffleMode == SHUFFLE_AUTO) {
-                mShuffleMode = SHUFFLE_NORMAL;
-            }
+
+            mShuffleMode = SHUFFLE_NORMAL;
+
             final long oldId = getAudioId();
             final int listlength = list.length;
             boolean newlist = true;
@@ -2374,7 +2276,7 @@ public class MediaService extends Service {
             openCurrentAndNext();
             play();
             notifyChange(META_CHANGED);
-            notifyChange(MUSIC_CHANGED);
+
         }
     }
 
@@ -2394,12 +2296,11 @@ public class MediaService extends Service {
     }
 
 
-    public void prev(boolean forcePrevious) {
+    public void prev() {
         synchronized (this) {
 
 
-            boolean goPrevious = getRepeatMode() != REPEAT_CURRENT &&
-                    (position() < REWIND_INSTEAD_PREVIOUS_THRESHOLD || forcePrevious);
+            boolean goPrevious = getRepeatMode() != REPEAT_CURRENT;
 
             if (goPrevious) {
                 if (D) Log.d(TAG, "Going to previous track");
@@ -2414,7 +2315,7 @@ public class MediaService extends Service {
                 openCurrent();
                 play(false);
                 notifyChange(META_CHANGED);
-                notifyChange(MUSIC_CHANGED);
+
             } else {
                 if (D) Log.d(TAG, "Going to beginning of track");
                 seek(0);
@@ -2798,7 +2699,7 @@ public class MediaService extends Service {
                 //mService.get().loading(true);
                 handler.postDelayed(startMediaPlayerIfPrepared, 50);
             }
-            mService.get().notifyChange(MUSIC_CHANGED);
+            //mService.get().notifyChange(MUSIC_CHANGED);
         }
 
 
@@ -3055,7 +2956,7 @@ public class MediaService extends Service {
 
                         service.updateCursor(service.mPlaylist.get(service.mPlayPos).mId);
                         service.notifyChange(META_CHANGED);
-                        service.notifyChange(MUSIC_CHANGED);
+
                         //service.updateNotification();
                         break;
                     case TRACK_ENDED:

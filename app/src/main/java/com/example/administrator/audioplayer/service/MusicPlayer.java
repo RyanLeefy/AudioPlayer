@@ -231,7 +231,7 @@ public class MusicPlayer {
 
     public static void previous() {
        if(mService != null) {
-           mService.prev(true);
+           mService.prev();
        }
     }
 
@@ -354,6 +354,68 @@ public class MusicPlayer {
             mService.setQueuePosition(position);
         }
     }
+
+    /**
+     * 获取随机的模式，没有随机或正常随机
+     * @return
+     */
+    public static final int getShuffleMode() {
+        if (mService != null) {
+            return mService.getShuffleMode();
+        }
+        return 0;
+    }
+
+    /**
+     * 获取重复的模式，列表重复或单曲重复
+     * @return
+     */
+    public static final int getRepeatMode() {
+        if (mService != null) {
+            return mService.getRepeatMode();
+        }
+        return 0;
+    }
+
+    /**
+     * 该表模式
+     */
+    public static void changeMode() {
+        if (mService != null) {
+            //如果当前是随机播放
+            if (mService.getShuffleMode() == MediaService.SHUFFLE_NORMAL) {
+                //取消随机播放
+                mService.setShuffleMode(MediaService.SHUFFLE_NONE);
+                //设为单曲循环
+                mService.setRepeatMode(MediaService.REPEAT_CURRENT);
+                return;
+            } else {
+                switch (mService.getRepeatMode()) {
+                    //如果当前是单曲播放，切换为列表循环
+                    case MediaService.REPEAT_CURRENT:
+                        mService.setRepeatMode(MediaService.REPEAT_ALL);
+                        break;
+                    //如果当前为列表循环，切换为随机播放
+                    case MediaService.REPEAT_ALL:
+                        mService.setShuffleMode(MediaService.SHUFFLE_NORMAL);
+                        break;
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 获取当前音频的id
+     * @return
+     */
+    public static final long getCurrentAudioId() {
+        if (mService != null) {
+            return mService.getAudioId();
+        }
+        return -1;
+    }
+
 
 
 

@@ -142,13 +142,7 @@ public class BottomPlayBarFragment extends BaseFragment {
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 PlayingActivity.startActivity(MyApplication.getContext());
-                /*
-                Intent intent = new Intent(MainApplication.context, PlayingActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                MainApplication.context.startActivity(intent);
-                */
             }
         });
 
