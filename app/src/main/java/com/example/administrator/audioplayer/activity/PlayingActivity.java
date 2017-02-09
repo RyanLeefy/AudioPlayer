@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -226,6 +227,7 @@ public class PlayingActivity extends BaseActivity {
                 //正在播放，针下去，开始旋转
                 mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
                 mAnimatorSet.start();
+                Logger.d("update start");
             }
 
         } else {
@@ -472,7 +474,7 @@ public class PlayingActivity extends BaseActivity {
      * 初始化唱片ViewPager
      */
     private void setViewPager() {
-        //两边提前读取2个
+        //两边提前读取1个
         mViewPager.setOffscreenPageLimit(1);
         mAdapter = new RoundFragmentPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mAdapter);
@@ -482,7 +484,7 @@ public class PlayingActivity extends BaseActivity {
                     @Override
                     public void transformPage(View page, float position) {
 
-                        Logger.d("transformPage");
+                        //Logger.d("transformPage");
                         //position为位置[-Infinity,-1)  左边看不到的
                         //(1,+Infinity] 右边看不到了
                         //( 0, -1]左边滑出
@@ -497,11 +499,14 @@ public class PlayingActivity extends BaseActivity {
                             }
                         } else if (position == 0) {
                             if (MusicPlayer.isPlaying()) {
+                                Log.e("position","000000000");
                                 //mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
                                 if (mRotateAnim != null && !mRotateAnim.isRunning() && mNeedleAnim != null) {
+                                    Log.e("position","111");
                                     mAnimatorSet = new AnimatorSet();
                                     mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
                                     mAnimatorSet.start();
+                                    Logger.d("transform start");
                                 }
                             }
 

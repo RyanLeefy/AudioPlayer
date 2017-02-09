@@ -364,7 +364,7 @@ public class MediaService extends Service {
         //reloadQueueAfterPermissionCheck();
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
-
+        Logger.d("Service create");
 
 
 
