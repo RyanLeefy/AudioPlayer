@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -130,8 +132,14 @@ public class BottomPlayBarFragment extends BaseFragment {
                     @Override
                     public void run() {
                         //弹出播放列表Fragment
-                        //PlayQueueFragment playQueueFragment = new PlayQueueFragment();
-                        //playQueueFragment.show(getFragmentManager(), "playqueueframent");
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        Fragment prev = getFragmentManager().findFragmentByTag("playqueuefragment");
+                        if (prev != null) {
+                            ft.remove(prev);
+                        }
+                        ft.addToBackStack(null);
+                        PlayQueueFragment playQueueFragment = new PlayQueueFragment();
+                        playQueueFragment.show(ft, "playqueuefragment");
                     }
                 }, 60);
 
@@ -142,8 +150,9 @@ public class BottomPlayBarFragment extends BaseFragment {
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PlayingActivity.startActivity(MyApplication.getContext());
-                //设置动画？
+                PlayingActivity.startActivity(getActivity());
+                //设置activity进入动画
+                getActivity().overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
             }
         });
 

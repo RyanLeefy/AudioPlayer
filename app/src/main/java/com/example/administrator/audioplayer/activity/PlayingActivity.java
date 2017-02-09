@@ -328,6 +328,13 @@ public class PlayingActivity extends BaseActivity {
         //stopAnim();
     }
 
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        //设置activity退出动画
+        overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+    }
+
 
     /**
      * 初始化toolbar，这里toolbar为透明的，但是会占有位置，把其他内容往下移一点
@@ -377,7 +384,8 @@ public class PlayingActivity extends BaseActivity {
         }*/
         if(item.getItemId() == android.R.id.home) {
             this.finish();
-            overridePendingTransition(0, R.anim.push_right_out);
+            //设置activity退出动画
+            overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         }
         return super.onOptionsItemSelected(item);
     }
