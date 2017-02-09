@@ -6,9 +6,11 @@ import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 
 import com.example.administrator.audioplayer.R;
 import com.facebook.common.logging.FLog;
@@ -159,7 +161,42 @@ public class RoundFragment extends BaseFragment{
             }
         }
 
+        /*
+        animatorWeakReference = new WeakReference(ObjectAnimator.ofFloat(rootView, "rotation", 0.0F, 360.0F));
+        animator = animatorWeakReference.get();
+        animator.setRepeatCount(Integer.MAX_VALUE);
+        animator.setDuration(25000L);
+        animator.setInterpolator(new LinearInterpolator());
+
+        rootView.setTag(R.id.tag_animator, this.animator);
+*/
 
         return rootView;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        animatorWeakReference = new WeakReference(ObjectAnimator.ofFloat(getView(), "rotation", 0.0F, 360.0F));
+        animator = animatorWeakReference.get();
+        animator.setRepeatCount(Integer.MAX_VALUE);
+        animator.setDuration(25000L);
+        animator.setInterpolator(new LinearInterpolator());
+
+        if (getView() != null)
+            getView().setTag(R.id.tag_animator, this.animator);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("roundfragment", " id = " + hashCode());
+        if (animator != null) {
+            animator = null;
+            Log.e("roundfragment", " id = " + hashCode() + "  , animator destroy");
+        }
+
     }
 }

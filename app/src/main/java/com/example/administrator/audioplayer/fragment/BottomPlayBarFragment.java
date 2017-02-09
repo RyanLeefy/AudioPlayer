@@ -143,6 +143,7 @@ public class BottomPlayBarFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 PlayingActivity.startActivity(MyApplication.getContext());
+                //设置动画？
             }
         });
 

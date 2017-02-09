@@ -12,7 +12,26 @@
     </style>
 
 
-   <!-- 右往左滑出效果 -->
+    <!-- 有进入退出动画的activity -->
+    <style name="AppThemeWithAnimation" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:windowAnimationStyle">@style/AppThemeWithAnimation</item>
+    </style>
+
+
+
+
+    <style name="ActivityInOutAnimation" parent="android:Animation">
+        <item name="android:activityOpenEnterAnimation">@anim/push_right_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/push_right_out</item>
+    </style>
+
+    <!-- 右往左滑出效果 -->
     <style name="dialog_anim_slide_left" mce_bogus="1" parent="android:Animation">
         <item name="android:windowExitAnimation">@anim/dialog_exit_slide_left</item>
     </style>
@@ -51,5 +70,7 @@
         <item name="android:taskToBackEnterAnimation">@null</item>
         <item name="android:taskToBackExitAnimation">@null</item>
     </style>
+
+
 
 </resources>

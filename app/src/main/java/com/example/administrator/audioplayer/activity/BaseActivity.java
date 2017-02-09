@@ -190,6 +190,8 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
+            Log.e("Receiver", "context:" + context);
+            Log.e("Receiver", "Intent:" + intent);
             Log.e("Receiver", "Action:" + action);
             BaseActivity baseActivity = mReference.get();
             if (baseActivity != null) {

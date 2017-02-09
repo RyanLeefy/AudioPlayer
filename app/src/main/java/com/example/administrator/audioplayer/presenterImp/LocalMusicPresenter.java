@@ -81,8 +81,9 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
 
     @Override
     public void pefromMusicClick(int position) {
+        //position应该大于等于1
         if(position == 0) {
-
+            //点击播放全部按钮
         } else {
             long[] list = new long[mList.size()];
             HashMap<Long, MusicInfo> infos = new HashMap();
@@ -93,6 +94,7 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
                 //info.albumData = MusicUtils.getAlbumArtUri(info.albumId) + "";
                 infos.put(list[i], mList.get(i));
             }
+            //position - 1 对应歌单中的位置
             MusicPlayer.playAll(infos, list, position - 1, false);
         }
     }

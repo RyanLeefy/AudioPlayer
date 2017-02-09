@@ -536,7 +536,7 @@ public class MediaService extends Service {
         if (D) Log.d(TAG, "handleCommandIntent: action = " + action);
 
         if (NEXT_ACTION.equals(action)) {
-            //gotoNext(true);
+            gotoNext(true);
         } else if (PREVIOUS_ACTION.equals(action)) {
             prev();
         } else if (TOGGLEPAUSE_ACTION.equals(action)) {
@@ -796,6 +796,7 @@ public class MediaService extends Service {
 
     private void addToPlayList(final long[] list, int position) {
         final int addlen = list.length;
+        Logger.d("Addtoplaylist");
         if (position < 0) {
             mPlaylist.clear();
             position = 0;
@@ -815,6 +816,7 @@ public class MediaService extends Service {
 
         if (mPlaylist.size() == 0) {
             closeCursor();
+            Logger.d("AddtoplaylistMETA_CHANGED");
             notifyChange(META_CHANGED);
         }
     }
@@ -1087,6 +1089,7 @@ public class MediaService extends Service {
                 if (mIsSupposedToBePlaying) {
                     mIsSupposedToBePlaying = false;
                     notifyChange(PLAYSTATE_CHANGED);
+                    Logger.d("openCurrentAndMaybeNext");
                 }
             } else if (openNext) {
                 setNextTrack();
@@ -1233,10 +1236,12 @@ public class MediaService extends Service {
         intent.putExtra("albumuri", getAlbumPath());
         intent.putExtra("islocal", isTrackLocal());
 
-        sendStickyBroadcast(intent);
+        //sendStickyBroadcast(intent);
+        sendBroadcast(intent);
         final Intent musicIntent = new Intent(intent);
         musicIntent.setAction(what.replace(TIMBER_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
-        sendStickyBroadcast(musicIntent);
+        //sendStickyBroadcast(musicIntent);
+        sendBroadcast(musicIntent);
 //        if (what.equals(TRACK_PREPARED)) {
 //            return;
 //        }
@@ -1282,6 +1287,7 @@ public class MediaService extends Service {
                         .setActions(PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE |
                                 PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
                         .build());
+                Logger.d("updateMediaSession");
             }
         } else if (what.equals(META_CHANGED) || what.equals(QUEUE_CHANGED)) {
             //Bitmap albumArt = ImageLoader.getInstance().loadImageSync(CommonUtils.getAlbumArtUri(getAlbumId()).toString());
@@ -1719,7 +1725,7 @@ public class MediaService extends Service {
         return mShuffleMode;
     }
 
-    public void setShuffleMode(final int shufflemode) {
+        public void setShuffleMode(final int shufflemode) {
         synchronized (this) {
             if (mShuffleMode == shufflemode && mPlaylist.size() > 0) {
                 return;
@@ -2117,6 +2123,7 @@ public class MediaService extends Service {
 
             if (notify) {
                 notifyChange(PLAYSTATE_CHANGED);
+                Logger.d("setIsSupposedToBePlaying");
             }
         }
     }
@@ -2136,9 +2143,8 @@ public class MediaService extends Service {
         synchronized (this) {
 
             mPlaylistInfo = infos;
-            Logger.d( TAG, mPlaylistInfo.toString());
-
-            mShuffleMode = SHUFFLE_NORMAL;
+            Logger.d(mPlaylistInfo.toString());
+            Logger.d("open");
 
             final long oldId = getAudioId();
             final int listlength = list.length;
@@ -2155,6 +2161,7 @@ public class MediaService extends Service {
             if (newlist) {
                 addToPlayList(list, -1);
                 notifyChange(QUEUE_CHANGED);
+                Logger.d("QUEUE_CHANGED");
             }
             if (position >= 0) {
                 mPlayPos = position;
@@ -2167,6 +2174,7 @@ public class MediaService extends Service {
             openCurrentAndNextPlay(true);
             if (oldId != getAudioId()) {
                 notifyChange(META_CHANGED);
+                Logger.d("META_CHANGED");
             }
         }
     }

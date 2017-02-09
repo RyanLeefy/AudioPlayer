@@ -22,11 +22,11 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
 
         //把最左边的多添加的item初始化为最后一个唱片的图片
-        if ( position == 0) {
+        if (position == 0) {
             return RoundFragment.newInstance(MusicPlayer.getAlbumPathAll()[MusicPlayer.getQueueSize() - 1]);
         }
         //把最右边的多添加爱的item初始化为第一个唱片的图片
-        if (position == MusicPlayer.getQueue().length + 1 ) {
+        if (position == MusicPlayer.getQueue().length + 1) {
             return RoundFragment.newInstance(MusicPlayer.getAlbumPathAll()[0]);
         }
 
@@ -48,6 +48,8 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
         super.notifyDataSetChanged();
     }
 
+
+    /*
     @Override
     public int getItemPosition(Object object) {
         if (mChildCount > 0) {
@@ -55,5 +57,7 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
             return POSITION_NONE;
         }
         return super.getItemPosition(object);
-    }
+    }*/
+
+
 }

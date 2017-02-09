@@ -378,7 +378,7 @@ public class MusicPlayer {
     }
 
     /**
-     * 该表模式
+     * 改变模式
      */
     public static void changeMode() {
         if (mService != null) {

@@ -59,6 +59,8 @@ import java.util.List;
 
 public class PlayingActivity extends BaseActivity {
 
+    private ActionBar ab;
+
     //整个视图的背景图片
     private ImageView mBackAlbum;
 
@@ -107,6 +109,8 @@ public class PlayingActivity extends BaseActivity {
     //需要旋转的视图，这里指RoundFragment的根视图
     private View mRotateView;
 
+    private WeakReference<View> mViewWeakReference = new WeakReference<View>(null);
+
     //唱针动画，唱片旋转动画
     private ObjectAnimator mNeedleAnim, mRotateAnim;
 
@@ -115,6 +119,10 @@ public class PlayingActivity extends BaseActivity {
 
     //判断viewpager由手动滑动 还是setcruuentitem换页
     private boolean isNextOrPreSetPage = false;
+
+    //判断是不是点了上一首和下一首，还是直接从LocalMusicFragment进来
+    //直接进来的话唱针直接就在下面，点了上一首和下一首的话唱针有动画
+    private boolean isFromOutSide = true;
 
     private HandlerThread mHandlerThread;
     private MusicChangeHandler mHandler;
@@ -157,9 +165,7 @@ public class PlayingActivity extends BaseActivity {
      * @param show 显示或关闭底部播放控制栏
      */
     @Override
-    protected void showQuickControl(boolean show) {
-
-    }
+    protected void showQuickControl(boolean show) {}
 
     /**
      * 重写该方法，当切换歌曲时候进行刷新
@@ -171,89 +177,21 @@ public class PlayingActivity extends BaseActivity {
             return;
         }
 
-        //Fragment fragment = (RoundFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
 
-        /*
-        if (fragment != null) {
-            View v = fragment.getView();
-            if (mViewWeakReference.get() != v && v != null) {
-                ((ViewGroup) v).setAnimationCacheEnabled(false);
-                if (mViewWeakReference != null)
-                    mViewWeakReference.clear();
-                mViewWeakReference = new WeakReference<View>(v);
-                mRotateView = mViewWeakReference.get();
-            }
-        }*/
-
-        /*
-        if (mRotateView != null) {
-            //            animatorWeakReference = new WeakReference<>((ObjectAnimator) mActiveView.getTag(R.id.tag_animator));
-            //            mRotateAnim = animatorWeakReference.get();
-            mRotateAnim = (ObjectAnimator) mRotateView.getTag(R.id.tag_animator);
-        }*/
+        ab.setTitle(MusicPlayer.getTrackName());
+        ab.setSubtitle(MusicPlayer.getArtistName());
 
 
-        mNeedleAnim = ObjectAnimator.ofFloat(mNeedle, "rotation", -25, 0);
-        mNeedleAnim.setDuration(200);
-        //mNeedleAnim.setRepeatMode();
-        mNeedleAnim.setInterpolator(new LinearInterpolator());
-
-
-        Fragment fragment = (RoundFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
-
-        mRotateAnim = ObjectAnimator.ofFloat(fragment.getView(), "rotation", 0.0F, 360.0F);
-        mRotateAnim.setRepeatCount(Integer.MAX_VALUE);
-        mRotateAnim.setDuration(25000L);
-        mRotateAnim.setInterpolator(new LinearInterpolator());
-
-        //mProgress.setMax((int) MusicPlayer.mDuration());
-
-
-        mAnimatorSet = new AnimatorSet();
-        if (MusicPlayer.isPlaying()) {
-            //重置PlaySeekBar
-            mProgress.removeCallbacks(mUpdateProgress);
-            mProgress.postDelayed(mUpdateProgress, 200);
-            //播放按钮设置为暂停图片
-            mPlayorPause.setImageResource(R.drawable.play_rdi_btn_pause);
-            if (mAnimatorSet != null && mRotateAnim != null && !mRotateAnim.isRunning()) {
-                //修复从playactivity回到Main界面null
-                if (mNeedleAnim == null) {
-                    mNeedleAnim = ObjectAnimator.ofFloat(mNeedle, "rotation", -30, 0);
-                    mNeedleAnim.setDuration(200);
-                    //mNeedleAnim.setRepeatMode(0);
-                    mNeedleAnim.setInterpolator(new LinearInterpolator());
-                }
-                //正在播放，针下去，开始旋转
-                mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
-                mAnimatorSet.start();
-                Logger.d("update start");
-            }
-
-        } else {
-            //暂停PlaySeekBar
-            mProgress.removeCallbacks(mUpdateProgress);
-            //播放按钮设置为暂停图片
-            mPlayorPause.setImageResource(R.drawable.play_rdi_btn_play);
-            //暂停，针回去
-            if (mNeedleAnim != null) {
-                mNeedleAnim.reverse();
-                mNeedleAnim.end();
-            }
-
-            //停止旋转，停在旋转位置
-            if (mRotateAnim != null && mRotateAnim.isRunning()) {
-                mRotateAnim.cancel();
-                float valueAvatar = (float) mRotateAnim.getAnimatedValue();
-                mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
-            }
-        }
-
+        //ControlTool控制的上一首，下一首是先发送PRE或NEXT命令给BaseActivity中接受到在执行刷行界面的
+        //用来刷新通过ControlTool控制的上一首，下一首的页面变化
         isNextOrPreSetPage = false;
         if (MusicPlayer.getQueuePosition() + 1 != mViewPager.getCurrentItem()) {
             mViewPager.setCurrentItem(MusicPlayer.getQueuePosition() + 1);
             isNextOrPreSetPage = true;
         }
+
+        startAnim();
+
 
     }
 
@@ -313,6 +251,10 @@ public class PlayingActivity extends BaseActivity {
         mNeedle = (ImageView) findViewById(R.id.needle);
         mViewPager = (AlbumViewPager) findViewById(R.id.view_pager);
 
+
+        mNeedleAnim = ObjectAnimator.ofFloat(mNeedle, "rotation", -25, 0);
+        mNeedleAnim.setDuration(200);
+        mNeedleAnim.setInterpolator(new LinearInterpolator());
 
 
         initVolumeBar();
@@ -397,7 +339,7 @@ public class PlayingActivity extends BaseActivity {
         toolbar.setSubtitle("歌手名");
         setSupportActionBar(toolbar);
 
-        ActionBar ab = getSupportActionBar();
+        ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -435,6 +377,7 @@ public class PlayingActivity extends BaseActivity {
         }*/
         if(item.getItemId() == android.R.id.home) {
             this.finish();
+            overridePendingTransition(0, R.anim.push_right_out);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -482,7 +425,7 @@ public class PlayingActivity extends BaseActivity {
         //设置页面切换时候的回调，用于显示唱针的动画
         mViewPager.setPageTransformer(true, new ViewPager.PageTransformer() {
                     @Override
-                    public void transformPage(View page, float position) {
+                    public void transformPage(View view, float position) {
 
                         //Logger.d("transformPage");
                         //position为位置[-Infinity,-1)  左边看不到的
@@ -491,44 +434,42 @@ public class PlayingActivity extends BaseActivity {
                         //[ 1 , 0 ]右边划入
 
                         //当看不见的时候，把恢复原样，把旋转动画取消并设置为null
-                        if (position < -1 || position > 1) {
+                        if (position <= -1 || position >= 1) {
+                            mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
                             if (mRotateAnim != null) {
                                 mRotateAnim.setFloatValues(0);
                                 mRotateAnim.end();
                                 mRotateAnim = null;
                             }
+                            Log.e("position","-111");
                         } else if (position == 0) {
                             if (MusicPlayer.isPlaying()) {
                                 Log.e("position","000000000");
-                                //mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
+                                mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
+
                                 if (mRotateAnim != null && !mRotateAnim.isRunning() && mNeedleAnim != null) {
                                     Log.e("position","111");
                                     mAnimatorSet = new AnimatorSet();
                                     mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
                                     mAnimatorSet.start();
-                                    Logger.d("transform start");
                                 }
                             }
-
-                            //} else if (position == -1 || position == -2 || position == 1) {
-
                         } else {
-                            //mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
-
+                            mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
+                            Log.e("position","22222");
                             if (mNeedleAnim != null) {
                                 mNeedleAnim.reverse();
                                 mNeedleAnim.end();
                             }
 
-                            //mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
+                            mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
                             if (mRotateAnim != null) {
                                 mRotateAnim.cancel();
                                 float valueAvatar = (float) mRotateAnim.getAnimatedValue();
                                 mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
-
                             }
-
                         }
+
                     }
                 });
 
@@ -538,18 +479,24 @@ public class PlayingActivity extends BaseActivity {
             @Override
             public void onPageSelected(final int pPosition) {
 
-                Logger.d("OnPageSelected" + pPosition);
+                Logger.d("OnPageSelected:" + pPosition);
+                Logger.d("MusicPlayer.getQueue().length:" + MusicPlayer.getQueue().length);
+                Logger.d("MusicPlayer.getQueuePosition():" + MusicPlayer.getQueuePosition());
+
 
                 if (pPosition < 1) { //首位之前，跳转到末尾（N）
                     MusicPlayer.setQueuePosition(MusicPlayer.getQueue().length - 1);
-                    mViewPager.setCurrentItem(MusicPlayer.getQueue().length, false);
+                    mViewPager.setCurrentItem(MusicPlayer.getQueue().length);
                     isNextOrPreSetPage = false;
+                    Logger.d("Message:tiaodaowei");
                     return;
 
                 } else if (pPosition > MusicPlayer.getQueue().length) { //末位之后，跳转到首位（1）
                     MusicPlayer.setQueuePosition(0);
-                    mViewPager.setCurrentItem(1, false); //false:不显示跳转过程的动画
+                    //mViewPager.setCurrentItem(1, false); //false:不显示跳转过程的动画
+                    mViewPager.setCurrentItem(1);
                     isNextOrPreSetPage = false;
+                    Logger.d("Message:tiaodaotou");
                     return;
                 } else {
                     if (!isNextOrPreSetPage) {
@@ -558,17 +505,18 @@ public class PlayingActivity extends BaseActivity {
                             Message msg = new Message();
                             msg.what = PRE_MUSIC;
                             mHandler.sendMessageDelayed(msg, TIME_DELAY);
+                            Logger.d("Message:PRE");
 
                         } else if (pPosition > MusicPlayer.getQueuePosition() + 1) {
                             //下一首，发送消息到Handler中处理
                             Message msg = new Message();
                             msg.what = NEXT_MUSIC;
                             mHandler.sendMessageDelayed(msg, TIME_DELAY);
+                            Logger.d("Message:Next");
                         }
                     }
 
                 }
-                //MusicPlayer.setQueuePosition(pPosition - 1);
                 isNextOrPreSetPage = false;
 
 
@@ -702,6 +650,7 @@ public class PlayingActivity extends BaseActivity {
                 Message msg = new Message();
                 msg.what = PRE_MUSIC;
                 mHandler.sendMessage(msg);
+                isFromOutSide = false;
             }
         });
 
@@ -734,6 +683,7 @@ public class PlayingActivity extends BaseActivity {
                 Message msg = new Message();
                 msg.what = NEXT_MUSIC;
                 mHandler.sendMessage(msg);
+                isFromOutSide = false;
             }
         });
 
@@ -805,6 +755,83 @@ public class PlayingActivity extends BaseActivity {
         }
         return rows;
     }
+
+
+    public void startAnim() {
+        Fragment fragment = (RoundFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
+
+
+        if (fragment != null) {
+            View v = fragment.getView();
+            if (mViewWeakReference.get() != v && v != null) {
+                ((ViewGroup) v).setAnimationCacheEnabled(false);
+                if (mViewWeakReference != null)
+                    mViewWeakReference.clear();
+                mViewWeakReference = new WeakReference<View>(v);
+                mRotateView = mViewWeakReference.get();
+            }
+        }
+
+        if(mRotateView != null)
+            mRotateAnim = (ObjectAnimator) mRotateView.getTag(R.id.tag_animator);
+
+
+        //这里再判断一下，如果是点上一首下一首的就针下去
+        //否则是进来的话就直接下去
+
+
+        mAnimatorSet = new AnimatorSet();
+        if (MusicPlayer.isPlaying()) {
+            //重置PlaySeekBar
+            mProgress.removeCallbacks(mUpdateProgress);
+            mProgress.postDelayed(mUpdateProgress, 200);
+            //播放按钮设置为暂停图片
+            mPlayorPause.setImageResource(R.drawable.play_rdi_btn_pause);
+
+            if (mAnimatorSet != null && mRotateAnim != null && !mRotateAnim.isRunning()) {
+                //正在播放，针下去，开始旋转
+
+                //修复从playactivity回到Main界面null
+                if (mNeedleAnim == null) {
+                    mNeedleAnim = ObjectAnimator.ofFloat(mNeedle, "rotation", -30, 0);
+                    mNeedleAnim.setDuration(200);
+                    mNeedleAnim.setInterpolator(new LinearInterpolator());
+                }
+
+                if(isFromOutSide) {
+                    mNeedleAnim.reverse();
+                    mNeedleAnim.end();
+                    mRotateAnim.start();
+                } else {
+
+                mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
+                mAnimatorSet.start();
+                }
+
+                Logger.d("update start");
+            }
+
+        } else {
+            //暂停PlaySeekBar
+            mProgress.removeCallbacks(mUpdateProgress);
+            //播放按钮设置为暂停图片
+            mPlayorPause.setImageResource(R.drawable.play_rdi_btn_play);
+            //暂停，针回去
+            if (mNeedleAnim != null) {
+                mNeedleAnim.reverse();
+                mNeedleAnim.end();
+            }
+
+            //停止旋转，停在旋转位置
+            if (mRotateAnim != null && mRotateAnim.isRunning()) {
+                mRotateAnim.cancel();
+                float valueAvatar = (float) mRotateAnim.getAnimatedValue();
+                mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
+            }
+        }
+    }
+
+
 
     /**
      *
