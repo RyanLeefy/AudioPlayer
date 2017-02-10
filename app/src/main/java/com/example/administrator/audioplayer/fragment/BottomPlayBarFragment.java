@@ -68,7 +68,8 @@ public class BottomPlayBarFragment extends BaseFragment {
     private View rootView;
     private ImageView playQueue, next;
     private String TAG = "QuickControlsFragment";
-    private static BottomPlayBarFragment fragment;
+
+
 
     public static BottomPlayBarFragment newInstance() {
         return new BottomPlayBarFragment();
@@ -99,12 +100,7 @@ public class BottomPlayBarFragment extends BaseFragment {
                     //Toast.makeText(MyApplication.getContext(), getResources().getString(R.string.queue_is_empty),
                     //        Toast.LENGTH_SHORT).show();
                 } else {
-                    GlobalHandler.getInstance().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            MusicPlayer.playOrPause();
-                        }
-                    }, 60);
+                    MusicPlayer.playOrPause();
                 }
 
             }
@@ -113,36 +109,15 @@ public class BottomPlayBarFragment extends BaseFragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        MusicPlayer.next();
-                    }
-                }, 60);
-
+                MusicPlayer.next();
             }
         });
 
         playQueue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //弹出播放列表Fragment
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        Fragment prev = getFragmentManager().findFragmentByTag("playqueuefragment");
-                        if (prev != null) {
-                            ft.remove(prev);
-                        }
-                        ft.addToBackStack(null);
-                        PlayQueueFragment playQueueFragment = new PlayQueueFragment();
-                        playQueueFragment.show(ft, "playqueuefragment");
-                    }
-                }, 60);
-
+                PlayQueueFragment playQueueFragment = new PlayQueueFragment();
+                playQueueFragment.show(getFragmentManager(), "playqueuefragment");
             }
         });
 
@@ -227,11 +202,11 @@ public class BottomPlayBarFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        //在重新显示的时候刷新ui
         mProgress.setMax(1000);
-        mProgress.removeCallbacks(mUpdateProgress);
         mProgress.postDelayed(mUpdateProgress, 10);
         updateNowplayingCard();
-
+        updateState();
     }
 
 
@@ -243,7 +218,6 @@ public class BottomPlayBarFragment extends BaseFragment {
     public void updateState() {
         if (MusicPlayer.isPlaying()) {
             mPlayPause.setImageResource(R.drawable.playbar_btn_pause);
-            mProgress.removeCallbacks(mUpdateProgress);
             mProgress.postDelayed(mUpdateProgress, 50);
         } else {
             mPlayPause.setImageResource(R.drawable.playbar_btn_play);
@@ -251,15 +225,24 @@ public class BottomPlayBarFragment extends BaseFragment {
         }
     }
 
-
     /**
-     * 重写父类updateTrackInfo()方法，供BaseActivity调用，刷新底部播放栏
+     * 重写该方法，当歌曲信息变更的时候调用
+     * 唱针动画和唱片动画
      */
     @Override
-    public void updateTrackInfo() {
+    public void onMetaChange() {
         updateNowplayingCard();
+    }
+
+
+    /**
+     * 重写该方法，当歌曲播放状态变更的时候调用
+     */
+    @Override
+    public void onPlayStateChange() {
         updateState();
     }
+
 
 
 

@@ -24,6 +24,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="收藏"
+                android:textColor="@color/count_color"
                 android:layout_margin="3dp"
                 android:textSize="12sp" />
 
@@ -34,7 +35,7 @@
                 android:layout_weight="6"
                 android:gravity="center"
                 android:text="播放列表"
-                android:textColor="@color/count_color"
+                android:textColor="@color/text_color"
                 android:textSize="15sp" />
 
             <TextView
@@ -44,6 +45,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="清空"
+                android:textColor="@color/count_color"
                 android:layout_margin="3dp"
                 android:textSize="12sp" />
         </LinearLayout>

@@ -31,7 +31,7 @@ public class LocalSearchModel implements ILocalSearchModel {
         if ((cursor != null) && (cursor.moveToFirst()))
             do {
                 MusicInfo musicInfo = new MusicInfo();
-                musicInfo.setSongId((int) cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+                musicInfo.setAudioId((int) cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                 musicInfo.setAlbumId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
                 musicInfo.setMusicName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
                 musicInfo.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));

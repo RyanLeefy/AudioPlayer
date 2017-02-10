@@ -51,7 +51,7 @@ public class LocalMusicModel implements ILocalMusicModel{
         while (cursor.moveToNext()) {
 
             MusicInfo music = new MusicInfo();
-            music.setSongId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+            music.setAudioId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
             music.setAlbumId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
             music.setAlbumName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM)));
             music.setAlbumData(getAlbumArtUri(music.getAlbumId()) + "");

@@ -17,12 +17,18 @@ import java.util.List;
 
 /**
  * Created on 2017/1/26.
+ * 歌曲的adapter，默认没有PlayItem，需要的话初始化时候传入true
+ * 默认末尾是更多，若是删除，需要setMore(false)
  */
 
-public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
+    //有无第一个播放全部项
     private boolean HasPlayItem = false;
+
+    //末尾是更多还是删除
+    private boolean isMore = true;
     final static int FIRST_ITEM = 0;
     final static int ITEM = 1;
     private Context mContext;
@@ -34,13 +40,13 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private OnMusicItemClickListener onMusicItemClickListener;
 
 
-    public LocalMusicAdapter(Context context, List list) {
+    public MusicAdapter(Context context, List list) {
         mContext = context;
         mInflater = LayoutInflater.from(mContext);
         mList = list;
     }
 
-    public LocalMusicAdapter(Context context, List list, boolean hasPlayItem) {
+    public MusicAdapter(Context context, List list, boolean hasPlayItem) {
         mContext = context;
         mInflater = LayoutInflater.from(mContext);
         mList = list;
@@ -57,6 +63,10 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public void updateAdapter(List list) {
         this.mList = list;
+    }
+
+    public void setMore(boolean isMore) {
+        this.isMore = isMore;
     }
 
 
@@ -120,6 +130,16 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
                 ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(realPosition)).getMusicName());
                 ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(realPosition)).getArtist());
+
+                if(isMore) {
+                    //末尾是更多图片
+                    ((MusicItemViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_more);
+                } else {
+                    //末尾是删除图片
+                    ((MusicItemViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_delete);
+                }
+
+                //设置点击事件
                 if(onMusicItemClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override

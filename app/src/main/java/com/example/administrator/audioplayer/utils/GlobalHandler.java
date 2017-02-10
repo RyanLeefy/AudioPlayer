@@ -16,7 +16,7 @@ public class GlobalHandler extends Handler {
     private WeakReference<Context> reference;
     private static GlobalHandler instance = null;
 
-    public GlobalHandler() {
+    private GlobalHandler() {
         reference = new WeakReference<Context>(MyApplication.getContext());
     }
     public static GlobalHandler getInstance() {

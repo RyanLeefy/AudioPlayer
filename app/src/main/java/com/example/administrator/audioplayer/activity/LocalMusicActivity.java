@@ -2,13 +2,9 @@ package com.example.administrator.audioplayer.activity;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 
-import com.example.administrator.audioplayer.Iview.ILocalMusicView;
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
 

@@ -19,15 +19,12 @@ import android.widget.Toast;
 import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
-import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.presenterImp.LocalMusicPresenter;
-import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 
 
 public class LocalMusicFragment extends BaseFragment implements ILocalMusicView {
@@ -149,9 +146,9 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
 
 
     @Override
-    public void setAdapter(LocalMusicAdapter adapter) {
+    public void setAdapter(MusicAdapter adapter) {
        //获取回来的adapter先设置监听事件，然后再设置给recycleView
-        adapter.setOnPlayAllItemClickListener(new LocalMusicAdapter.OnPlayAllItemClickListener() {
+        adapter.setOnPlayAllItemClickListener(new MusicAdapter.OnPlayAllItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Toast.makeText(getActivity(), "播放全部", Toast.LENGTH_SHORT).show();
@@ -163,7 +160,7 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
             }
         });
 
-        adapter.setOnMusicItemClickListener(new LocalMusicAdapter.OnMusicItemClickListener() {
+        adapter.setOnMusicItemClickListener(new MusicAdapter.OnMusicItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 //获取点击的MusicInfo实体类((LocalMusicAdapter)rv.getAdapter()).getItem(position)
@@ -171,12 +168,12 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
 
                 presenter.pefromMusicClick(position);
 
-                Toast.makeText(getActivity(), ((LocalMusicAdapter)rv.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), ((MusicAdapter)rv.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onMoreClick(View view, int position) {
-                Toast.makeText(getActivity(), ((LocalMusicAdapter)rv.getAdapter()).getItem(position).getMusicName() + "more", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), ((MusicAdapter)rv.getAdapter()).getItem(position).getMusicName() + "more", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.example.administrator.audioplayer.Ipresenter.ILocalSearchPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalSearchView;
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.presenterImp.LocalSearchPresenter;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
@@ -140,9 +140,9 @@ public class LocalSearchFragment extends BaseFragment implements ILocalSearchVie
     }*/
 
     @Override
-    public void setAdapter(LocalMusicAdapter adapter) {
+    public void setAdapter(MusicAdapter adapter) {
         //获取回来的adapter先设置监听事件，然后再设置给recycleView
-        adapter.setOnMusicItemClickListener(new LocalMusicAdapter.OnMusicItemClickListener() {
+        adapter.setOnMusicItemClickListener(new MusicAdapter.OnMusicItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
 

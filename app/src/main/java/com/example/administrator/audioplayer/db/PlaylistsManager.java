@@ -36,13 +36,13 @@ public class PlaylistsManager {
     //建立播放列表表设置播放列表id和歌曲id为复合主键
     public void onCreate(final SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + PlaylistsColumns.NAME + " ("
-                + PlaylistsColumns.PLAYLIST_ID + " LONG NOT NULL," + PlaylistsColumns.TRACK_ID + " LONG NOT NULL,"
+                + PlaylistsColumns.PLAYLIST_ID + " LONG NOT NULL," + PlaylistsColumns.AUDIO_ID + " LONG NOT NULL,"
                 + PlaylistsColumns.TRACK_NAME + " CHAR NOT NULL," + PlaylistsColumns.ALBUM_ID + " LONG,"
                 + PlaylistsColumns.ALBUM_NAME + " CHAR," + PlaylistsColumns.ALBUM_ART + " CHAR,"
                 + PlaylistsColumns.ARTIST_ID + " LONG," + PlaylistsColumns.ARTIST_NAME + " CHAR,"
                 + PlaylistsColumns.IS_LOCAL + " BOOLEAN ," + PlaylistsColumns.PATH + " CHAR,"
                 + PlaylistsColumns.TRACK_ORDER + " LONG NOT NULL, primary key ( " + PlaylistsColumns.PLAYLIST_ID
-                + ", " + PlaylistsColumns.TRACK_ID + "));");
+                + ", " + PlaylistsColumns.AUDIO_ID + "));");
     }
 
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
@@ -65,7 +65,7 @@ public class PlaylistsManager {
         try {
             ContentValues values = new ContentValues(3);
             values.put(PlaylistsColumns.PLAYLIST_ID, playlistid);
-            values.put(PlaylistsColumns.TRACK_ID, id);
+            values.put(PlaylistsColumns.AUDIO_ID, id);
             values.put(PlaylistsColumns.TRACK_ORDER, getPlaylist(playlistid).size());
             database.insert(PlaylistsColumns.NAME, null, values);
             database.setTransactionSuccessful();
@@ -84,7 +84,7 @@ public class PlaylistsManager {
         try {
             ContentValues values = new ContentValues(11);
             values.put(PlaylistsColumns.PLAYLIST_ID, playlistid);
-            values.put(PlaylistsColumns.TRACK_ID, info.getSongId());
+            values.put(PlaylistsColumns.AUDIO_ID, info.getAudioId());
             values.put(PlaylistsColumns.TRACK_ORDER, getPlaylist(playlistid).size());
             values.put(PlaylistsColumns.TRACK_NAME, info.getMusicName());
             values.put(PlaylistsColumns.ALBUM_ID, info.getAlbumId());
@@ -125,7 +125,7 @@ public class PlaylistsManager {
                 MusicInfo info = musicInfos.get(i);
                 ContentValues values = new ContentValues(11);
                 values.put(PlaylistsColumns.PLAYLIST_ID, playlistid);
-                values.put(PlaylistsColumns.TRACK_ID, info.getSongId());
+                values.put(PlaylistsColumns.AUDIO_ID, info.getAudioId());
                 values.put(PlaylistsColumns.TRACK_ORDER, getPlaylist(playlistid).size());
                 values.put(PlaylistsColumns.TRACK_NAME, info.getMusicName());
                 values.put(PlaylistsColumns.ALBUM_ID, info.getAlbumId());
@@ -181,7 +181,7 @@ public class PlaylistsManager {
             ContentValues values = new ContentValues(1);
             values.put(PlaylistsColumns.TRACK_ORDER, order);
             database.update(PlaylistsColumns.NAME, values, PlaylistsColumns.PLAYLIST_ID + " = ?" + " AND " +
-                    PlaylistsColumns.TRACK_ID + " = ?", new String[]{playlistid + "", id + ""});
+                    PlaylistsColumns.AUDIO_ID + " = ?", new String[]{playlistid + "", id + ""});
             database.setTransactionSuccessful();
         } finally {
             database.endTransaction();
@@ -195,7 +195,7 @@ public class PlaylistsManager {
         try {
             cursor = mMusicDatabase.getReadableDatabase().query(PlaylistsColumns.NAME, null,
                     PlaylistsColumns.PLAYLIST_ID + " = ?" + " AND " +
-                            PlaylistsColumns.TRACK_ID + " = ?", new String[]{favPlaylistId + "", id + ""}, null, null, null, null);
+                            PlaylistsColumns.AUDIO_ID + " = ?", new String[]{favPlaylistId + "", id + ""}, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 return true;
             }
@@ -220,7 +220,7 @@ public class PlaylistsManager {
                 ContentValues values = new ContentValues(1);
                 values.put(PlaylistsColumns.TRACK_ORDER, order[i]);
                 database.update(PlaylistsColumns.NAME, values, PlaylistsColumns.PLAYLIST_ID + " = ?" + " AND " +
-                        PlaylistsColumns.TRACK_ID + " = ?", new String[]{playlistid + "", ids[i] + ""});
+                        PlaylistsColumns.AUDIO_ID + " = ?", new String[]{playlistid + "", ids[i] + ""});
             }
 
             database.setTransactionSuccessful();
@@ -230,10 +230,10 @@ public class PlaylistsManager {
 
     }
 
-    public void removeItem(Context context, final long playlistId, long songId) {
+    public void removeItem(Context context, final long playlistId, long audioId) {
         final SQLiteDatabase database = mMusicDatabase.getWritableDatabase();
-        database.delete(PlaylistsColumns.NAME, PlaylistsColumns.PLAYLIST_ID + " = ?" + " AND " + PlaylistsColumns.TRACK_ID + " = ?", new String[]{
-                String.valueOf(playlistId), String.valueOf(songId)
+        database.delete(PlaylistsColumns.NAME, PlaylistsColumns.PLAYLIST_ID + " = ?" + " AND " + PlaylistsColumns.AUDIO_ID + " = ?", new String[]{
+                String.valueOf(playlistId), String.valueOf(audioId)
         });
 
         PlaylistInfo playlistInfo = PlaylistInfo.getInstance(context);
@@ -253,7 +253,7 @@ public class PlaylistsManager {
         Cursor cursor = null;
         try {
             cursor = mMusicDatabase.getReadableDatabase().query(PlaylistsColumns.NAME, null,
-                    PlaylistsColumns.PLAYLIST_ID + " = ? and" + PlaylistsColumns.TRACK_ID + " = ?", new String[]{
+                    PlaylistsColumns.PLAYLIST_ID + " = ? and" + PlaylistsColumns.AUDIO_ID + " = ?", new String[]{
                             String.valueOf(playlistid), String.valueOf(musicid)
                     }, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
@@ -285,7 +285,7 @@ public class PlaylistsManager {
         Cursor cursor = null;
         try {
             cursor = mMusicDatabase.getReadableDatabase().query(PlaylistsColumns.NAME, null,
-                    PlaylistsColumns.TRACK_ID + " = " + String.valueOf(musicId), null, null, null, null, null);
+                    PlaylistsColumns.AUDIO_ID + " = " + String.valueOf(musicId), null, null, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 long[] deletedPlaylistIds = new long[cursor.getCount()];
                 int i = 0;
@@ -306,7 +306,7 @@ public class PlaylistsManager {
             }
         }
 
-        database.delete(PlaylistsColumns.NAME, PlaylistsColumns.TRACK_ID + " = ?", new String[]
+        database.delete(PlaylistsColumns.NAME, PlaylistsColumns.AUDIO_ID + " = ?", new String[]
                 {String.valueOf(musicId)});
     }
 
@@ -382,7 +382,7 @@ public class PlaylistsManager {
 
                 do {
                     MusicInfo info = new MusicInfo();
-                    info.setSongId(cursor.getLong(1));
+                    info.setAudioId(cursor.getLong(1));
                     info.setMusicName(cursor.getString(2));
                     info.setAlbumId(cursor.getInt(3));
                     info.setAlbumName(cursor.getString(4));
@@ -412,7 +412,7 @@ public class PlaylistsManager {
         String PLAYLIST_ID = "playlist_id";
 
         /* Time played column */
-        String TRACK_ID = "track_id";
+        String AUDIO_ID = "audio_id";
 
         String TRACK_ORDER = "track_order";
 

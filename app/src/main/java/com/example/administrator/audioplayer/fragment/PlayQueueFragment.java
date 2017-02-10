@@ -37,13 +37,11 @@ public class PlayQueueFragment extends DialogFragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //设置无标题
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         //设置从底部弹出
         WindowManager.LayoutParams params = getDialog().getWindow()
                 .getAttributes();
         params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setAttributes(params);
 
 

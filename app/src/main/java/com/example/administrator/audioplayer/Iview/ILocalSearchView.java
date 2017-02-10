@@ -1,11 +1,11 @@
 package com.example.administrator.audioplayer.Iview;
 
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 
 /**
  * Created by on 2017/2/4.
  */
 
 public interface ILocalSearchView {
-    void setAdapter(LocalMusicAdapter adapter);
+    void setAdapter(MusicAdapter adapter);
 }

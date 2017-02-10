@@ -3,14 +3,13 @@ package com.example.administrator.audioplayer.presenterImp;
 import com.example.administrator.audioplayer.Imodel.ILocalMusicModel;
 import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.orhanobut.logger.Logger;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
                 //设置adapter，刷新界面
                 Logger.d(list.size());
                 mList = list;
-                LocalMusicAdapter adapter = new LocalMusicAdapter(((LocalMusicFragment)view).getActivity(), list, true);
+                MusicAdapter adapter = new MusicAdapter(((LocalMusicFragment)view).getActivity(), list, true);
                 view.setAdapter(adapter);
             }
         };
@@ -89,7 +88,7 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
             HashMap<Long, MusicInfo> infos = new HashMap();
             for (int i = 0; i < mList.size(); i++) {
                 MusicInfo info = mList.get(i);
-                list[i] = info.getSongId();
+                list[i] = info.getAudioId();
                 info.setIslocal(true);
                 //info.albumData = MusicUtils.getAlbumArtUri(info.albumId) + "";
                 infos.put(list[i], mList.get(i));

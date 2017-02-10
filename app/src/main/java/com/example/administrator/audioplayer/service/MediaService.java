@@ -828,7 +828,7 @@ public class MediaService extends Service {
         MusicInfo info = mPlaylistInfo.get(trackId);
         if (mPlaylistInfo.get(trackId) != null) {
             MatrixCursor cursor = new MatrixCursor(PROJECTION);
-            cursor.addRow(new Object[]{info.getSongId(), info.getArtist(), info.getAlbumName(), info.getMusicName()
+            cursor.addRow(new Object[]{info.getAudioId(), info.getArtist(), info.getAlbumName(), info.getMusicName()
                     , info.getData(), info.getAlbumData(), info.getAlbumId(), info.getArtistId()});
             cursor.moveToFirst();
             mCursor = cursor;

@@ -107,9 +107,14 @@ public class BaseActivity extends AppCompatActivity {
 
 
     /**
-     * 歌曲切换，在需要的activity中具体实现
+     * 歌曲信息变更，在需要的activity中具体实现
      */
-    public void updateTrack() {}
+    public void onMetaChange() {}
+
+    /**
+     * 歌曲状态切换，在需要的activity中具体实现
+     */
+    public void onPlayStateChange() {}
 
 
     /**
@@ -122,13 +127,33 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * 更新歌曲状态信息，在需要的fragment中具体实现
      */
-    public void updateTrackInfo() {
+    public void onMetaChangeAction() {
+        //调用acticity的onMetaChange();
+        onMetaChange();
+
         for (final MusicStateListener listener : mMusicListener) {
             if (listener != null) {
-                listener.reloadAdapter();
-                listener.updateTrackInfo();
+                //listener.reloadAdapter();
+                //listener.updateTrackInfo();
+                //调用fragment的onMetaChange();
+                listener.onMetaChange();
             }
         }
+    }
+
+
+    public void onPlayStateChangeAction() {
+        //调用acticity的onPlyaStateChange();
+        onPlayStateChange();
+
+        for (final MusicStateListener listener : mMusicListener) {
+            if (listener != null) {
+
+                //调用fragment的onPlyaStateChange();
+                listener.onPlayStateChange();
+            }
+        }
+
     }
 
     /**
@@ -196,10 +221,11 @@ public class BaseActivity extends AppCompatActivity {
             BaseActivity baseActivity = mReference.get();
             if (baseActivity != null) {
                 if (action.equals(MediaService.META_CHANGED)) {
-                    baseActivity.updateTrack();
-                    baseActivity.updateTrackInfo();
+                    //调用activity和fragment的onMetaChange()
+                    baseActivity.onMetaChangeAction();
                 } else if (action.equals(MediaService.PLAYSTATE_CHANGED)) {
-
+                    //调用activity和fragment的onPlayStateChange()
+                    baseActivity.onPlayStateChangeAction();
                 } else if (action.equals(MediaService.TRACK_PREPARED)) {
                     //bottomPlayBarFragment.updateTime();
                 } else if (action.equals(MediaService.BUFFER_UP)) {
@@ -248,6 +274,18 @@ public class BaseActivity extends AppCompatActivity {
      * fragment中要实现的回调接口，用于在播放状态改变时候做出相应操作
      */
     public interface MusicStateListener {
+
+
+        /**
+         *
+         */
+        void onMetaChange();
+
+
+        /**
+         *
+         */
+        void onPlayStateChange();
 
         /**
          * 更新歌曲状态信息

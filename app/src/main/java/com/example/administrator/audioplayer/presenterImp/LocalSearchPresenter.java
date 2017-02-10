@@ -3,7 +3,7 @@ package com.example.administrator.audioplayer.presenterImp;
 import com.example.administrator.audioplayer.Imodel.ILocalSearchModel;
 import com.example.administrator.audioplayer.Ipresenter.ILocalSearchPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalSearchView;
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
 import com.example.administrator.audioplayer.modelImp.LocalSearchModel;
@@ -50,7 +50,7 @@ public class LocalSearchPresenter implements ILocalSearchPresenter {
 
             @Override
             public void onNext(List<MusicInfo> musicInfos) {
-                LocalMusicAdapter adapter = new LocalMusicAdapter(((LocalSearchFragment) view).getActivity(), musicInfos);
+                MusicAdapter adapter = new MusicAdapter(((LocalSearchFragment) view).getActivity(), musicInfos);
                 view.setAdapter(adapter);
             }
         };

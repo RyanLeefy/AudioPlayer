@@ -56,9 +56,9 @@
 
     <!--PlayQueueFragment的样式-->
     <style name="BottomDialogFragment" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
+        <!--表示浮在屏幕上的，背景虚化，所以这个只适用于dialog -->
         <item name="android:windowIsFloating">true</item>
+        <!--设置进入退出动画-->
         <item name="android:windowAnimationStyle">@style/Popupwindow</item>
     </style>
 

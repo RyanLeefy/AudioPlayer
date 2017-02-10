@@ -1,6 +1,6 @@
 package com.example.administrator.audioplayer.Iview;
 
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 
 /**
  * LocalMusicFragment实现它
@@ -8,5 +8,5 @@ import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
  */
 
 public interface ILocalMusicView {
-    void setAdapter(LocalMusicAdapter adapter);
+    void setAdapter(MusicAdapter adapter);
 }

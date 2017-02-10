@@ -7,11 +7,10 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.example.administrator.audioplayer.MyApplication;
-import com.example.administrator.audioplayer.adapter.LocalMusicAdapter;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 
@@ -108,12 +107,12 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
                 }
             }
             //本地播放里面第一个播放全部的item
-            if(parent.getChildViewHolder(child) instanceof LocalMusicAdapter.PlayAllItemViewHolder) {
+            if(parent.getChildViewHolder(child) instanceof MusicAdapter.PlayAllItemViewHolder) {
                 left = parent.getPaddingLeft();
             }
             //本地播放里面其他歌曲item
-            if(parent.getChildViewHolder(child) instanceof LocalMusicAdapter.MusicItemViewHolder) {
-                LocalMusicAdapter.MusicItemViewHolder viewHolder = (LocalMusicAdapter.MusicItemViewHolder)parent.getChildViewHolder(child);
+            if(parent.getChildViewHolder(child) instanceof MusicAdapter.MusicItemViewHolder) {
+                MusicAdapter.MusicItemViewHolder viewHolder = (MusicAdapter.MusicItemViewHolder)parent.getChildViewHolder(child);
                 left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 13);
             }
 

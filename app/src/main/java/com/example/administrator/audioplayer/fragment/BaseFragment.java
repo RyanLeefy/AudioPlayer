@@ -55,6 +55,12 @@ public class BaseFragment extends Fragment implements BaseActivity.MusicStateLis
     }
 
 
+    @Override
+    public void onMetaChange() {}
+
+    @Override
+    public void onPlayStateChange() {}
+
     /**
      * BaseActivity中监听各种播放状态然后执行的函数，默认为空，子类需要自己实现
      */
