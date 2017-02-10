@@ -8,11 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.service.MusicTrack;
+//import com.example.administrator.audioplayer.service.MusicTrack;
 
 import java.util.ArrayList;
 
-
+/*
 public class PlaylistsManager {
 
 
@@ -405,13 +405,13 @@ public class PlaylistsManager {
     }
 
     public interface PlaylistsColumns {
-        /* Table name */
+        // Table name
         String NAME = "playlists";
 
-        /* Album IDs column */
+        // Album IDs column
         String PLAYLIST_ID = "playlist_id";
 
-        /* Time played column */
+        // Time played column
         String AUDIO_ID = "audio_id";
 
         String TRACK_ORDER = "track_order";
@@ -434,4 +434,4 @@ public class PlaylistsManager {
 
         String ALBUM_ART = "album_art";
     }
-}
+*/

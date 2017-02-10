@@ -21,8 +21,10 @@ import android.widget.Toast;
 
 import com.example.administrator.audioplayer.bean.MusicInfo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.WeakHashMap;
 
 /**
@@ -39,7 +41,7 @@ public class MusicPlayer {
     //绑定映射，用于解绑
     private static WeakHashMap<Context, ServiceBinder> mConnectionMap = new WeakHashMap<Context, ServiceBinder>();
 
-    private static final long[] sEmptyList = new long[0];
+    private static final List<MusicInfo> sEmptyList = new ArrayList<>();
 
 
     //初始化，绑定服务,多次调用不会重复绑定
@@ -100,8 +102,8 @@ public class MusicPlayer {
     }
 
 
-    public static synchronized void playAll(final HashMap<Long, MusicInfo> infos, final long[] list, int position, final boolean forceShuffle) {
-        if (list == null || list.length == 0 || mService == null) {
+    public static synchronized void playAll(final List<MusicInfo> list, int position, final boolean forceShuffle) {
+        if (list == null || list.size() == 0 || mService == null) {
             return;
         }
         try {
@@ -109,13 +111,14 @@ public class MusicPlayer {
                 mService.setShuffleMode(MediaService.SHUFFLE_NORMAL);
             }
             final long currentId = mService.getAudioId();
-            long playId = list[position];
+
             Log.e("currentId", currentId + "");
             final int currentQueuePosition = getQueuePosition();
             if (position != -1) {
-                final long[] playlist = getQueue();
-                if (Arrays.equals(list, playlist)) {
-                    if (currentQueuePosition == position && currentId == list[position]) {
+                final List<MusicInfo> playlist = getQueue();
+
+                if (list.size() == playlist.size() && list.containsAll(playlist)) {
+                    if (currentQueuePosition == position && currentId == list.get(position).getAudioId()) {
                         mService.play();
                         return;
                     } else {
@@ -128,7 +131,7 @@ public class MusicPlayer {
             if (position < 0) {
                 position = 0;
             }
-            mService.open(infos, list, forceShuffle ? -1 : position);
+            mService.open(list, forceShuffle ? -1 : position);
             mService.play();
             Log.e("time", System.currentTimeMillis() + "");
         } catch (IllegalStateException e) {
@@ -333,7 +336,7 @@ public class MusicPlayer {
         return 0;
     }
 
-    public static final long[] getQueue() {
+    public static final List<MusicInfo> getQueue() {
         if (mService != null) {
             return mService.getQueue();
         } else {

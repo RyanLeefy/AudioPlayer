@@ -26,7 +26,7 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
             return RoundFragment.newInstance(MusicPlayer.getAlbumPathAll()[MusicPlayer.getQueueSize() - 1]);
         }
         //把最右边的多添加爱的item初始化为第一个唱片的图片
-        if (position == MusicPlayer.getQueue().length + 1) {
+        if (position == MusicPlayer.getQueue().size() + 1) {
             return RoundFragment.newInstance(MusicPlayer.getAlbumPathAll()[0]);
         }
 
@@ -38,7 +38,7 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         //左右各加一个
-        return MusicPlayer.getQueue().length + 2;
+        return MusicPlayer.getQueue().size() + 2;
     }
 
 

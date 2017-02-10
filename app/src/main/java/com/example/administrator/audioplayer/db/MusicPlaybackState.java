@@ -22,7 +22,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 
-import com.example.administrator.audioplayer.service.MusicTrack;
+//import com.example.administrator.audioplayer.service.MusicTrack;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +31,7 @@ import java.util.LinkedList;
 /**
  * This keeps track of the music playback and history state of the playback service
  */
+/*
 public class MusicPlaybackState {
     private static MusicPlaybackState sInstance = null;
 
@@ -251,4 +252,4 @@ public class MusicPlaybackState {
 
         public static final String POSITION = "position";
     }
-}
+}*/

@@ -25,6 +25,7 @@ import android.os.Parcelable;
  * It has extra meta data to determine where the track came from so that we can show the appropriate
  * song playing indicator
  */
+/*
 public class MusicTrack implements Parcelable {
 
 
@@ -77,4 +78,4 @@ public class MusicTrack implements Parcelable {
 
     }
 
-}
+}*/

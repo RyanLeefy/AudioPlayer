@@ -44,6 +44,7 @@ import com.example.administrator.audioplayer.lrc.LrcView;
 import com.example.administrator.audioplayer.service.MediaService;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.utils.CommonUtils;
+import com.example.administrator.audioplayer.utils.GlobalHandler;
 import com.example.administrator.audioplayer.widget.AlbumViewPager;
 import com.example.administrator.audioplayer.widget.PlayingSeekBar;
 import com.orhanobut.logger.Logger;
@@ -545,18 +546,18 @@ public class PlayingActivity extends BaseActivity {
             public void onPageSelected(final int pPosition) {
 
                 Logger.d("OnPageSelected:" + pPosition);
-                Logger.d("MusicPlayer.getQueue().length:" + MusicPlayer.getQueue().length);
+                Logger.d("MusicPlayer.getQueue().length:" + MusicPlayer.getQueue().size());
                 Logger.d("MusicPlayer.getQueuePosition():" + MusicPlayer.getQueuePosition());
 
 
                 if (pPosition < 1) { //首位之前，跳转到末尾（N）
-                    MusicPlayer.setQueuePosition(MusicPlayer.getQueue().length - 1);
-                    mViewPager.setCurrentItem(MusicPlayer.getQueue().length);
+                    MusicPlayer.setQueuePosition(MusicPlayer.getQueue().size() - 1);
+                    mViewPager.setCurrentItem(MusicPlayer.getQueue().size());
                     isNextOrPreSetPage = false;
                     Logger.d("Message:tiaodaowei");
                     return;
 
-                } else if (pPosition > MusicPlayer.getQueue().length) { //末位之后，跳转到首位（1）
+                } else if (pPosition > MusicPlayer.getQueue().size()) { //末位之后，跳转到首位（1）
                     MusicPlayer.setQueuePosition(0);
                     //mViewPager.setCurrentItem(1, false); //false:不显示跳转过程的动画
                     mViewPager.setCurrentItem(1);
@@ -724,7 +725,13 @@ public class PlayingActivity extends BaseActivity {
                 }
                 isFromOutSide = false;
                 if (MusicPlayer.getQueueSize() != 0) {
-                    MusicPlayer.playOrPause();
+                    GlobalHandler.getInstance().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            MusicPlayer.playOrPause();
+                        }
+                    }, 200);
+
                 }
 
             }

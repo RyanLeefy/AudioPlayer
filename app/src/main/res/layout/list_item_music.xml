@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="6dp"
+        android:layout_marginLeft="10dp"
         android:scaleType="centerInside"
         android:visibility="gone"/>
 
@@ -19,15 +19,15 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="7dp"
         android:layout_toEndOf="@id/play_state"
-        android:layout_toLeftOf="@+id/viewpager_list_button"
+        android:layout_toLeftOf="@+id/img_moreOverflow"
         android:layout_toRightOf="@+id/play_state"
-        android:layout_toStartOf="@+id/viewpager_list_button"
+        android:layout_toStartOf="@+id/img_moreOverflow"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="6dp">
 
         <TextView
-            android:id="@+id/viewpager_list_toptext"
+            android:id="@+id/tv_musicname"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -36,7 +36,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/viewpager_list_bottom_text"
+            android:id="@+id/tv_bottom_text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -49,7 +49,7 @@
 
     <!-- 末尾图片，可能是更多，可能是删除-->
     <ImageView
-        android:id="@+id/viewpager_list_button"
+        android:id="@+id/img_moreOverflow"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"

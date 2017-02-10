@@ -104,6 +104,29 @@ public class MusicInfo implements Parcelable {
     }
 
 
+    public MusicInfo() {
+
+    }
+
+    public MusicInfo(MusicInfo musicInfo) {
+        this.audioId = musicInfo.getAudioId();
+        this.albumId = musicInfo.getAlbumId();
+        this.albumName = musicInfo.getAlbumName();
+        this.albumData = musicInfo.getAlbumData();
+        this.duration = musicInfo.getDuration();
+        this.musicName = musicInfo.getMusicName();
+        this.artist = musicInfo.getArtist();
+        this.artistId = musicInfo.getArtistId();
+        this.data = musicInfo.getData();
+        this.folder = musicInfo.getFolder();
+        this.lrc = musicInfo.getLrc();
+        this.islocal = musicInfo.islocal();
+        this.sort = musicInfo.getSort();
+        this.size = musicInfo.getSize();
+        this.favorite = musicInfo.getFavorite();
+    }
+
+
     public long getAudioId() {
         return audioId;
     }

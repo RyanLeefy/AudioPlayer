@@ -71,6 +71,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.TreeSet;
@@ -205,9 +206,9 @@ public class MediaService extends Service {
 
     private int mServiceStartId = -1;
 
-    private ArrayList<MusicTrack> mPlaylist = new ArrayList<MusicTrack>(100);
+    //播放列表 用List来装MusicInfo实例
+    private ArrayList<MusicInfo> mPlaylist = new ArrayList<MusicInfo>();
 
-    private HashMap<Long, MusicInfo> mPlaylistInfo = new HashMap<>();
 
     private long[] mAutoShuffleList = null;
 
@@ -755,9 +756,7 @@ public class MediaService extends Service {
                 mHistory.clear();
             } else {
                 for (int i = 0; i < numToRemove; i++) {
-                    mPlaylistInfo.remove(mPlaylist.get(first).mId);
                     mPlaylist.remove(first);
-
                 }
 
                 ListIterator<Integer> positionIterator = mHistory.listIterator();
@@ -794,8 +793,8 @@ public class MediaService extends Service {
         }
     }
 
-    private void addToPlayList(final long[] list, int position) {
-        final int addlen = list.length;
+    private void addToPlayList(final List<MusicInfo> list, int position) {
+        final int addlen = list.size();
         Logger.d("Addtoplaylist");
         if (position < 0) {
             mPlaylist.clear();
@@ -807,12 +806,7 @@ public class MediaService extends Service {
             position = mPlaylist.size();
         }
 
-        final ArrayList<MusicTrack> arrayList = new ArrayList<MusicTrack>(addlen);
-        for (int i = 0; i < list.length; i++) {
-            arrayList.add(new MusicTrack(list[i], i));
-        }
-
-        mPlaylist.addAll(position, arrayList);
+        mPlaylist.addAll(position, list);
 
         if (mPlaylist.size() == 0) {
             closeCursor();
@@ -822,11 +816,10 @@ public class MediaService extends Service {
     }
 
 
-    private void updateCursor(final long trackId) {
+    private void updateCursor() {
 
-
-        MusicInfo info = mPlaylistInfo.get(trackId);
-        if (mPlaylistInfo.get(trackId) != null) {
+        MusicInfo info = mPlaylist.get(mPlayPos);
+        if (info != null) {
             MatrixCursor cursor = new MatrixCursor(PROJECTION);
             cursor.addRow(new Object[]{info.getAudioId(), info.getArtist(), info.getAlbumName(), info.getMusicName()
                     , info.getData(), info.getAlbumData(), info.getAlbumId(), info.getArtistId()});
@@ -1037,16 +1030,14 @@ public class MediaService extends Service {
             stop(false);
             boolean shutdown = false;
 
-            if (mPlaylist.size() == 0 || mPlaylistInfo.size() == 0 && mPlayPos >= mPlaylist.size()) {
+            if (mPlaylist.size() == 0  && mPlayPos >= mPlaylist.size()) {
                 //clearPlayInfos();
                 return;
             }
-            final long id = mPlaylist.get(mPlayPos).mId;
-            updateCursor(id);
+
+            updateCursor();
             //getLrc(id);
-            if (mPlaylistInfo.get(id) == null) {
-                return;
-            }
+
             /*
             if (!mPlaylistInfo.get(id).islocal()) {
                 if (mRequestUrl != null) {
@@ -1074,7 +1065,7 @@ public class MediaService extends Service {
                         mPlayPos = pos;
                         stop(false);
                         mPlayPos = pos;
-                        updateCursor(mPlaylist.get(mPlayPos).mId);
+                        updateCursor();
                     } else {
                         mOpenFailedCounter = 0;
                         Log.w(TAG, "Failed to open file for playback");
@@ -1189,15 +1180,12 @@ public class MediaService extends Service {
         mNextPlayPos = position;
         if (D) Log.d(TAG, "setNextTrack: next play position = " + mNextPlayPos);
         if (mNextPlayPos >= 0 && mPlaylist != null && mNextPlayPos < mPlaylist.size()) {
-            final long id = mPlaylist.get(mNextPlayPos).mId;
-            if (mPlaylistInfo.get(id) != null) {
-                if (mPlaylistInfo.get(id).islocal()) {
+            final long id = mPlaylist.get(mNextPlayPos).getAudioId();
+                if (mPlaylist.get(mNextPlayPos).islocal()) {
                     mPlayer.setNextDataSource(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + id);
                 } else {
                     mPlayer.setNextDataSource(null);
                 }
-
-            }
         } else {
             mPlayer.setNextDataSource(null);
         }
@@ -1308,7 +1296,7 @@ public class MediaService extends Service {
                         .putString(MediaMetadata.METADATA_KEY_TITLE, getTrackName())
                         .putLong(MediaMetadata.METADATA_KEY_DURATION, duration())
                         .putLong(MediaMetadata.METADATA_KEY_TRACK_NUMBER, getQueuePosition() + 1)
-                        .putLong(MediaMetadata.METADATA_KEY_NUM_TRACKS, getQueue().length)
+                        .putLong(MediaMetadata.METADATA_KEY_NUM_TRACKS, getQueue().size())
                         .putString(MediaMetadata.METADATA_KEY_GENRE, getGenreName())
                         .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART,
                                 mShowAlbumArtOnLockscreen ? albumArt : null)
@@ -1616,7 +1604,7 @@ public class MediaService extends Service {
 
                 } else if (id != -1 && path.startsWith(
                         MediaStore.Files.getContentUri("external").toString())) {
-                    updateCursor(id);
+                    updateCursor();
 
                 } else if (path.startsWith("content://downloads/")) {
 
@@ -1642,8 +1630,7 @@ public class MediaService extends Service {
                 try {
                     if (mCursor != null && shouldAddToPlaylist) {
                         mPlaylist.clear();
-                        mPlaylist.add(new MusicTrack(
-                                mCursor.getLong(IDCOLIDX), -1));
+                        //mPlaylist.add(new MusicInfo(mCursor.getLong(IDCOLIDX), -1));
                         notifyChange(QUEUE_CHANGED);
                         mPlayPos = 0;
                         mHistory.clear();
@@ -1756,13 +1743,12 @@ public class MediaService extends Service {
         int numremoved = 0;
         synchronized (this) {
             for (int i = 0; i < mPlaylist.size(); i++) {
-                if (mPlaylist.get(i).mId == id) {
+                if (mPlaylist.get(i).getAudioId() == id) {
                     numremoved += removeTracksInternal(i, i);
                     i--;
                 }
             }
 
-            mPlaylistInfo.remove(id);
         }
 
 
@@ -1776,8 +1762,7 @@ public class MediaService extends Service {
         synchronized (this) {
             if (position >= 0 &&
                     position < mPlaylist.size() &&
-                    mPlaylist.get(position).mId == id) {
-                mPlaylistInfo.remove(id);
+                    mPlaylist.get(position).getAudioId() == id) {
                 return removeTracks(position, position) > 0;
             }
 
@@ -1869,11 +1854,10 @@ public class MediaService extends Service {
     public String[] getAlbumPathAll() {
         synchronized (this) {
             try {
-                int len = mPlaylistInfo.size();
+                int len = mPlaylist.size();
                 String[] albums = new String[len];
-                long[] queue = getQueue();
                 for (int i = 0; i < len; i++) {
-                    albums[i] = mPlaylistInfo.get(queue[i]).getAlbumData();
+                    albums[i] = mPlaylist.get(i).getAlbumData();
                 }
                 return albums;
             } catch (Exception e) {
@@ -1894,7 +1878,7 @@ public class MediaService extends Service {
 
     public boolean isTrackLocal() {
         synchronized (this) {
-            MusicInfo info = mPlaylistInfo.get(getAudioId());
+            MusicInfo info = getCurrentTrack();
             if (info == null) {
                 return true;
             }
@@ -1902,17 +1886,7 @@ public class MediaService extends Service {
         }
     }
 
-    public String getAlbumPath(long id) {
-        synchronized (this) {
-            try {
-                String str = mPlaylistInfo.get(id).getAlbumData();
-                return str;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
+
 
     public String getGenreName() {
         synchronized (this) {
@@ -1921,7 +1895,7 @@ public class MediaService extends Service {
             }
             String[] genreProjection = {MediaStore.Audio.Genres.NAME};
             Uri genreUri = MediaStore.Audio.Genres.getContentUriForAudioId("external",
-                    (int) mPlaylist.get(mPlayPos).mId);
+                    (int) mPlaylist.get(mPlayPos).getAudioId());
             Cursor genreCursor = getContentResolver().query(genreUri, genreProjection,
                     null, null, null);
             if (genreCursor != null) {
@@ -1975,19 +1949,19 @@ public class MediaService extends Service {
     }
 
     public long getAudioId() {
-        MusicTrack track = getCurrentTrack();
-        if (track != null) {
-            return track.mId;
+        MusicInfo music = getCurrentTrack();
+        if (music != null) {
+            return music.getAudioId();
         }
 
         return -1;
     }
 
-    public MusicTrack getCurrentTrack() {
+    public MusicInfo getCurrentTrack() {
         return getTrack(mPlayPos);
     }
 
-    public synchronized MusicTrack getTrack(int index) {
+    public synchronized MusicInfo getTrack(int index) {
         if (index >= 0 && index < mPlaylist.size()) {
             return mPlaylist.get(index);
         }
@@ -2074,27 +2048,24 @@ public class MediaService extends Service {
         return -1;
     }
 
-    public HashMap<Long, MusicInfo> getPlayinfos() {
-        synchronized (this) {
-            return mPlaylistInfo;
-        }
-    }
 
-    public long[] getQueue() {
+
+    public List<MusicInfo> getQueue() {
         synchronized (this) {
+            /*
             final int len = mPlaylist.size();
             final long[] list = new long[len];
             for (int i = 0; i < len; i++) {
-                list[i] = mPlaylist.get(i).mId;
-            }
-            return list;
+                list[i] = mPlaylist.get(i).getAudioId();
+            }*/
+            return mPlaylist;
         }
     }
 
     public long getQueueItemAtPosition(int position) {
         synchronized (this) {
             if (position >= 0 && position < mPlaylist.size()) {
-                return mPlaylist.get(position).mId;
+                return mPlaylist.get(position).getAudioId();
             }
         }
 
@@ -2135,24 +2106,19 @@ public class MediaService extends Service {
 
     /**
      * 创建播放列表
-     * @param infos
      * @param list
      * @param position
      */
-    public void open(final HashMap<Long, MusicInfo> infos, final long[] list, final int position) {
+    public void open(final List<MusicInfo> list, final int position) {
         synchronized (this) {
 
-            mPlaylistInfo = infos;
-            Logger.d(mPlaylistInfo.toString());
-            Logger.d("open");
-
             final long oldId = getAudioId();
-            final int listlength = list.length;
+            final int listlength = list.size();
             boolean newlist = true;
             if (mPlaylist.size() == listlength) {
                 newlist = false;
                 for (int i = 0; i < listlength; i++) {
-                    if (list[i] != mPlaylist.get(i).mId) {
+                    if (list.get(i) != mPlaylist.get(i)) {
                         newlist = true;
                         break;
                     }
@@ -2374,7 +2340,7 @@ public class MediaService extends Service {
                 return;
             }
             mPlaylistInfo.remove(mPlaylist.get(index1).mId);
-            final MusicTrack track = mPlaylist.remove(index1);
+            final MusicInfo track = mPlaylist.remove(index1);
             if (index1 < index2) {
                 mPlaylist.add(index2, track);
                 if (mPlayPos == index1) {
@@ -2962,7 +2928,7 @@ public class MediaService extends Service {
                             service.mCursor = null;
                         }
 
-                        service.updateCursor(service.mPlaylist.get(service.mPlayPos).mId);
+                        service.updateCursor();
                         service.notifyChange(META_CHANGED);
 
                         //service.updateNotification();

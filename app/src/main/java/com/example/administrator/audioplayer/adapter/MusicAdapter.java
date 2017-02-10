@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.service.MusicPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 /**
  * Created on 2017/1/26.
  * 歌曲的adapter，默认没有PlayItem，需要的话初始化时候传入true
+ * 默认歌曲名和歌手名上下排列，如需打横排列设置setHorizontal（true）
  * 默认末尾是更多，若是删除，需要setMore(false)
  */
 
@@ -26,6 +28,9 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     //有无第一个播放全部项
     private boolean HasPlayItem = false;
+
+    //默认歌曲名和歌手名上下排列
+    private boolean isHorizontal = false;
 
     //末尾是更多还是删除
     private boolean isMore = true;
@@ -65,6 +70,10 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.mList = list;
     }
 
+    public void setHorizontal(boolean horizontal) {
+        this.isHorizontal = horizontal;
+    }
+
     public void setMore(boolean isMore) {
         this.isMore = isMore;
     }
@@ -74,13 +83,19 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //先判断有无playitem
         if(!HasPlayItem) {
-            return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false));
+            if(isHorizontal){
+                //播放列表的item
+                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_playlist, parent, false), isHorizontal);
+            } else {
+                //正常列表的item
+                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
+            }
         } else {
             if (viewType == FIRST_ITEM) {
                 return new PlayAllItemViewHolder(mInflater.inflate(R.layout.list_item_playallitem, parent, false));
             }
             else {
-                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false));
+                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
             }
         }
     }
@@ -128,8 +143,23 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     realPosition = position;
                 }
 
-                ((MusicItemViewHolder) holder).mainTitle.setText(((MusicInfo) mList.get(realPosition)).getMusicName());
-                ((MusicItemViewHolder) holder).title.setText(((MusicInfo) mList.get(realPosition)).getArtist());
+                ((MusicItemViewHolder) holder).musicName.setText(((MusicInfo) mList.get(realPosition)).getMusicName());
+                if(isHorizontal){
+                    //水平显示的话 歌曲名和歌手名要加个"-"
+                    ((MusicItemViewHolder) holder).artistName.setText(" - " +((MusicInfo) mList.get(realPosition)).getArtist());
+                } else {
+                    ((MusicItemViewHolder) holder).artistName.setText(((MusicInfo) mList.get(realPosition)).getArtist());
+                }
+
+
+                //判断该条目音乐是否是当前音乐，是的话显示小喇叭
+                if (MusicPlayer.getCurrentAudioId() == mList.get(realPosition).getAudioId()) {
+                    ((MusicItemViewHolder) holder).playState.setVisibility(View.VISIBLE);
+                    ((MusicItemViewHolder) holder).playState.setImageResource(R.drawable.song_play_icon);
+                } else {
+                    ((MusicItemViewHolder) holder).playState.setVisibility(View.GONE);
+                }
+
 
                 if(isMore) {
                     //末尾是更多图片
@@ -226,14 +256,19 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static class MusicItemViewHolder extends RecyclerView.ViewHolder{
 
         ImageView playState,moreOverflow;
-        public TextView mainTitle, title;
+        public TextView musicName, artistName;
 
-        public MusicItemViewHolder(View view) {
+        public MusicItemViewHolder(View view, Boolean Horizontal) {
             super(view);
-            this.mainTitle = (TextView) view.findViewById(R.id.viewpager_list_toptext);
-            this.title = (TextView) view.findViewById(R.id.viewpager_list_bottom_text);
+            this.musicName = (TextView) view.findViewById(R.id.tv_musicname);
+
+            if(Horizontal) {
+                this.artistName = (TextView) view.findViewById(R.id.tv_right_text);
+            } else {
+                this.artistName = (TextView) view.findViewById(R.id.tv_bottom_text);
+            }
             this.playState = (ImageView) view.findViewById(R.id.play_state);
-            this.moreOverflow = (ImageView) view.findViewById(R.id.viewpager_list_button);
+            this.moreOverflow = (ImageView) view.findViewById(R.id.img_moreOverflow);
 
         }
     }

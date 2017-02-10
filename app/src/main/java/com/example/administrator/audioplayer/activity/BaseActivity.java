@@ -90,7 +90,7 @@ public class BaseActivity extends AppCompatActivity {
      * @param show 显示或关闭底部播放控制栏
      */
     protected void showQuickControl(boolean show) {
-        Logger.d(MusicPlayer.getQueue().length);
+        Logger.d(MusicPlayer.getQueue().size());
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (show) {
             if (fragment == null) {

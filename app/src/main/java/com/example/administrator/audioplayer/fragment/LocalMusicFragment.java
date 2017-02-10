@@ -188,6 +188,16 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
     }
 
 
+    /**
+     * 重写该方法，在baseActivity中接受到个歌曲信息变化时候调用
+     */
+    @Override
+    public void onMetaChange() {
+        //重新载入数据
+        presenter.onCreateView();
+    }
+
+
     public interface Callback {
         // TODO: Update argument type and name
         void showLocalSearchFragment();
