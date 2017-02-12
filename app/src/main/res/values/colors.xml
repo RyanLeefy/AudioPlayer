@@ -14,4 +14,8 @@
 
     <color name="listSubTextColor">#ff888888</color>
     <color name="listTextColor">#ff333333</color>
+
+
+    <color name="dividerColor">#e9e6e6</color>
+    <color name="dividerColorForMusicItem">#c7c5c5</color>
 </resources>

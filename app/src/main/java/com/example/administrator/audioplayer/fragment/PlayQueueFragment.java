@@ -1,6 +1,7 @@
 package com.example.administrator.audioplayer.fragment;
 
 
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,13 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.audioplayer.Ipresenter.IPlayQueuePresenter;
+import com.example.administrator.audioplayer.Iview.IPlayQueueView;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.BaseActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.presenterImp.PlayQueuePresenter;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 
@@ -28,12 +34,18 @@ import java.util.List;
  * Created by on 2017/2/7.
  */
 
-public class PlayQueueFragment extends DialogFragment {
+public class PlayQueueFragment extends DialogFragment implements IPlayQueueView,  BaseActivity.MusicStateListener {
 
+    private static final int[] ATTRS = new int[]{
+            android.R.attr.listDivider
+    };
     private TextView mCollect, mTitle, mClear;
     private RecyclerView mRecyclerView;
 
     private List<MusicInfo> playlist;
+
+    private IPlayQueuePresenter presenter;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,15 +80,17 @@ public class PlayQueueFragment extends DialogFragment {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
 
-        playlist = MusicPlayer.getQueue();
+        //playlist = MusicPlayer.getQueue();
 
-        MusicAdapter adapter = new MusicAdapter(getActivity(), playlist);
+        //MusicAdapter adapter = new MusicAdapter(getActivity(), playlist);
         //最后的imageview设为删除而不是更多
-        adapter.setMore(false);
+        //adapter.setMore(false);
         //设置歌曲名，歌手名水平显示
-        adapter.setHorizontal(true);
-        mRecyclerView.setAdapter(adapter);
+        //adapter.setHorizontal(true);
+        //mRecyclerView.setAdapter(adapter);
 
+        presenter = new PlayQueuePresenter(this);
+        presenter.onCreateView();
 
         return view;
     }
@@ -92,19 +106,46 @@ public class PlayQueueFragment extends DialogFragment {
 
     }
 
+    /**
+     * 当fragment显示时候，把其作为回调函数加到BaseActivity中，以便进行各种回调操作
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((BaseActivity) getActivity()).setMusicStateListenerListener(this);
+    }
+
+
+    /**
+     * 当fragment消失时候，去除回调
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((BaseActivity) getActivity()).removeMusicStateListenerListener(this);
+    }
+
+    @Override
+    public void updateSongNumber(int n) {
+        mTitle.setText("播放列表（" + n + "）");
+    }
+
     //@Override
     public void setAdapter(MusicAdapter adapter) {
         //获取回来的adapter先设置监听事件，然后再设置给recycleView
 
+        //最后的imageview设为删除而不是更多
+        adapter.setMore(false);
+        //设置歌曲名，歌手名水平显示
+        adapter.setHorizontal(true);
+
         adapter.setOnMusicItemClickListener(new MusicAdapter.OnMusicItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                //获取点击的MusicInfo实体类((LocalMusicAdapter)rv.getAdapter()).getItem(position)
-                //调用presenter的方法，播放该实体代表的歌曲
 
-                //presenter.pefromMusicClick(position);
-
-                //Toast.makeText(getActivity(), ((MusicAdapter)rv.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
+                //调用presenter的方法，播放该歌曲
+                presenter.peformMusicClick(position);
+                Toast.makeText(getActivity(), ((MusicAdapter)mRecyclerView.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
 
             }
 
@@ -112,6 +153,7 @@ public class PlayQueueFragment extends DialogFragment {
             public void onMoreClick(View view, int position) {
                 //Toast.makeText(getActivity(), ((MusicAdapter)rv.getAdapter()).getItem(position).getMusicName() + "more", Toast.LENGTH_SHORT).show();
                 //删除
+                presenter.peformDeleteClick(position);
             }
         });
 
@@ -119,4 +161,24 @@ public class PlayQueueFragment extends DialogFragment {
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onMetaChange() {
+        //重新载入数据
+        presenter.onCreateView();
+    }
+
+    @Override
+    public void onPlayStateChange() {
+
+    }
+
+    @Override
+    public void updateTrackInfo() {
+
+    }
+
+    @Override
+    public void reloadAdapter() {
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.administrator.audioplayer.activity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.administrator.audioplayer.R;
@@ -91,17 +95,21 @@ public class BaseActivity extends AppCompatActivity {
      */
     protected void showQuickControl(boolean show) {
         Logger.d(MusicPlayer.getQueue().size());
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if (show) {
-            if (fragment == null) {
-                fragment = BottomPlayBarFragment.newInstance();
-                ft.add(R.id.bottom_container, fragment).commitAllowingStateLoss();
+        //当有播放列表的时候才显示
+        if(MusicPlayer.getQueue().size() != 0) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+            if (show) {
+                if (fragment == null) {
+                    fragment = BottomPlayBarFragment.newInstance();
+                    ft.add(R.id.bottom_container, fragment).commitAllowingStateLoss();
+                } else {
+                    ft.show(fragment).commitAllowingStateLoss();
+                }
             } else {
-                ft.show(fragment).commitAllowingStateLoss();
+                if (fragment != null)
+                    ft.hide(fragment).commitAllowingStateLoss();
             }
-        } else {
-            if (fragment != null)
-                ft.hide(fragment).commitAllowingStateLoss();
         }
     }
 
@@ -240,6 +248,7 @@ public class BaseActivity extends AppCompatActivity {
                     //bottomPlayBarFragment.refreshUI();
                 } else if (action.equals(MediaService.QUEUE_CHANGED)) {
                     //bottomPlayBarFragment.updateQueue();
+                    baseActivity.showQuickControl(true);
                 } else if (action.equals(MediaService.TRACK_ERROR)) {
                     //final String errorMsg = context.getString(R.string.exit,
                     //        intent.getStringExtra(MediaService.TrackErrorExtra.TRACK_NAME));

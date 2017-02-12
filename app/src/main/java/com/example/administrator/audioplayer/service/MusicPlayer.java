@@ -280,6 +280,19 @@ public class MusicPlayer {
     }
 
 
+    /**
+     * 歌单中移除歌曲
+     * @param id 音频id
+     * @return
+     */
+    public static final int removeTrack(final long id) {
+        if (mService != null) {
+            return mService.removeTrack(id);
+        }
+        return 0;
+    }
+
+
     public static final int getSongCountForAlbumInt(final Context context, final long id) {
         int songCount = 0;
         if (id == -1) {

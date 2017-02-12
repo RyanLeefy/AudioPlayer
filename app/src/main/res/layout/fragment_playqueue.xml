@@ -10,9 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="right"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <LinearLayout
+            android:id="@+id/ll_playqueue_titlelayout"
             android:layout_width="match_parent"
             android:layout_height="43dp"
             android:orientation="horizontal">
@@ -49,6 +51,12 @@
                 android:layout_margin="3dp"
                 android:textSize="12sp" />
         </LinearLayout>
+
+        <View
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:background="@color/dividerColor"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/play_list"
