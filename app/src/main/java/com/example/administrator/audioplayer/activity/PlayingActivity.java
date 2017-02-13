@@ -130,6 +130,9 @@ public class PlayingActivity extends BaseActivity {
     private RoundFragmentPagerAdapter mAdapter;
 
 
+    //TODO 在正在播放页面，如果当前是播放最后一首歌，在播放列表中删除最后一首歌，会出现错乱！！
+
+
     /**
      * 刷新播放进度条
      * mProgress.postDelayed(mUpdateProgress, 50)  开启
@@ -178,7 +181,9 @@ public class PlayingActivity extends BaseActivity {
      */
     @Override
     public void onMetaChange() {
+        Logger.d("MusicPlayer.getQueueSize():" + MusicPlayer.getQueueSize());
         if (MusicPlayer.getQueueSize() == 0) {
+            this.finish();
             return;
         }
 
@@ -196,6 +201,10 @@ public class PlayingActivity extends BaseActivity {
             mViewPager.setCurrentItem(MusicPlayer.getQueuePosition() + 1);
             isNextOrPreSetPage = true;
         }
+
+        //mAdapter = new RoundFragmentPagerAdapter(getSupportFragmentManager());
+        //mViewPager.setAdapter(mAdapter);
+        //onPlayStateChange();
     }
 
 
@@ -260,6 +269,20 @@ public class PlayingActivity extends BaseActivity {
                 mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
             }
         }
+    }
+
+    /**
+     * 重写该方法进场页面的更新，在baseActivity中调用
+     */
+    @Override
+    public void onQueueChange() {
+        if (MusicPlayer.getQueueSize() == 0) {
+            MusicPlayer.stop();
+            finish();
+            return;
+        }
+        mAdapter.notifyDataSetChanged();
+        mViewPager.setCurrentItem(MusicPlayer.getQueuePosition() + 1, false);
     }
 
 
@@ -394,7 +417,6 @@ public class PlayingActivity extends BaseActivity {
     /**
      * 初始化toolbar，这里toolbar为透明的，但是会占有位置，把其他内容往下移一点
      */
-
     private void setToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("一首歌名");

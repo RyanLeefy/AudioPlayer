@@ -40,7 +40,7 @@ public class MusicDBOpenHelper extends SQLiteOpenHelper {
     }
 
     //单例模式获取数据库
-    public static final synchronized MusicDBOpenHelper getInstance(final Context context) {
+    public static synchronized MusicDBOpenHelper getInstance(final Context context) {
         if (sInstance == null) {
             sInstance = new MusicDBOpenHelper(context.getApplicationContext());
         }
@@ -50,7 +50,7 @@ public class MusicDBOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //MusicPlaybackState.getInstance(mContext).onCreate(db);
-        RecentStore.getInstance(mContext).onCreate(db);
+        RecentMusicDB.getInstance(mContext).onCreate(db);
         SearchHistory.getInstance(mContext).onCreate(db);
         PlaylistInfo.getInstance(mContext).onCreate(db);
         //PlaylistsManager.getInstance(mContext).onCreate(db);
@@ -60,20 +60,12 @@ public class MusicDBOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //MusicPlaybackState.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
-        RecentStore.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
+        RecentMusicDB.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         SearchHistory.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         PlaylistInfo.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         //PlaylistsManager.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         DownFileStore.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
     }
 
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //MusicPlaybackState.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
-        RecentStore.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
-        SearchHistory.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
-        PlaylistInfo.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
-        //PlaylistsManager.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
-        DownFileStore.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
-    }
+
 }

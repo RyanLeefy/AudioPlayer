@@ -8,4 +8,5 @@ public interface IPlayQueuePresenter {
     void onCreateView();
     void peformMusicClick(int position);
     void peformDeleteClick(int position);
+    void peformClearClick();
 }

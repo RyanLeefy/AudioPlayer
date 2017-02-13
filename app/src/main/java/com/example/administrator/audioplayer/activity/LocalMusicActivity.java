@@ -1,9 +1,13 @@
 package com.example.administrator.audioplayer.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
@@ -23,6 +27,12 @@ public class LocalMusicActivity extends BaseActivity
 
     private LocalSearchFragment localSearchFragment;
 
+    public static void startActivity(Context context) {
+        Intent intent = new Intent(context, LocalMusicActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +45,6 @@ public class LocalMusicActivity extends BaseActivity
         transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.localmusic_fragment_container, localMusicFragment);
         transaction.commit();
-
 
     }
 
@@ -64,6 +73,7 @@ public class LocalMusicActivity extends BaseActivity
     public void showLocalMusicFragment() {
         ShowFragment(1);
     }
+
 
 
 }

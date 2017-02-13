@@ -42,10 +42,6 @@ public class DownFileStore {
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
     }
 
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + DownFileStoreColumns.NAME);
-        onCreate(db);
-    }
 
     /*
     public synchronized void insert(DownloadDBEntity entity) {

@@ -293,6 +293,16 @@ public class MusicPlayer {
     }
 
 
+    /**
+     * 清空歌单
+     */
+    public static void clearQueue() {
+        if(mService != null) {
+            mService.removeTracks(0, Integer.MAX_VALUE);
+        }
+    }
+
+
     public static final int getSongCountForAlbumInt(final Context context, final long id) {
         int songCount = 0;
         if (id == -1) {

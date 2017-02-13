@@ -24,14 +24,18 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.LocalMusicActivity;
+import com.example.administrator.audioplayer.activity.RecentActivity;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
+import com.example.administrator.audioplayer.db.RecentMusicDB;
+import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.orhanobut.logger.Logger;
 
@@ -99,11 +103,15 @@ public class MusicFragment extends Fragment {
         //先获取Header数据，Expand数据，create歌单数据和collect歌单数据
         //初始化SongListAdapter,
         //recyclerView.setAdapter();
+        LocalMusicModel model = new LocalMusicModel();
+        int num_local_music = model.getLocalMusic().size();
 
+        //TODO 在子线程中读取
+        //int num_recent_music = RecentMusicDB.getInstance(MyApplication.getContext()).queryRecentIds(null).size();
 
         //模拟数据
         List<MusicFragmentHeaderItem> headerItemList = new ArrayList<>(
-                Arrays.asList(new MusicFragmentHeaderItem(R.drawable.music_icn_local, "本地播放", 0),
+                Arrays.asList(new MusicFragmentHeaderItem(R.drawable.music_icn_local, "本地播放", num_local_music),
                         new MusicFragmentHeaderItem(R.drawable.music_icn_recent, "最近播放", 0),
                         new MusicFragmentHeaderItem(R.drawable.music_icn_download, "下载管理", 0),
                         new MusicFragmentHeaderItem(R.drawable.music_icn_artist, "我的歌手", 0)));
@@ -139,12 +147,12 @@ public class MusicFragment extends Fragment {
                 switch (position) {
                     case 0:
                         //跳转到LocalMusicActivity
-                        Intent i = new Intent(mContext, LocalMusicActivity.class);
-                        startActivity(i);
+                        LocalMusicActivity.startActivity(mContext);
                         Toast.makeText(mContext, "本地播放", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
                         //跳转到RecentActivity
+                        RecentActivity.startActivity(mContext);
                         Toast.makeText(mContext, "最近播放", Toast.LENGTH_SHORT).show();
                         break;
                     case 2:

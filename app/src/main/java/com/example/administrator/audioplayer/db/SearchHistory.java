@@ -51,10 +51,6 @@ public class SearchHistory {
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
     }
 
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + SearchHistoryColumns.NAME);
-        onCreate(db);
-    }
 
     public void addSearchString(final String searchString) {
         if (searchString == null) {

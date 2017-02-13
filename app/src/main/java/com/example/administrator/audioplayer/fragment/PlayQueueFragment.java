@@ -89,6 +89,8 @@ public class PlayQueueFragment extends DialogFragment implements IPlayQueueView,
         //adapter.setHorizontal(true);
         //mRecyclerView.setAdapter(adapter);
 
+        initListener();
+
         presenter = new PlayQueuePresenter(this);
         presenter.onCreateView();
 
@@ -123,6 +125,16 @@ public class PlayQueueFragment extends DialogFragment implements IPlayQueueView,
     public void onStop() {
         super.onStop();
         ((BaseActivity) getActivity()).removeMusicStateListenerListener(this);
+    }
+
+
+    public void initListener(){
+        mClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.peformClearClick();
+            }
+        });
     }
 
     @Override

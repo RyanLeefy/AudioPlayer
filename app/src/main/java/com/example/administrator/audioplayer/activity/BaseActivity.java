@@ -96,9 +96,8 @@ public class BaseActivity extends AppCompatActivity {
     protected void showQuickControl(boolean show) {
         Logger.d(MusicPlayer.getQueue().size());
         //当有播放列表的时候才显示
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if(MusicPlayer.getQueue().size() != 0) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
             if (show) {
                 if (fragment == null) {
                     fragment = BottomPlayBarFragment.newInstance();
@@ -110,6 +109,9 @@ public class BaseActivity extends AppCompatActivity {
                 if (fragment != null)
                     ft.hide(fragment).commitAllowingStateLoss();
             }
+        } else {
+            if (fragment != null)
+                ft.hide(fragment).commitAllowingStateLoss();
         }
     }
 
@@ -124,6 +126,11 @@ public class BaseActivity extends AppCompatActivity {
      */
     public void onPlayStateChange() {}
 
+
+    /**
+     * 播放列表改变的时候，在需要的activity中具体是吸纳
+     */
+    public void onQueueChange(){}
 
     /**
      * 刷新歌词，在需要的activity中具体实现
@@ -247,8 +254,14 @@ public class BaseActivity extends AppCompatActivity {
                 //} else if (action.equals(IConstants.PLAYLIST_COUNT_CHANGED)) {
                     //bottomPlayBarFragment.refreshUI();
                 } else if (action.equals(MediaService.QUEUE_CHANGED)) {
-                    //bottomPlayBarFragment.updateQueue();
-                    baseActivity.showQuickControl(true);
+                    baseActivity.onQueueChange();
+                    //播放列表变为0的时候隐藏播放栏
+                    if(MusicPlayer.getQueueSize() == 0) {
+                        baseActivity.showQuickControl(true);
+                    } else {
+                        //否则显示播放栏
+                        baseActivity.showQuickControl(true);
+                    }
                 } else if (action.equals(MediaService.TRACK_ERROR)) {
                     //final String errorMsg = context.getString(R.string.exit,
                     //        intent.getStringExtra(MediaService.TrackErrorExtra.TRACK_NAME));

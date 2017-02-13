@@ -100,4 +100,9 @@ public class PlayQueuePresenter implements IPlayQueuePresenter {
         adapter.notifyDataSetChanged();
         view.updateSongNumber(mList.size());
     }
+
+    @Override
+    public void peformClearClick() {
+        MusicPlayer.clearQueue();
+    }
 }

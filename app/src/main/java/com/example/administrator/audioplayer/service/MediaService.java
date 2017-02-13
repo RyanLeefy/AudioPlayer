@@ -43,9 +43,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.MainActivity;
 import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.db.RecentMusicDB;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
@@ -1234,9 +1236,17 @@ public class MediaService extends Service {
 //            return;
 //        }
 
+        //如果切换了歌曲，那么把当前歌曲加入到最近播放数据库中
         if (what.equals(META_CHANGED)) {
+            if(getCurrentTrack() != null) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        RecentMusicDB.getInstance(MyApplication.getContext()).addSongId(getCurrentTrack());
+                    }
+                }).start();
 
-            //mRecentStore.addSongId(getAudioId());
+            }
             //mSongPlayCount.bumpSongCount(getAudioId());
 
         } else if (what.equals(QUEUE_CHANGED)) {
@@ -1751,7 +1761,6 @@ public class MediaService extends Service {
 
         }
 
-
         if (numremoved > 0) {
             notifyChange(QUEUE_CHANGED);
         }
@@ -2238,13 +2247,14 @@ public class MediaService extends Service {
             int pos = mNextPlayPos;
             if (pos < 0) {
                 pos = getNextPosition(force);
+
             }
 
             if (pos < 0) {
                 setIsSupposedToBePlaying(false, true);
                 return;
             }
-
+            Logger.d("mNextPlayPos:" + pos);
             stop(false);
             setAndRecordPlayPos(pos);
             openCurrentAndNext();

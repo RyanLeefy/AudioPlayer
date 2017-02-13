@@ -67,7 +67,6 @@ public class RecycleViewWithEmptyView extends RecyclerView {
     }
 
     private void checkIfEmpty() {
-        Logger.d("check");
         if(getAdapter() == null) {
             emptyView.setVisibility(GONE);
         }

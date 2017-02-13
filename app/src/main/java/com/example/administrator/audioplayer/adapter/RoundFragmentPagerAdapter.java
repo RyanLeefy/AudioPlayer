@@ -18,6 +18,7 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
     }
 
+
     @Override
     public Fragment getItem(int position) {
 
@@ -49,7 +50,6 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
     }
 
 
-    /*
     @Override
     public int getItemPosition(Object object) {
         if (mChildCount > 0) {
@@ -57,7 +57,7 @@ public class RoundFragmentPagerAdapter extends FragmentStatePagerAdapter {
             return POSITION_NONE;
         }
         return super.getItemPosition(object);
-    }*/
+    }
 
 
 }

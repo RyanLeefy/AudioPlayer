@@ -1,0 +1,20 @@
+package com.example.administrator.audioplayer.modelImp;
+
+import com.example.administrator.audioplayer.Imodel.IRecentModel;
+import com.example.administrator.audioplayer.MyApplication;
+import com.example.administrator.audioplayer.db.RecentMusicDB;
+import com.orhanobut.logger.Logger;
+
+import java.util.List;
+
+/**
+ * Created by on 2017/2/13.
+ */
+
+public class RecentModel implements IRecentModel {
+    @Override
+    public List getRecentMusic() {
+        Logger.d("getRecentMusic()ing");
+        return RecentMusicDB.getInstance(MyApplication.getContext()).queryRecentIds(null);
+    }
+}

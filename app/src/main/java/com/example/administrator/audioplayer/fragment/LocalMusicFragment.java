@@ -181,6 +181,13 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
         adapter.notifyDataSetChanged();
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.onCreateView();
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -194,6 +201,11 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
     @Override
     public void onMetaChange() {
         //重新载入数据
+        presenter.onCreateView();
+    }
+
+    @Override
+    public void onPlayStateChange() {
         presenter.onCreateView();
     }
 
