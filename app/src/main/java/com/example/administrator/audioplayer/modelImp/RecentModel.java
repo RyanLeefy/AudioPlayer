@@ -14,7 +14,6 @@ import java.util.List;
 public class RecentModel implements IRecentModel {
     @Override
     public List getRecentMusic() {
-        Logger.d("getRecentMusic()ing");
-        return RecentMusicDB.getInstance(MyApplication.getContext()).queryRecentIds(null);
+        return RecentMusicDB.getInstance(MyApplication.getContext()).getRecentList(null);
     }
 }

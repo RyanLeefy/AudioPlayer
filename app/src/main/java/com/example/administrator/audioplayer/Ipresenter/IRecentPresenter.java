@@ -6,6 +6,6 @@ package com.example.administrator.audioplayer.Ipresenter;
  */
 
 public interface IRecentPresenter {
-    void onCreateView();
+    void onCreate();
     void pefromMusicClick(int position);
 }

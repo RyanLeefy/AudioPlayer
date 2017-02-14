@@ -24,10 +24,13 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.audioplayer.Ipresenter.IMusicPresenter;
+import com.example.administrator.audioplayer.Iview.IMusicView;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.LocalMusicActivity;
 import com.example.administrator.audioplayer.activity.RecentActivity;
+import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
@@ -36,6 +39,7 @@ import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
 import com.example.administrator.audioplayer.db.RecentMusicDB;
 import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
+import com.example.administrator.audioplayer.presenterImp.MusicPresenter;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.orhanobut.logger.Logger;
 
@@ -48,7 +52,7 @@ import java.util.List;
  * Created on 2017/1/22.
  */
 
-public class MusicFragment extends Fragment {
+public class MusicFragment extends BaseFragment implements IMusicView {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
@@ -56,15 +60,10 @@ public class MusicFragment extends Fragment {
     private LayoutInflater mInflater;
     private PopupWindow popupWindow;
 
-
-    //所有数据源，即需要放入recycleview中的所有item
-    private List allItems;
-
-
     //收藏歌单栏展开否
     public boolean collectExpanded = true;
 
-
+    private IMusicPresenter presenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,49 +95,76 @@ public class MusicFragment extends Fragment {
             }
         });
 
-
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL_LIST));
 
-        //TODO 获取并填充数据
-        //先获取Header数据，Expand数据，create歌单数据和collect歌单数据
-        //初始化SongListAdapter,
-        //recyclerView.setAdapter();
-        LocalMusicModel model = new LocalMusicModel();
-        int num_local_music = model.getLocalMusic().size();
+        presenter = new MusicPresenter(this);
+        presenter.onCreateView();
 
-        //TODO 在子线程中读取
-        //int num_recent_music = RecentMusicDB.getInstance(MyApplication.getContext()).queryRecentIds(null).size();
-
-        //模拟数据
-        List<MusicFragmentHeaderItem> headerItemList = new ArrayList<>(
-                Arrays.asList(new MusicFragmentHeaderItem(R.drawable.music_icn_local, "本地播放", num_local_music),
-                        new MusicFragmentHeaderItem(R.drawable.music_icn_recent, "最近播放", 0),
-                        new MusicFragmentHeaderItem(R.drawable.music_icn_download, "下载管理", 0),
-                        new MusicFragmentHeaderItem(R.drawable.music_icn_artist, "我的歌手", 0)));
+        return v;
+    }
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.onCreateView();
+    }
 
-        final List<MusicFragmengSongCollectionItem> create_songCollectionItems = new ArrayList<>();
-        create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我喜欢的音乐", 0));
-        create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "粤语歌单", 0));
+    /**
+     * @param view   要出现的位置相关的view
+     * @param layout popupwindow的样式
+     */
+    public void ShowPopUpWindow(View view, LinearLayout layout) {
+        //初始化并弹出popupWindow
+        if (popupWindow != null && popupWindow.isShowing()) {
+            return;
+        }
 
-        final List<MusicFragmengSongCollectionItem> collect_songCollectionItems = new ArrayList<>();
-        collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我收藏的音乐", 0));
-        collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "英文歌", 0));
+        popupWindow = new PopupWindow(layout,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setAnimationStyle(R.style.Popupwindow);//包括进入和退出两个动画
 
-        final List<MusicFragmentExpandItem> expandItemList = new ArrayList<>(
-                Arrays.asList(new MusicFragmentExpandItem(MusicFragmentExpandItem.TYPE_CREATE, "创建的歌单", create_songCollectionItems.size()),
-                        new MusicFragmentExpandItem(MusicFragmentExpandItem.TYPE_COLLECT, "收藏的歌单", collect_songCollectionItems.size())));
+        //popupwindow获取焦点，点击其他地方消失
+        popupWindow.setFocusable(true);
+        //popupWindow.setOutsideTouchable(true);
 
-        allItems = new ArrayList();
-        allItems.addAll(headerItemList);
-        allItems.add(expandItemList.get(0));
-        allItems.addAll(create_songCollectionItems);
-        allItems.add(expandItemList.get(1));
-        allItems.addAll(collect_songCollectionItems);
+        popupWindow.setBackgroundDrawable(new ColorDrawable());
 
 
-        final SongListAdapter adapter = new SongListAdapter(mContext, allItems);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                //popupwindow消失的时候恢复成原来的透明度
+                backgroundAlpha(1f);
+            }
+        });
+
+        backgroundAlpha(0.7f);
+        popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
+    }
+
+
+    /**
+     * 设置添加屏幕的背景透明度
+     * @param bgAlpha
+     */
+    public void backgroundAlpha(float bgAlpha)
+    {
+        WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
+        lp.alpha = bgAlpha; //0.0-1.0
+        getActivity().getWindow().setAttributes(lp);
+    }
+
+
+    @Override
+    public void setAdapter(final SongListAdapter adapter,
+                           final List allItems,
+                           final List<MusicFragmengSongCollectionItem> create_songCollectionItems,
+                           final List<MusicFragmengSongCollectionItem> collect_songCollectionItems,
+                           final List<MusicFragmentExpandItem> expandItemList) {
 
         //给headeritem添加点击事件
         adapter.setOnHeaderItemClickListener(new SongListAdapter.OnHeaderItemClickListener() {
@@ -178,7 +204,7 @@ public class MusicFragment extends Fragment {
                 anim.setInterpolator(new LinearInterpolator());
 
                 if (itemViewTag.getItemViewType() == 2) {            //判断类型，创建的歌单
-                        //已展开则合上
+                    //已展开则合上
                     if (itemViewTag.createdExpanded) {
                         anim.start();
                         //TODO 刷新列表
@@ -298,58 +324,6 @@ public class MusicFragment extends Fragment {
         });
 
         recyclerView.setAdapter(adapter);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL_LIST));
-
-
-        return v;
+        adapter.notifyDataSetChanged();
     }
-
-
-    /**
-     * @param view   要出现的位置相关的view
-     * @param layout popupwindow的样式
-     */
-    public void ShowPopUpWindow(View view, LinearLayout layout) {
-        //初始化并弹出popupWindow
-        if (popupWindow != null && popupWindow.isShowing()) {
-            return;
-        }
-
-        popupWindow = new PopupWindow(layout,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        popupWindow.setAnimationStyle(R.style.Popupwindow);//包括进入和退出两个动画
-
-        //popupwindow获取焦点，点击其他地方消失
-        popupWindow.setFocusable(true);
-        //popupWindow.setOutsideTouchable(true);
-
-        popupWindow.setBackgroundDrawable(new ColorDrawable());
-
-
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                //popupwindow消失的时候恢复成原来的透明度
-                backgroundAlpha(1f);
-            }
-        });
-
-        backgroundAlpha(0.7f);
-        popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
-    }
-
-
-    /**
-     * 设置添加屏幕的背景透明度
-     * @param bgAlpha
-     */
-    public void backgroundAlpha(float bgAlpha)
-    {
-        WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
-        lp.alpha = bgAlpha; //0.0-1.0
-        getActivity().getWindow().setAttributes(lp);
-    }
-
 }

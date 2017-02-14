@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,25 +101,24 @@ public class RecentMusicDB {
      * 插入数据
      * @param musicInfo
      */
-    public synchronized void addSongId(MusicInfo musicInfo) {
+    public synchronized void insertRecentSong(MusicInfo musicInfo) {
         final SQLiteDatabase database = mMusicDatabase.getWritableDatabase();
         database.beginTransaction();
-
 
         Map<Long, Integer> recentMap = null;
         try {
 
             //查询是否有与插入歌曲音频id一样的，有的话删除旧的
-            recentMap = getRecentIds();
+            recentMap = getRecentIdMap();
             //如果该map中存在该音频id对应的int值为1，则表示存在
-            if (!recentMap.isEmpty() && recentMap.get(musicInfo.getAudioId()) == 1) {
+            if (!recentMap.isEmpty() && recentMap.get(musicInfo.getAudioId()) != null) {
                 //删除旧的
                 removeItem(musicInfo.getAudioId());
             }
 
 
             //插入数据
-            final ContentValues values = new ContentValues(2);
+            final ContentValues values = new ContentValues(16);
             values.put(MusicInfo.KEY_AUDIO_ID, musicInfo.getAudioId());
             values.put(MusicInfo.KEY_ALBUM_ID, musicInfo.getAlbumId());
             values.put(MusicInfo.KEY_ALBUM_NAME, musicInfo.getAlbumName());
@@ -141,7 +141,6 @@ public class RecentMusicDB {
             values.put(TIMEPLAYED, System.currentTimeMillis());
             database.insert(TABLE_NAME, null, values);
 
-
             //若数量大于上限，则删除旧的数据
             Cursor oldest = null;
             try {
@@ -153,10 +152,11 @@ public class RecentMusicDB {
                     oldest.moveToPosition(oldest.getCount() - MAX_ITEMS_IN_DB);
                     long timeOfRecordToKeep = oldest.getLong(0);
 
+                    Logger.d("begin delete");
                     database.delete(TABLE_NAME,
                             TIMEPLAYED + " < ?",
                             new String[]{String.valueOf(timeOfRecordToKeep)});
-
+                    Logger.d("end delete");
                 }
             } finally {
                 if (oldest != null) {
@@ -194,14 +194,12 @@ public class RecentMusicDB {
 
     /**
      * 获取前多少条数据,若传入null 则查询所有数据
-     * @param limit
-     * @return
+     * @return 返回cursor，可以直接用于getCount得到数据的多少
      */
-    public synchronized List queryRecentIds(final String limit) {
+    public synchronized Cursor getRecentCursor() {
         final SQLiteDatabase database = mMusicDatabase.getReadableDatabase();
         Cursor cursor = database.query(TABLE_NAME,
                 new String[]{MusicInfo.KEY_AUDIO_ID,
-                        MusicInfo.KEY_AUDIO_ID,
                         MusicInfo.KEY_ALBUM_ID,
                         MusicInfo.KEY_ALBUM_NAME,
                         MusicInfo.KEY_ALBUM_DATA,
@@ -215,10 +213,36 @@ public class RecentMusicDB {
                         MusicInfo.KEY_FAVORITE,
                         MusicInfo.KEY_LRC,
                         MusicInfo.KEY_ISLOCAL,
-                        MusicInfo.KEY_SORT}, null, null, null, null, TIMEPLAYED + " ASC", limit);
-
+                        MusicInfo.KEY_SORT,}, null, null, null, null, TIMEPLAYED + " DESC");
+        return cursor;
+    }
+    
+    
+    /**
+     * 获取前多少条数据,若传入null 则查询所有数据
+     * @param limit
+     * @return 返回组装好的list
+     */
+    public synchronized List<MusicInfo> getRecentList(final String limit) {
+        final SQLiteDatabase database = mMusicDatabase.getReadableDatabase();
+        Cursor cursor = database.query(TABLE_NAME,
+                new String[]{MusicInfo.KEY_AUDIO_ID,
+                        MusicInfo.KEY_ALBUM_ID,
+                        MusicInfo.KEY_ALBUM_NAME,
+                        MusicInfo.KEY_ALBUM_DATA,
+                        MusicInfo.KEY_DURATION,
+                        MusicInfo.KEY_MUSIC_NAME,
+                        MusicInfo.KEY_ARTIST,
+                        MusicInfo.KEY_ARTIST_ID,
+                        MusicInfo.KEY_DATA,
+                        MusicInfo.KEY_FOLDER,
+                        MusicInfo.KEY_SIZE,
+                        MusicInfo.KEY_FAVORITE,
+                        MusicInfo.KEY_LRC,
+                        MusicInfo.KEY_ISLOCAL,
+                        MusicInfo.KEY_SORT,}, null, null, null, null, TIMEPLAYED + " DESC", limit);
         List<MusicInfo> list = new ArrayList<>();
-        while(cursor != null && cursor.moveToFirst()) {
+        while(cursor != null && cursor.moveToNext()) {
             MusicInfo musicInfo = new MusicInfo();
             musicInfo.setAudioId(cursor.getLong(cursor.getColumnIndex(MusicInfo.KEY_AUDIO_ID)));
             musicInfo.setAlbumId(cursor.getInt(cursor.getColumnIndex(MusicInfo.KEY_ALBUM_ID)));
@@ -239,6 +263,11 @@ public class RecentMusicDB {
                 musicInfo.setIslocal(true);
             }
             musicInfo.setSort(cursor.getString(cursor.getColumnIndex(MusicInfo.KEY_SORT)));
+            list.add(musicInfo);
+        }
+
+        if(cursor != null) {
+            cursor.close();
         }
         return list;
     }
@@ -248,8 +277,9 @@ public class RecentMusicDB {
      * 返回最近播放音频id map, 把有的都设置为1
      * @return
      */
-    public synchronized Map<Long, Integer> getRecentIds() {
-        List<MusicInfo> musicInfos = queryRecentIds(null);
+    public synchronized Map<Long, Integer> getRecentIdMap() {
+        Logger.d("begin get RecentIds");
+        List<MusicInfo> musicInfos = getRecentList(null);
         Map<Long, Integer> map = new HashMap<>();
         if (musicInfos == null || musicInfos.isEmpty()) {
             return map;

@@ -60,7 +60,7 @@ public class RecentActivity extends BaseActivity implements IRecentView {
 
 
         presenter = new RencentPresenter(this);
-        presenter.onCreateView();
+        presenter.onCreate();
     }
 
 
@@ -121,5 +121,17 @@ public class RecentActivity extends BaseActivity implements IRecentView {
 
         rv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.onCreate();
+    }
+
+    @Override
+    public void onMetaChange() {
+        presenter.onCreate();
     }
 }

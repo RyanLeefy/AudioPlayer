@@ -40,32 +40,27 @@ public class RencentPresenter implements IRecentPresenter {
     }
 
     @Override
-    public void onCreateView() {
+    public void onCreate() {
         //用Rxjava进行异步处理
         //第一步创建Subscriber
         //第二步创建Observable
         //第三步订阅，并添加到父类的CompositeSubscription中，进行管理
-        Logger.d("1111");
+
         Subscriber<List<MusicInfo>> subscriber = new Subscriber<List<MusicInfo>>() {
             @Override
             public void onCompleted() {
-                Logger.d("onCompleted");
-                Toast.makeText(MyApplication.getContext(),"onCompleted",Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
             public void onError(Throwable e) {
                 Logger.d("Error");
-                Toast.makeText(MyApplication.getContext(),"error",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onNext(List list) {
                 //设置adapter，刷新界面
-                Logger.d("onNext");
-                Toast.makeText(MyApplication.getContext(),"onNext",Toast.LENGTH_SHORT).show();
-                Logger.d("111");
-                Logger.d("111" + list.size());
+
                 mList = list;
                 MusicAdapter adapter = new MusicAdapter(((RecentActivity)view), list, true);
                 view.setAdapter(adapter);
@@ -82,17 +77,13 @@ public class RencentPresenter implements IRecentPresenter {
             }
         });
 
-        /*
+
         ((RecentActivity)view).addSubscription(
                 observable.subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(subscriber));
-                */
-        observable.subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+
     }
 
     @Override

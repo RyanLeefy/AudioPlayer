@@ -1242,7 +1242,7 @@ public class MediaService extends Service {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        RecentMusicDB.getInstance(MyApplication.getContext()).addSongId(getCurrentTrack());
+                        RecentMusicDB.getInstance(MyApplication.getContext()).insertRecentSong(getCurrentTrack());
                     }
                 }).start();
 
