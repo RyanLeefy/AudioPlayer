@@ -2,7 +2,10 @@ package com.example.administrator.audioplayer.jsonbean;
 
 /**
  * Created by on 2017/2/15.
+<<<<<<< HEAD
  * http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.search.merge&query=%E5%8B%87&page_no=1&page_size=10&type=-1&data_source=0
+=======
+>>>>>>> 94da056a946089a352ec0b5585b01ee41be00c90
  */
 
 import java.util.List;

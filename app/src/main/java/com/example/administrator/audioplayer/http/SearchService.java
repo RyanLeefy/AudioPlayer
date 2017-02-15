@@ -6,6 +6,7 @@ import com.example.administrator.audioplayer.jsonbean.HotWord;
 import com.example.administrator.audioplayer.jsonbean.Lru;
 import com.example.administrator.audioplayer.jsonbean.SearchMeageResult;
 
+
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import rx.Observable;
@@ -19,6 +20,8 @@ public interface SearchService {
 
     /**
      * 获取搜索热词接口
+    /**
+     *
      * @param from
      * @param version
      * @param format
@@ -65,7 +68,5 @@ public interface SearchService {
     Observable<SearchMeageResult> searchMerge(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                               @Query("method") String method, @Query("query") String query, @Query("page_no") String page_no,
                                               @Query("page_size") String page_size, @Query("type") String type, @Query("data_source") String data_source);
-
-
 
 }

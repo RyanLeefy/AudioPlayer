@@ -71,6 +71,7 @@ public class RecommendFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 HttpMethods.getInstance().billSongList(1, 0, 3);
+
             }
         });
 

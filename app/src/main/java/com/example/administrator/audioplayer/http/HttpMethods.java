@@ -10,6 +10,8 @@ import com.example.administrator.audioplayer.jsonbean.SongBaseInfo;
 import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
 import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
+
+
 import com.example.administrator.audioplayer.utils.PrintLog;
 
 import java.io.UnsupportedEncodingException;
@@ -21,7 +23,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
-import rx.Subscriber;
+
+
 
 /**
  * Created by on 2017/2/15.
@@ -45,10 +48,12 @@ public class HttpMethods {
 
     private Retrofit retrofit;
 
+
     private AlbumService albumService;
     private SongService songService;
     private SongCollectionService songCollectionService;
     private BillBoardService billBoardService;
+
     private SearchService searchService;
 
     private static HttpMethods sInstance = new HttpMethods();
@@ -75,6 +80,7 @@ public class HttpMethods {
         songService = retrofit.create(SongService.class);
         songCollectionService = retrofit.create(SongCollectionService.class);
         billBoardService = retrofit.create(BillBoardService.class);
+
         searchService = retrofit.create(SearchService.class);
 
     }
@@ -82,6 +88,7 @@ public class HttpMethods {
     public static HttpMethods getInstance() {
         return sInstance;
     }
+
 
 
 
@@ -197,7 +204,7 @@ public class HttpMethods {
         String url = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.search.hot";
         printUrlLog(url);
 
-        return  searchService.hotWord(FROM, VERSION, FORMAT, method);
+        return searchService.hotWord(FROM, VERSION, FORMAT, method);
     }
 
 
@@ -217,6 +224,7 @@ public class HttpMethods {
                 + "&ts=" + ts + "&type=" + type + "&e=" + e;
         printUrlLog(url);
 
+
         return searchService.searchLrcPic(FROM, VERSION, FORMAT, method, query, ts, type, e);
     }
 
@@ -227,6 +235,7 @@ public class HttpMethods {
      * @param page_no
      * @param page_size
      */
+
     public Observable<SearchMeageResult> searchMerge(String query, String page_no, String page_size) {
         String method = "baidu.ting.search.merge";
         String type = "-1";
