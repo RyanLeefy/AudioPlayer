@@ -12,7 +12,6 @@ import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
 import com.example.administrator.audioplayer.db.RecentMusicDB;
 import com.example.administrator.audioplayer.fragment.MusicFragment;
 import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
-import com.example.administrator.audioplayer.modelImp.MusicModel;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
