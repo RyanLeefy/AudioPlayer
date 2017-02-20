@@ -1,82 +1,143 @@
 package com.example.administrator.audioplayer.fragment;
 
 
+import android.content.Context;
+import android.graphics.Point;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutCompat;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 
+import com.example.administrator.audioplayer.Ipresenter.IRecommendPresenter;
+import com.example.administrator.audioplayer.Iview.IRecommendView;
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.http.HttpMethods;
+import com.example.administrator.audioplayer.adapter.RecommendNewAlbumAdapter;
+import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
+import com.example.administrator.audioplayer.presenterImp.RecommendPresenter;
+import com.example.administrator.audioplayer.widget.CarouselFigureView;
 
 /**
  * Netfragment下的新曲推荐fragment
  *
- * A simple {@link Fragment} subclass.
- * Use the {@link RecommendFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
-public class RecommendFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class RecommendFragment extends BaseFragment implements IRecommendView {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Context mContext;
+    private LayoutInflater mInflater;
+
+    //放轮播图的layout
+    private LinearLayout cfvlayout;
+
+    //轮播图
+    private CarouselFigureView cfv;
+
+    //添加内容的layout,里面动态各种view，如歌单view，唱片view
+    private LinearLayout mContentlayout;
+
+    //推荐歌单view
+    private View mSongColletionView;
+
+    //新专辑上架view
+    private View mNewAlbumView;
+
+    private RecyclerView mSongCollectionRecycle, mNewAlbumRecycle;
+
+    private GridLayoutManager gridLayoutManager;
+
+    private IRecommendPresenter presenter;
 
 
-    public RecommendFragment() {
-        // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RecommendFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static RecommendFragment newInstance(String param1, String param2) {
-        RecommendFragment fragment = new RecommendFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        mContext = getActivity();
+        mInflater = LayoutInflater.from(mContext);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_recommend, container, false);
 
-        Button button = (Button)view.findViewById(R.id.test_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HttpMethods.getInstance().billSongList(1, 0, 3);
+        cfvlayout = (LinearLayout) view.findViewById(R.id.cfvly_recommend_fragment);
 
-            }
-        });
+        //获取屏幕的宽度
+        WindowManager wm = getActivity().getWindowManager();
+        Point outSize = new Point();
+        wm.getDefaultDisplay().getSize(outSize);
+        //设置轮播图的大小，宽度为屏幕的宽度，高度为宽度/2.5
+        int width = outSize.x;
+        int height = (int)(width / 2.5);
+
+        LinearLayoutCompat.LayoutParams params = new LinearLayoutCompat.LayoutParams(width, height);
+        cfv = new CarouselFigureView(mContext);
+        cfv.setLayoutParams(params);
+
+        //把轮播图添加到轮播图的layout中
+        cfvlayout.addView(cfv);
+
+        //内容布局
+        mContentlayout = (LinearLayout) view.findViewById(R.id.ly_recommend_fragment);
+
+
+        //初始化推荐歌单模块
+        mSongColletionView = mInflater.inflate(R.layout.layout_recommend_songcollection_view, container, false);
+        mSongCollectionRecycle = (RecyclerView) mSongColletionView.findViewById(R.id.recommend_playlist_recyclerview);
+        //recycle排列方式，表格排列，一行3个
+        gridLayoutManager = new GridLayoutManager(mContext, 3);
+        mSongCollectionRecycle.setLayoutManager(gridLayoutManager);
+        mSongCollectionRecycle.setHasFixedSize(true);
+        //setAdapter
+
+
+        //初始化新专辑上架模块
+        mNewAlbumView = mInflater.inflate(R.layout.layout_recommend_newalbum_view, container, false);
+        mNewAlbumRecycle = (RecyclerView) mNewAlbumView.findViewById(R.id.recommend_newalbums_recyclerview);
+        //recycle排列方式，表格排列，一行3个
+        gridLayoutManager = new GridLayoutManager(mContext, 3);
+        mNewAlbumRecycle.setLayoutManager(gridLayoutManager);
+        mNewAlbumRecycle.setHasFixedSize(true);
+        //setAdapter
+
+
+        presenter = new RecommendPresenter(this);
+        presenter.onCreateView();
+
+        //往内容布局添加推荐歌单模块
+        mContentlayout.addView(mSongColletionView);
+        //往内容布局添加新专辑上架模块
+        mContentlayout.addView(mNewAlbumView);
 
 
         return view;
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        cfv.onDestroy();
+    }
+
+    @Override
+    public void setRecommendSongCollectionAdapter(RecommendSongCollectionAdapter adapter) {
+        mSongCollectionRecycle.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void setRecommendNewAlbumAdapter(RecommendNewAlbumAdapter albumAdapter) {
+        mNewAlbumRecycle.setAdapter(albumAdapter);
+        albumAdapter.notifyDataSetChanged();
+    }
 }

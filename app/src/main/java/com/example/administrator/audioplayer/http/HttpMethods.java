@@ -1,10 +1,15 @@
 package com.example.administrator.audioplayer.http;
 
 
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.jsonbean.Album;
+import com.example.administrator.audioplayer.jsonbean.Artist;
 import com.example.administrator.audioplayer.jsonbean.BillBoard;
+import com.example.administrator.audioplayer.jsonbean.CarouselFigure;
 import com.example.administrator.audioplayer.jsonbean.HotWord;
 import com.example.administrator.audioplayer.jsonbean.Lru;
+import com.example.administrator.audioplayer.jsonbean.RecommendNewAlbum;
+import com.example.administrator.audioplayer.jsonbean.RecommendSongCollection;
 import com.example.administrator.audioplayer.jsonbean.SearchMeageResult;
 import com.example.administrator.audioplayer.jsonbean.SongBaseInfo;
 import com.example.administrator.audioplayer.jsonbean.SongCollection;
@@ -12,13 +17,21 @@ import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
 import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
 
 
+import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.PrintLog;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
+import okhttp3.CacheControl;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -49,11 +62,12 @@ public class HttpMethods {
     private Retrofit retrofit;
 
 
+    private CarouselFigureService carouselFigureService;
     private AlbumService albumService;
     private SongService songService;
+    private ArtistService artistService;
     private SongCollectionService songCollectionService;
     private BillBoardService billBoardService;
-
     private SearchService searchService;
 
     private static HttpMethods sInstance = new HttpMethods();
@@ -63,10 +77,55 @@ public class HttpMethods {
         httpclientBuilder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
-        //缓存
-        //File sdcache = context.getCacheDir();
-        //Cache cache = new Cache(sdcache.getAbsoluteFile(), 1024 * 1024 * 30); //30Mb
-        //httpclientBuilder.cache(cache);
+
+
+        //重写Interceptor拦截器来实现缓存
+        Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                CacheControl.Builder cacheBuilder = new CacheControl.Builder();
+                cacheBuilder.maxAge(0, TimeUnit.SECONDS);
+                cacheBuilder.maxStale(1, TimeUnit.DAYS);
+                CacheControl cacheControl = cacheBuilder.build();
+
+                //获取请求
+                Request request = chain.request();
+
+                //如果没有网络
+                if(!CommonUtils.isConnectInternet(MyApplication.getContext())){
+                    //请求中设置缓存策略
+                    request = request.newBuilder()
+                             .cacheControl(cacheControl)
+                             .build();
+                }
+
+                //获取响应
+                Response originalResponse = chain.proceed(request);
+
+                //如果有网络，则响应中缓存数据
+                if(CommonUtils.isConnectInternet(MyApplication.getContext())) {
+                    int maxAge = 0;// read from cache
+                    return originalResponse.newBuilder()
+                            .removeHeader("Pragma")
+                            .header("Cache-Control","public ,max-age="+ maxAge)
+                            .build();
+                } else{
+                    //如果没有网络，则响应中读取缓存数据
+                    int maxStale =60*60*24;// 一天
+                    return originalResponse.newBuilder()
+                            .removeHeader("Pragma")
+                            .header("Cache-Control","public, only-if-cached, max-stale="+ maxStale)
+                            .build();
+                }
+            }
+        };
+
+        //设置缓存地址，设置拦截器实现缓存
+        File sdcache = MyApplication.getContext().getCacheDir();
+        Cache cache = new Cache(sdcache.getAbsoluteFile(), 1024 * 1024 * 30); //30Mb
+        httpclientBuilder.addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)
+                .cache(cache);
+
 
         retrofit = new Retrofit.Builder()
                 .client(httpclientBuilder.build())
@@ -76,11 +135,12 @@ public class HttpMethods {
                 .build();
 
 
+        carouselFigureService = retrofit.create(CarouselFigureService.class);
         albumService = retrofit.create(AlbumService.class);
         songService = retrofit.create(SongService.class);
+        artistService = retrofit.create(ArtistService.class);
         songCollectionService = retrofit.create(SongCollectionService.class);
         billBoardService = retrofit.create(BillBoardService.class);
-
         searchService = retrofit.create(SearchService.class);
 
     }
@@ -90,6 +150,20 @@ public class HttpMethods {
     }
 
 
+    /**
+     * 获取轮播图
+     * @param num
+     * @return
+     */
+    public Observable<CarouselFigure> focusPic(int num) {
+        String method = "baidu.ting.plaza.getFocusPic";
+
+        String url = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.plaza.getFocusPic"
+                + "&num=" + num;
+        printUrlLog(url);
+
+        return carouselFigureService.focusPic(FROM, VERSION, FORMAT, method, num);
+    }
 
 
     /**
@@ -104,6 +178,23 @@ public class HttpMethods {
         printUrlLog(url);
 
         return albumService.albumInfo(FROM, VERSION, FORMAT, method, album_id);
+    }
+
+
+    /**
+     * 获取新上架专辑(唱片)
+     * @param offset
+     * @param limit
+     * @return
+     */
+    public Observable<RecommendNewAlbum> recommendAlbum(int offset, int limit) {
+        String method = "baidu.ting.plaza.getRecommendAlbum";
+
+        String url = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.plaza.getRecommendAlbum"
+                + "&offset=" + offset + "&limit=" + limit;
+        printUrlLog(url);
+
+        return albumService.recommendAlbum(FROM, VERSION, FORMAT, method, offset, limit);
     }
 
 
@@ -142,6 +233,25 @@ public class HttpMethods {
 
 
     /**
+     * 获取歌手信息
+     * @param artistid
+     * @return
+     */
+    public Observable<Artist> artistInfo(String artistid) {
+        String method = "baidu.ting.artist.getinfo";
+        String tinguid = "";
+
+        String url = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.artist.getinfo"
+                + "&tinguid=" + tinguid + "&artistid=" + artistid;
+        printUrlLog(url);
+
+
+        return artistService.artistInfo(FROM, VERSION, FORMAT, method, tinguid, artistid);
+    }
+
+
+
+    /**
      * 获取歌单
      * @param pageNo 页码，从1开始
      * @param pageSize 每页多少个
@@ -173,6 +283,25 @@ public class HttpMethods {
 
         return songCollectionService.geDanInfo(FROM, VERSION, FORMAT, method, listid);
     }
+
+
+    /**
+     * 获取热门歌单
+     * @param num
+     * @return
+     */
+    public Observable<RecommendSongCollection> hotGeDan(int num) {
+        String method = "baidu.ting.diy.getHotGeDanAndOfficial";
+
+        String url = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.diy.getHotGeDanAndOfficial"
+                + "&num=" + num;
+        printUrlLog(url);
+
+        return songCollectionService.hotGeDan(FROM, VERSION, FORMAT, method, num);
+
+    }
+
+
 
 
     /**

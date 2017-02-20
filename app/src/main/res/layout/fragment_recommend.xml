@@ -4,18 +4,49 @@
     android:layout_height="match_parent"
     tools:context="com.example.administrator.audioplayer.fragment.RecommendFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="新曲界面" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/test_button"
-        android:layout_marginTop="100dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="textUrl"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
+                android:id="@+id/cfvly_recommend_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.3dp"
+                android:layout_marginTop="15dp"
+                android:background="#E0E0E0" />
+
+            <LinearLayout
+                android:id="@+id/ly_recommend_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!--<include layout="@layout/recommend_playlist" />-->
+                <!--<include layout="@layout/recommend_newalbums"/>-->
+                <!--<include layout="@layout/recommend_radio"/>-->
+
+                <!--添加布局的位置-->
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
 
 </FrameLayout>

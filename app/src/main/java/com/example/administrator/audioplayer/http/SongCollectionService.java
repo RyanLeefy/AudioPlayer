@@ -1,5 +1,6 @@
 package com.example.administrator.audioplayer.http;
 
+import com.example.administrator.audioplayer.jsonbean.RecommendSongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
 
@@ -40,4 +41,21 @@ public interface SongCollectionService {
     @GET("v1/restserver/ting")
     Observable<SongCollectionInfo> geDanInfo(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                              @Query("method") String method, @Query("listid") String listid);
+
+
+    /**
+     * 获取热门歌单接口
+     * @param from
+     * @param version
+     * @param format
+     * @param method
+     * @param num
+     * @return
+     */
+    @GET("v1/restserver/ting")
+    Observable<RecommendSongCollection> hotGeDan(@Query("from") String from, @Query("version") String version, @Query("format") String format,
+                                                 @Query("method") String method, @Query("num") int num);
+
+
+
 }

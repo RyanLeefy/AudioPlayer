@@ -1,6 +1,8 @@
 package com.example.administrator.audioplayer.utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.DisplayMetrics;
 
@@ -52,6 +54,23 @@ public class CommonUtils {
         long s = (milliSecs % (60 * 1000)) / 1000;
         sb.append(s < 10 ? "0" + s : s);
         return sb.toString();
+    }
+
+
+    /**
+     * 检查是否有网络
+     * @param pContext
+     * @return
+     */
+    public static boolean isConnectInternet(final Context pContext) {
+        final ConnectivityManager conManager = (ConnectivityManager) pContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo networkInfo = conManager.getActiveNetworkInfo();
+
+        if (networkInfo != null) {
+            return networkInfo.isAvailable();
+        }
+
+        return false;
     }
 
 
