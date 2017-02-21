@@ -113,6 +113,12 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
                 left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 13);
             }
 
+            //有序号的歌曲item
+            if(parent.getChildViewHolder(child) instanceof MusicAdapter.MusicItemWithNumberViewHolder) {
+                MusicAdapter.MusicItemWithNumberViewHolder viewHolder = (MusicAdapter.MusicItemWithNumberViewHolder)parent.getChildViewHolder(child);
+                left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 40) + CommonUtils.dip2px(MyApplication.getContext(), 13);
+            }
+
 
 
             android.support.v7.widget.RecyclerView v = new android.support.v7.widget.RecyclerView(parent.getContext());

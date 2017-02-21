@@ -11,6 +11,9 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        renderscriptTargetApi 18
+        renderscriptSupportModeEnabled true
+
     }
     buildTypes {
         release {
@@ -36,6 +39,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'
     compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.github.ksoichiro:android-observablescrollview:1.6.0'
 
     testCompile 'junit:junit:4.12'
 }

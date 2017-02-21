@@ -40,6 +40,8 @@ public class RecommendSongCollectionAdapter extends RecyclerView.Adapter {
     //可变String，可以在其中间加图片
     private SpannableString spanString;
 
+    private OnItemClickListener listener;
+
 
     //歌单图片的大小
     private static final int WIDTH = 160;
@@ -58,14 +60,27 @@ public class RecommendSongCollectionAdapter extends RecyclerView.Adapter {
     }
 
 
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(mInflater.inflate(R.layout.list_item_recommend_songcollection, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         RecommendSongCollection.ContentBean.ListBean songCollection = (RecommendSongCollection.ContentBean.ListBean)mList.get(position);
+
+        //先保存对应的歌单数据
+        ((ViewHolder)holder).listid = songCollection.getListid();
+        ((ViewHolder)holder).pic = songCollection.getPic();
+        ((ViewHolder)holder).listenum = songCollection.getListenum();
+        ((ViewHolder)holder).title = songCollection.getTitle();
+        ((ViewHolder)holder).tag = songCollection.getTag();
 
         //创建一个ImageRequest,设置图片地址，裁剪图片，以防出现内存不足
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(songCollection.getPic()))
@@ -92,6 +107,17 @@ public class RecommendSongCollectionAdapter extends RecyclerView.Adapter {
             ((ViewHolder) holder).count.append(" " + songCollection.getListenum());
         }
 
+        //设置点击事件
+        if(listener != null) {
+            ((ViewHolder) holder).itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemClick(holder, position);
+                }
+            });
+        }
+
+
     }
 
     @Override
@@ -99,7 +125,14 @@ public class RecommendSongCollectionAdapter extends RecyclerView.Adapter {
         return mList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+        //用来保存对应的歌单数据
+        public String listid;
+        public String pic;
+        public String listenum;
+        public String title;
+        public String tag;
+
         private SimpleDraweeView art;
         private TextView name, count;
 
@@ -111,5 +144,11 @@ public class RecommendSongCollectionAdapter extends RecyclerView.Adapter {
         }
     }
 
+
+    //回调接口
+    public interface OnItemClickListener
+    {
+        void onItemClick(RecyclerView.ViewHolder viewHolder, int position);
+    }
 
 }

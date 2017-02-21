@@ -435,7 +435,7 @@ public class MusicPlayer {
      * 获取当前音频的id
      * @return
      */
-    public static final long getCurrentAudioId() {
+    public static int getCurrentAudioId() {
         if (mService != null) {
             return mService.getAudioId();
         }

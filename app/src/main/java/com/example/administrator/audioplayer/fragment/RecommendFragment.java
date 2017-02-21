@@ -16,7 +16,9 @@ import android.widget.LinearLayout;
 
 import com.example.administrator.audioplayer.Ipresenter.IRecommendPresenter;
 import com.example.administrator.audioplayer.Iview.IRecommendView;
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.RecommendNewAlbumAdapter;
 import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
 import com.example.administrator.audioplayer.presenterImp.RecommendPresenter;
@@ -132,6 +134,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
     @Override
     public void setRecommendSongCollectionAdapter(RecommendSongCollectionAdapter adapter) {
         mSongCollectionRecycle.setAdapter(adapter);
+        adapter.setOnItemClickListener(new RecommendSongCollectionAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
+                RecommendSongCollectionAdapter.ViewHolder holder = ((RecommendSongCollectionAdapter.ViewHolder)viewHolder);
+                SongCollectionActivity.startActivity(MyApplication.getContext(), false,
+                        holder.listid, holder.pic, holder.listenum, holder.title, holder.tag);
+            }
+        });
         adapter.notifyDataSetChanged();
     }
 

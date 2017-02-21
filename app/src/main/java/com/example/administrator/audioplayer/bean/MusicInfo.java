@@ -30,7 +30,7 @@ public class MusicInfo implements Parcelable {
     /**
      * 数据库中的_id
      */
-    private long audioId = -1;
+    private int audioId = -1;
     private int albumId = -1;
     private String albumName;
     private String albumData;
@@ -55,7 +55,7 @@ public class MusicInfo implements Parcelable {
         public MusicInfo createFromParcel(Parcel source) {
             MusicInfo music = new MusicInfo();
             Bundle bundle = source.readBundle();
-            music.audioId = bundle.getLong(KEY_AUDIO_ID);
+            music.audioId = bundle.getInt(KEY_AUDIO_ID);
             music.albumId = bundle.getInt(KEY_ALBUM_ID);
             music.albumName = bundle.getString(KEY_ALBUM_NAME);
             music.duration = bundle.getInt(KEY_DURATION);
@@ -86,7 +86,7 @@ public class MusicInfo implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         Bundle bundle = new Bundle();
-        bundle.putLong(KEY_AUDIO_ID, audioId);
+        bundle.putInt(KEY_AUDIO_ID, audioId);
         bundle.putInt(KEY_ALBUM_ID, albumId);
         bundle.putString(KEY_ALBUM_NAME, albumName);
         bundle.putString(KEY_ALBUM_DATA, albumData);
@@ -127,11 +127,11 @@ public class MusicInfo implements Parcelable {
     }
 
 
-    public long getAudioId() {
+    public int getAudioId() {
         return audioId;
     }
 
-    public void setAudioId(long audioid) {
+    public void setAudioId(int audioid) {
         this.audioId = audioid;
     }
 

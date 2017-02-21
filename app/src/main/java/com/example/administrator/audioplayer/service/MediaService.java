@@ -1957,7 +1957,7 @@ public class MediaService extends Service {
         }
     }
 
-    public long getAudioId() {
+    public int getAudioId() {
         MusicInfo music = getCurrentTrack();
         if (music != null) {
             return music.getAudioId();
@@ -2795,7 +2795,7 @@ public class MediaService extends Service {
 
         @Override
         public void onCompletion(MediaPlayer mp) {
-            /*
+
             Logger.d(TAG, "completion");
             //若是当前播放器结束且有下一播放器，则切换到下一播放器
             if (mp == mCurrentMediaPlayer && mNextMediaPlayer != null) {
@@ -2808,12 +2808,12 @@ public class MediaService extends Service {
                 mService.get().mWakeLock.acquire(30000);
                 mHandler.sendEmptyMessage(TRACK_ENDED);
                 mHandler.sendEmptyMessage(RELEASE_WAKELOCK);
-            }*/
+            }
         }
 
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
-            /*
+
             Logger.e(TAG, "Music Server Error what: " + what + " extra: " + extra);
             switch (what) {
                 case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
@@ -2831,8 +2831,6 @@ public class MediaService extends Service {
                 default:
                     break;
             }
-            return false;
-        }*/
             return false;
         }
 
@@ -2931,7 +2929,7 @@ public class MediaService extends Service {
                         }
                         break;
                     case TRACK_WENT_TO_NEXT:
-                        //service.setAndRecordPlayPos(service.mNextPlayPos);
+                        service.setAndRecordPlayPos(service.mNextPlayPos);
                         service.setNextTrack();
                         if (service.mCursor != null) {
                             service.mCursor.close();
@@ -2949,7 +2947,7 @@ public class MediaService extends Service {
                             service.play();
                         } else {
                             if (D) Log.d(TAG, "Going to  of track");
-                            //service.gotoNext(false);
+                            service.gotoNext(true);
                         }
                         break;
                     case RELEASE_WAKELOCK:

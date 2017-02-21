@@ -75,7 +75,7 @@ public class RecentMusicDB {
      */
     public void onCreate(final SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + MusicInfo.KEY_AUDIO_ID + " LONG NOT NULL,"
+                + MusicInfo.KEY_AUDIO_ID + " INT NOT NULL,"
                 + MusicInfo.KEY_ALBUM_ID + " INT NOT NULL,"
                 + MusicInfo.KEY_ALBUM_NAME + " VARCHAR NOT NULL,"
                 + MusicInfo.KEY_ALBUM_DATA + " VARCHAR,"
@@ -105,7 +105,7 @@ public class RecentMusicDB {
         final SQLiteDatabase database = mMusicDatabase.getWritableDatabase();
         database.beginTransaction();
 
-        Map<Long, Integer> recentMap = null;
+        Map<Integer, Integer> recentMap = null;
         try {
 
             //查询是否有与插入歌曲音频id一样的，有的话删除旧的
@@ -244,7 +244,7 @@ public class RecentMusicDB {
         List<MusicInfo> list = new ArrayList<>();
         while(cursor != null && cursor.moveToNext()) {
             MusicInfo musicInfo = new MusicInfo();
-            musicInfo.setAudioId(cursor.getLong(cursor.getColumnIndex(MusicInfo.KEY_AUDIO_ID)));
+            musicInfo.setAudioId(cursor.getInt(cursor.getColumnIndex(MusicInfo.KEY_AUDIO_ID)));
             musicInfo.setAlbumId(cursor.getInt(cursor.getColumnIndex(MusicInfo.KEY_ALBUM_ID)));
             musicInfo.setAlbumName(cursor.getString(cursor.getColumnIndex(MusicInfo.KEY_ALBUM_NAME)));
             musicInfo.setAlbumData(cursor.getString(cursor.getColumnIndex(MusicInfo.KEY_ALBUM_DATA)));
@@ -277,10 +277,10 @@ public class RecentMusicDB {
      * 返回最近播放音频id map, 把有的都设置为1
      * @return
      */
-    public synchronized Map<Long, Integer> getRecentIdMap() {
+    public synchronized Map<Integer, Integer> getRecentIdMap() {
         Logger.d("begin get RecentIds");
         List<MusicInfo> musicInfos = getRecentList(null);
-        Map<Long, Integer> map = new HashMap<>();
+        Map<Integer, Integer> map = new HashMap<>();
         if (musicInfos == null || musicInfos.isEmpty()) {
             return map;
         }

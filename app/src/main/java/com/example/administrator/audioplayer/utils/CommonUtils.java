@@ -5,6 +5,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
+
+import com.example.administrator.audioplayer.R;
 
 /**
  * Created by lipuyusx on 2017/2/6.
@@ -73,5 +76,42 @@ public class CommonUtils {
         return false;
     }
 
+
+    /**
+     * 获取状态栏高度
+     * @param context
+     * @return
+     */
+    public static int getStatusHeight(Context context) {
+
+        int statusHeight = -1;
+        try {
+            Class clazz = Class.forName("com.android.internal.R$dimen");
+            Object object = clazz.newInstance();
+            int height = Integer.parseInt(clazz.getField("status_bar_height")
+                    .get(object).toString());
+            statusHeight = context.getResources().getDimensionPixelSize(height);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statusHeight;
+    }
+
+
+    /**
+     * 获取导航栏高度
+     * @param context
+     * @return
+     */
+    public static int getActionBarHeight(Context context) {
+        int mActionBarHeight;
+        TypedValue mTypedValue = new TypedValue();
+
+        context.getTheme().resolveAttribute(R.attr.actionBarSize, mTypedValue, true);
+
+        mActionBarHeight = TypedValue.complexToDimensionPixelSize(mTypedValue.data, context.getResources().getDisplayMetrics());
+
+        return mActionBarHeight;
+    }
 
 }

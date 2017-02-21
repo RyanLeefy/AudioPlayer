@@ -3,6 +3,7 @@ package com.example.administrator.audioplayer.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +17,15 @@ import com.example.administrator.audioplayer.service.MusicPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
+import bolts.Bolts;
+
 /**
  * Created on 2017/1/26.
  * 歌曲的adapter，默认没有PlayItem，需要的话初始化时候传入true
  * 默认歌曲名和歌手名上下排列，如需打横排列设置setHorizontal（true）
  * 默认末尾是更多，若是删除，需要setMore(false)
+ * 默认没有头部偏移量，如果需要，则setHasTopPadding(true);
+ * 默认没有左边的序号，如果需要，则setHasTrackNumber(true);
  */
 
 public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -31,6 +36,12 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     //默认歌曲名和歌手名上下排列
     private boolean isHorizontal = false;
+
+    //第一个播放全部项有无paddingtop的距离，用在歌单页面，作偏移量露出头部header
+    private boolean HasTopPadding = false;
+
+    //默认没有左边的序号
+    private boolean HasTrackNumber = false;
 
     //末尾是更多还是删除
     private boolean isMore = true;
@@ -78,6 +89,14 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.isMore = isMore;
     }
 
+    public void setHasTopPadding(Boolean hasTopPadding) {
+        this.HasTopPadding = hasTopPadding;
+    }
+
+    public void setHasTrackNumber(Boolean hasTrackNumber) {
+        this.HasTrackNumber = hasTrackNumber;
+    }
+
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -88,14 +107,30 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_playlist, parent, false), isHorizontal);
             } else {
                 //正常列表的item
-                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
+                //没有序号
+                if(!HasTrackNumber) {
+                    return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
+                } else {
+                    //有序号
+                    return new MusicItemWithNumberViewHolder(mInflater.inflate(R.layout.list_item_music_withnumber, parent, false), isHorizontal);
+                }
             }
         } else {
             if (viewType == FIRST_ITEM) {
-                return new PlayAllItemViewHolder(mInflater.inflate(R.layout.list_item_playallitem, parent, false));
+                if(!HasTopPadding) {
+                    //没有头部偏移量
+                    return new PlayAllItemViewHolder(mInflater.inflate(R.layout.list_item_playallitem, parent, false));
+                } else {
+                    //有头部偏移量
+                    return new PlayAllItemViewHolder(mInflater.inflate(R.layout.list_item_playallitem_withmargin, parent, false));
+                }
             }
             else {
-                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
+                if(!HasTrackNumber) {
+                    return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
+                } else {
+                    return new MusicItemWithNumberViewHolder(mInflater.inflate(R.layout.list_item_music_withnumber, parent, false), isHorizontal);
+                }
             }
         }
     }
@@ -143,46 +178,98 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     realPosition = position;
                 }
 
-                ((MusicItemViewHolder) holder).musicName.setText(((MusicInfo) mList.get(realPosition)).getMusicName());
-                if(isHorizontal){
-                    //水平显示的话 歌曲名和歌手名要加个"-"
-                    ((MusicItemViewHolder) holder).artistName.setText(" - " +((MusicInfo) mList.get(realPosition)).getArtist());
-                } else {
-                    ((MusicItemViewHolder) holder).artistName.setText(((MusicInfo) mList.get(realPosition)).getArtist());
-                }
+                if(!HasTrackNumber) {
 
+                    //没有序号
+                    ((MusicItemViewHolder) holder).musicName.setText(((MusicInfo) mList.get(realPosition)).getMusicName());
+                    if (isHorizontal) {
+                        //水平显示的话 歌曲名和歌手名要加个"-"
+                        ((MusicItemViewHolder) holder).artistName.setText(" - " + ((MusicInfo) mList.get(realPosition)).getArtist());
+                    } else {
+                        ((MusicItemViewHolder) holder).artistName.setText(((MusicInfo) mList.get(realPosition)).getArtist());
+                    }
 
-                //判断该条目音乐是否是当前音乐，是的话显示小喇叭
-                if (MusicPlayer.getCurrentAudioId() == mList.get(realPosition).getAudioId()) {
-                    ((MusicItemViewHolder) holder).playState.setVisibility(View.VISIBLE);
-                    ((MusicItemViewHolder) holder).playState.setImageResource(R.drawable.song_play_icon);
-                } else {
-                    ((MusicItemViewHolder) holder).playState.setVisibility(View.GONE);
-                }
-
-
-                if(isMore) {
-                    //末尾是更多图片
-                    ((MusicItemViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_more);
-                } else {
-                    //末尾是删除图片
-                    ((MusicItemViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_delete);
-                }
-
-                //设置点击事件
-                if(onMusicItemClickListener != null) {
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onMusicItemClickListener.onItemClick(holder.itemView, position);
+                    if (!HasTrackNumber)
+                        //判断该条目音乐是否是当前音乐，是的话显示小喇叭
+                        if (MusicPlayer.getCurrentAudioId() == mList.get(realPosition).getAudioId()) {
+                            ((MusicItemViewHolder) holder).playState.setVisibility(View.VISIBLE);
+                            ((MusicItemViewHolder) holder).playState.setImageResource(R.drawable.song_play_icon);
+                        } else {
+                            ((MusicItemViewHolder) holder).playState.setVisibility(View.GONE);
                         }
-                    });
-                    ((MusicItemViewHolder) holder).moreOverflow.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onMusicItemClickListener.onMoreClick(holder.itemView, position);
-                        }
-                    });
+
+
+                    if (isMore) {
+                        //末尾是更多图片
+                        ((MusicItemViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_more);
+                    } else {
+                        //末尾是删除图片
+                        ((MusicItemViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_delete);
+                    }
+
+                    //设置点击事件
+                    if (onMusicItemClickListener != null) {
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onMusicItemClickListener.onItemClick(holder.itemView, position);
+                            }
+                        });
+                        ((MusicItemViewHolder) holder).moreOverflow.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onMusicItemClickListener.onMoreClick(holder.itemView, position);
+                            }
+                        });
+                    }
+                } else {
+
+
+                    //有序号
+                    ((MusicItemWithNumberViewHolder) holder).musicName.setText(((MusicInfo) mList.get(realPosition)).getMusicName());
+                    if (isHorizontal) {
+                        //水平显示的话 歌曲名和歌手名要加个"-"
+                        ((MusicItemWithNumberViewHolder) holder).artistName.setText(" - " + ((MusicInfo) mList.get(realPosition)).getArtist());
+                    } else {
+                        ((MusicItemWithNumberViewHolder) holder).artistName.setText(((MusicInfo) mList.get(realPosition)).getArtist());
+                    }
+
+
+                    //判断该条目音乐是否是当前音乐，是的话显示小喇叭
+                    if (MusicPlayer.getCurrentAudioId() == mList.get(realPosition).getAudioId()) {
+                        ((MusicItemWithNumberViewHolder) holder).trackNumber.setVisibility(View.GONE);
+                        ((MusicItemWithNumberViewHolder) holder).playState.setVisibility(View.VISIBLE);
+                        ((MusicItemWithNumberViewHolder) holder).playState.setImageResource(R.drawable.song_play_icon);
+                    } else {
+                        ((MusicItemWithNumberViewHolder) holder).playState.setVisibility(View.GONE);
+                        ((MusicItemWithNumberViewHolder) holder).trackNumber.setVisibility(View.VISIBLE);
+                        ((MusicItemWithNumberViewHolder) holder).trackNumber.setText(realPosition + "");
+                    }
+
+
+                    if (isMore) {
+                        //末尾是更多图片
+                        ((MusicItemWithNumberViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_more);
+                    } else {
+                        //末尾是删除图片
+                        ((MusicItemWithNumberViewHolder) holder).moreOverflow.setImageResource(R.drawable.list_icn_delete);
+                    }
+
+                    //设置点击事件
+                    if (onMusicItemClickListener != null) {
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onMusicItemClickListener.onItemClick(holder.itemView, position);
+                            }
+                        });
+                        ((MusicItemWithNumberViewHolder) holder).moreOverflow.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onMusicItemClickListener.onMoreClick(holder.itemView, position);
+                            }
+                        });
+                    }
                 }
                 break;
             default:
@@ -272,6 +359,30 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         }
     }
+
+
+    //MusicItemWithNumber的Holder
+    public static class MusicItemWithNumberViewHolder extends RecyclerView.ViewHolder{
+
+        ImageView playState,moreOverflow;
+        public TextView musicName, artistName, trackNumber;
+
+        public MusicItemWithNumberViewHolder(View view, Boolean Horizontal) {
+            super(view);
+            this.musicName = (TextView) view.findViewById(R.id.tv_musicname);
+
+            if(Horizontal) {
+                this.artistName = (TextView) view.findViewById(R.id.tv_right_text);
+            } else {
+                this.artistName = (TextView) view.findViewById(R.id.tv_bottom_text);
+            }
+            this.playState = (ImageView) view.findViewById(R.id.play_state);
+            this.trackNumber = (TextView) view.findViewById(R.id.trackNumber);
+            this.moreOverflow = (ImageView) view.findViewById(R.id.img_moreOverflow);
+
+        }
+    }
+
 
 
 }
