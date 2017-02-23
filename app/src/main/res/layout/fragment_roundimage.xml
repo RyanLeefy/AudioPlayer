@@ -17,6 +17,7 @@
         android:id="@+id/sdv"
         fresco:placeholderImage="@drawable/placeholder_disk_play_program"
         android:layout_width="170dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center" />
+        android:layout_height="170dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"/>
 </FrameLayout>

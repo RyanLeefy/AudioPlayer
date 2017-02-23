@@ -91,6 +91,7 @@ public class RencentPresenter implements IRecentPresenter {
         //position应该大于等于1
         if(position == 0) {
             //点击播放全部按钮
+            MusicPlayer.playAll(mList, 1, false);
         } else {
             //position - 1 对应歌单中的位置
             MusicPlayer.playAll(mList, position - 1, false);

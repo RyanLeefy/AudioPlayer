@@ -79,7 +79,7 @@ public class LocalMusicPresenter implements ILocalMusicPresenter {
     }
 
     @Override
-    public void pefromMusicClick(int position) {
+    public void peformMusicClick(int position) {
         //position应该大于等于1
         if(position == 0) {
             //点击播放全部按钮

@@ -166,7 +166,7 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
                 //获取点击的MusicInfo实体类((LocalMusicAdapter)rv.getAdapter()).getItem(position)
                 //调用presenter的方法，播放该实体代表的歌曲
 
-                presenter.pefromMusicClick(position);
+                presenter.peformMusicClick(position);
 
                 Toast.makeText(getActivity(), ((MusicAdapter)rv.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
             }

@@ -52,7 +52,7 @@ public class RecommendNewAlbumAdapter extends RecyclerView.Adapter {
         RecommendNewAlbum.PlazeAlbumListBean.RMBean.AlbumListBean.ListBean newAlbum = (RecommendNewAlbum.PlazeAlbumListBean.RMBean.AlbumListBean.ListBean)mList.get(position);
 
         //创建一个ImageRequest,设置图片地址，裁剪图片，以防出现内存不足
-        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(newAlbum.getPic_radio()))
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(newAlbum.getPic_big()))
                 .setResizeOptions(new ResizeOptions(WIDTH, HEIGHT))
                 .build();
 

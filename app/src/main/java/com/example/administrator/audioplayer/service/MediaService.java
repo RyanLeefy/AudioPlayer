@@ -48,7 +48,13 @@ import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.MainActivity;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.db.RecentMusicDB;
+import com.example.administrator.audioplayer.http.HttpMethods;
+import com.example.administrator.audioplayer.http.HttpUtils;
+import com.example.administrator.audioplayer.jsonbean.Lru;
+import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
 import com.example.administrator.audioplayer.utils.CommonUtils;
+import com.example.administrator.audioplayer.utils.PreferencesUtils;
+import com.example.administrator.audioplayer.utils.PrintLog;
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
@@ -58,6 +64,8 @@ import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.orhanobut.logger.Logger;
 
 import java.io.BufferedReader;
@@ -77,6 +85,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.TreeSet;
+
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 
 /**
@@ -228,10 +241,10 @@ public class MediaService extends Service {
     private static Handler mUrlHandler;
     private static Handler mLrcHandler;
     //private MediaPlayerProxy mProxy;
-    public static final String LRC_PATH = "/audioplay/lrc/";
+    public static final String LRC_PATH = "/audioplayer/lrc/";
     private long mLastSeekPos = 0;
-    //private RequestPlayUrl mRequestUrl;
-    //private RequestLrc mRequestLrc;
+    private RequestPlayUrl mRequestUrl;
+    private RequestLrc mRequestLrc;
     private boolean mIsSending = false;
     private boolean mIsLocked;
     private Bitmap mNoBit;
@@ -294,6 +307,9 @@ public class MediaService extends Service {
 
         }
     };
+
+
+
 
 
     @Override
@@ -872,11 +888,16 @@ public class MediaService extends Service {
         }
     }
 
-    /*
+
+    /**
+     * 播放网络歌曲的任务类
+     */
     class RequestPlayUrl implements Runnable {
         private long id;
         private boolean play;
         private boolean stop;
+
+        private String url;
 
         public RequestPlayUrl(long id, boolean play) {
             this.id = id;
@@ -889,44 +910,96 @@ public class MediaService extends Service {
 
         @Override
         public void run() {
-            try {
-                String url = PreferencesUtility.getInstance(MediaService.this).getPlayLink(id);
-                if (url == null) {
-                    MusicFileDownInfo song = Down.getUrl(MediaService.this, id + "");
-                    if (song != null && song.getShow_link() != null) {
-                        url = song.getShow_link();
-                        PreferencesUtility.getInstance(MediaService.this).setPlayLink(id, url);
-                    }
+            //从PreferencesUtils获取该音乐的播放地址
+            url = PreferencesUtils.getInstance(MediaService.this).getPlayLink(id);
+            if(url != null) {
+                PrintLog.e(TAG, "current url = " + url);
+                if (!stop) {
+                    mPlayer.setDataSource(url);
                 }
+                if (play && !stop) {
+                    play();
+                }
+            } else {
+            //如果没有则从网络获取，并把地址存入PreferencesUtils中
+                Logger.d("id:" + id);
+
+
+                JsonArray jsonArray = HttpUtils.getResposeJsonObject(HttpMethods.getInstance().songInfoSyn(String.valueOf(id)), MediaService.this, false)
+                        .get("songurl")
+                        .getAsJsonObject().get("url").getAsJsonArray();
+                Gson gson = new Gson();
+                SongExtraInfo.SongurlBean.UrlBean urlBean = gson.fromJson(jsonArray.get(0), SongExtraInfo.SongurlBean.UrlBean.class);
+
+                //Log.e(TAG, String.valueOf(songExtraInfo.getSonginfo() == null));
+                //Log.e(TAG, String.valueOf(songExtraInfo.getError_code()));
+                url = urlBean.getShow_link();
+                PreferencesUtils.getInstance(MediaService.this).setPlayLink(id, url);
+
                 if (url != null) {
-                    L.E(D, TAG, "current url = " + url);
+                    PrintLog.e(TAG, "current url = " + url);
                 } else {
                     gotoNext(true);
                 }
-
                 if (!stop) {
-                    startProxy();
-                    // String urlEn = HttpUtil.urlEncode(url);
-                    String urlEn = url;
-                    urlEn = mProxy.getProxyURL(urlEn);
-                    mPlayer.setDataSource(urlEn);
+                    mPlayer.setDataSource(url);
                 }
-
 
                 if (play && !stop) {
                     play();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
+                /*
+                HttpMethods.getInstance().songInfo(String.valueOf(id))
+                        .subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<SongExtraInfo>() {
+                            @Override
+                            public void onCompleted() {}
 
-    /*
+                            @Override
+                            public void onError(Throwable e) {
+                                PrintLog.e(e.toString());
+                                PrintLog.e(TAG, "fail to get play url");
+                            }
+
+                            @Override
+                            public void onNext(SongExtraInfo songExtraInfo) {
+                                Log.e(TAG, String.valueOf(songExtraInfo.getSonginfo() == null));
+                                Log.e(TAG, String.valueOf(songExtraInfo.getError_code()));
+                                url = songExtraInfo.getSongurl().getUrl().get(0).getShow_link();
+                                PreferencesUtils.getInstance(MediaService.this).setPlayLink(id, url);
+
+                                if (url != null) {
+                                    PrintLog.e(TAG, "current url = " + url);
+                                } else {
+                                    gotoNext(true);
+                                }
+                                if (!stop) {
+                                    mPlayer.setDataSource(url);
+                                }
+
+                                if (play && !stop) {
+                                    play();
+                                }
+                            }
+                        });*/
+
+
+            }
+
+        }
+    }
+
+
+    /**
+     * 获取歌词的任务类
+     */
     class RequestLrc implements Runnable {
 
         private MusicInfo musicInfo;
         private boolean stop;
+        String url;
 
         RequestLrc(MusicInfo info) {
             this.musicInfo = info;
@@ -938,72 +1011,140 @@ public class MediaService extends Service {
 
         @Override
         public void run() {
-            L.E(D, TAG, "start to getlrc");
-            String url = null;
-            if (musicInfo != null && musicInfo.lrc != null) {
-                url = musicInfo.lrc;
-            }
-            try {
-                JsonObject jsonObject = HttpUtil.getResposeJsonObject(BMA.Search.searchLrcPic(musicInfo.musicName, musicInfo.artist));
-                JsonArray array = jsonObject.get("songinfo").getAsJsonArray();
-                int len = array.size();
+            PrintLog.e(TAG, "start to getlrc");
+            //如果已经有歌词地址则获取
+            if (musicInfo != null && musicInfo.getLrc() != null) {
+                url = musicInfo.getLrc();
+                if (!stop) {
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + LRC_PATH + musicInfo.getAudioId());
+                    String lrc = null;
+                    try {
+                        //获取歌词连接返回的歌词数据，并写入文件当中,文件在/audioplay/lrc/音频id;
+                        lrc = HttpUtils.getResposeString(url);
+                        if (lrc != null && !lrc.isEmpty()) {
+                            if (!file.exists())
+                                file.createNewFile();
+                            writeToFile(file, lrc);
+                            mPlayerHandler.sendEmptyMessage(LRC_DOWNLOADED);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                //没有歌词地址则从网络获取歌词地址
+
+                JsonArray jsonArray = HttpUtils.getResposeJsonObject(HttpMethods.getInstance().searchLrcPicSyn(musicInfo.getMusicName(), musicInfo.getArtist()), MediaService.this, false)
+                        .get("songinfo").getAsJsonArray();
+                int len = jsonArray.size();
                 url = null;
                 for (int i = 0; i < len; i++) {
-                    url = array.get(i).getAsJsonObject().get("lrclink").getAsString();
+                    url = jsonArray.get(i).getAsJsonObject().get("lrclink").getAsString();
                     if (url != null) {
-                        Logger.d( TAG, "lrclink = " + url);
+                        PrintLog.e(TAG, "lrclink = " + url);
                         break;
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (!stop) {
-                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + LRC_PATH + musicInfo.songId);
-                String lrc = null;
-                try {
-                    lrc = HttpUtil.getResposeString(url);
-                    if (lrc != null && !lrc.isEmpty()) {
-                        if (!file.exists())
-                            file.createNewFile();
-                        writeToFile(file, lrc);
-                        mPlayerHandler.sendEmptyMessage(LRC_DOWNLOADED);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
 
+                if (!stop) {
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + LRC_PATH + musicInfo.getAudioId());
+                    String lrc = null;
+                    try {
+                        lrc = HttpUtils.getResposeString(url);
+                        if (lrc != null && !lrc.isEmpty()) {
+                            if (!file.exists())
+                                file.createNewFile();
+                            writeToFile(file, lrc);
+                            mPlayerHandler.sendEmptyMessage(LRC_DOWNLOADED);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+                /*
+                HttpMethods.getInstance().searchLrcPic(musicInfo.getMusicName(), musicInfo.getArtist())
+                        .subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<Lru>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                PrintLog.e(TAG, e.toString());
+                                PrintLog.e(TAG, "fail to getlrcLink");
+                            }
+
+                            @Override
+                            public void onNext(Lru lru) {
+                                PrintLog.e(TAG, String.valueOf(lru == null));
+                                PrintLog.e(TAG, lru.getError_code() + "");
+                                PrintLog.e(TAG, String.valueOf(lru.getSonginfo() == null));
+                                url = lru.getSonginfo().get(0).getLrclink();
+                                PrintLog.e(TAG, url);
+                                if (!stop) {
+                                    File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + LRC_PATH + musicInfo.getAudioId());
+                                    String lrc = null;
+                                    try {
+                                        //获取歌词连接返回的歌词数据，并写入文件当中,文件在/audioplay/lrc/音频id;
+                                        lrc = HttpUtils.getResposeString(url);
+                                        PrintLog.e(TAG, String.valueOf(lrc==null));
+                                        PrintLog.e(TAG, lrc);
+                                        if (lrc != null && !lrc.isEmpty()) {
+                                            if (!file.exists())
+                                                file.createNewFile();
+                                            writeToFile(file, lrc);
+                                            PrintLog.e(TAG, "success to getlrcLink");
+                                            mPlayerHandler.sendEmptyMessage(LRC_DOWNLOADED);
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });*/
+            }
 
         }
-    }*/
+    }
 
-    /*
-    private void getLrc(long id) {
-        MusicInfo info = mPlaylistInfo.get(id);
+
+    /**
+     * 获取当前音频的歌词
+     */
+    private void getLrc() {
+        MusicInfo info =  mPlaylist.get(mPlayPos);
 
         if (info == null) {
             Logger.d(TAG, "get lrc err ,musicinfo is null");
         }
         String lrc = Environment.getExternalStorageDirectory().getAbsolutePath() + LRC_PATH;
         File file = new File(lrc);
-        Logger.d(TAG, "file exists = " + file.exists());
+        Logger.d("file LRC_PATH exists = " + file.exists());
         if (!file.exists()) {
             //不存在就建立此目录
             boolean r = file.mkdirs();
             Logger.d(TAG, "file created = " + r);
 
         }
-        file = new File(lrc + id);
+        file = new File(lrc + info.getAudioId());
+        Logger.d("file LRC_PATH/id exists = " + file.exists());
+        PrintLog.e("file path:"+file.getAbsolutePath());
         if (!file.exists()) {
             if (mRequestLrc != null) {
                 mRequestLrc.stop();
                 mLrcHandler.removeCallbacks(mRequestLrc);
             }
-            mRequestLrc = new RequestLrc(mPlaylistInfo.get(id));
+            //把获取歌词任务传递给获取歌词的handler中进行处理
+            mRequestLrc = new RequestLrc(info);
             mLrcHandler.postDelayed(mRequestLrc, 70);
         }
-    }*/
+    }
 
     private synchronized void writeToFile(File file, String lrc) {
         try {
@@ -1038,18 +1179,18 @@ public class MediaService extends Service {
             }
 
             updateCursor();
-            //getLrc(id);
+            getLrc();
 
-            /*
-            if (!mPlaylistInfo.get(id).islocal()) {
+            //不是本地音乐
+            if (!getCurrentTrack().islocal()) {
                 if (mRequestUrl != null) {
                     mRequestUrl.stop();
                     mUrlHandler.removeCallbacks(mRequestUrl);
                 }
-                mRequestUrl = new RequestPlayUrl(id, play);
+                mRequestUrl = new RequestPlayUrl(getCurrentTrack().getAudioId(), play);
                 mUrlHandler.postDelayed(mRequestUrl, 70);
-
-            } else {*/
+            } else {
+                //本地音乐
                 while (true) {
                     if (mCursor != null
                             && openFile(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/"
@@ -1075,7 +1216,7 @@ public class MediaService extends Service {
                         break;
                     }
                 }
-           /* }*/
+            }
 
             if (shutdown) {
                 scheduleDelayedShutdown();
@@ -1182,10 +1323,12 @@ public class MediaService extends Service {
         mNextPlayPos = position;
         if (D) Log.d(TAG, "setNextTrack: next play position = " + mNextPlayPos);
         if (mNextPlayPos >= 0 && mPlaylist != null && mNextPlayPos < mPlaylist.size()) {
-            final long id = mPlaylist.get(mNextPlayPos).getAudioId();
+            final int id = mPlaylist.get(mNextPlayPos).getAudioId();
                 if (mPlaylist.get(mNextPlayPos).islocal()) {
+                    //如果下一首歌曲是本地的话就设置数据源
                     mPlayer.setNextDataSource(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + id);
                 } else {
+                    //如果不是本地歌曲则不设置
                     mPlayer.setNextDataSource(null);
                 }
         } else {
@@ -2984,6 +3127,7 @@ public class MediaService extends Service {
                         }
                         break;
                     case LRC_DOWNLOADED:
+                        PrintLog.e("receiver:LRC_DOWNLOADED");
                         service.notifyChange(LRC_UPDATED);
                     default:
                         break;

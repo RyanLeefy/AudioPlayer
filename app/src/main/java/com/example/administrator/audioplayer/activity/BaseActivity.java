@@ -238,6 +238,7 @@ public class BaseActivity extends AppCompatActivity {
                 if (action.equals(MediaService.META_CHANGED)) {
                     //调用activity和fragment的onMetaChange()
                     baseActivity.onMetaChangeAction();
+                    baseActivity.updateLrc();
                 } else if (action.equals(MediaService.PLAYSTATE_CHANGED)) {
                     //调用activity和fragment的onPlayStateChange()
                     baseActivity.onPlayStateChangeAction();
@@ -267,7 +268,7 @@ public class BaseActivity extends AppCompatActivity {
                     //        intent.getStringExtra(MediaService.TrackErrorExtra.TRACK_NAME));
                     //Toast.makeText(baseActivity, errorMsg, Toast.LENGTH_SHORT).show();
                 } else if (action.equals(MediaService.LRC_UPDATED)) {
-                    //baseActivity.updateLrc();
+                    baseActivity.updateLrc();
                 }
 
             }

@@ -809,6 +809,8 @@ public class PlayingActivity extends BaseActivity {
      * @return
      */
     private List<LrcRow> getLrcRows() {
+        Logger.e("start to get LrcRows");
+
 
         List<LrcRow> rows = null;
         InputStream is = null;
@@ -833,7 +835,9 @@ public class PlayingActivity extends BaseActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //Logger.e("return rows:" + rows.size());
         return rows;
+
     }
 
 

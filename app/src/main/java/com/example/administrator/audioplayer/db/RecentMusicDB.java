@@ -75,22 +75,22 @@ public class RecentMusicDB {
      */
     public void onCreate(final SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + MusicInfo.KEY_AUDIO_ID + " INT NOT NULL,"
-                + MusicInfo.KEY_ALBUM_ID + " INT NOT NULL,"
-                + MusicInfo.KEY_ALBUM_NAME + " VARCHAR NOT NULL,"
+                + MusicInfo.KEY_AUDIO_ID + " INT,"
+                + MusicInfo.KEY_ALBUM_ID + " INT,"
+                + MusicInfo.KEY_ALBUM_NAME + " VARCHAR,"
                 + MusicInfo.KEY_ALBUM_DATA + " VARCHAR,"
-                + MusicInfo.KEY_DURATION + " INT NOT NULL,"
-                + MusicInfo.KEY_MUSIC_NAME + " VARCHAR NOT NULL,"
-                + MusicInfo.KEY_ARTIST + " VARCHAR NOT NULL,"
-                + MusicInfo.KEY_ARTIST_ID + " LONG NOT NULL,"
-                + MusicInfo.KEY_DATA + " VARCHAR NOT NULL,"
+                + MusicInfo.KEY_DURATION + " INT,"
+                + MusicInfo.KEY_MUSIC_NAME + " VARCHAR,"
+                + MusicInfo.KEY_ARTIST + " VARCHAR,"
+                + MusicInfo.KEY_ARTIST_ID + " LONG,"
+                + MusicInfo.KEY_DATA + " VARCHAR,"
                 + MusicInfo.KEY_FOLDER + " VARCHAR,"
-                + MusicInfo.KEY_SIZE + " INT NOT NULL,"
+                + MusicInfo.KEY_SIZE + " INT,"
                 + MusicInfo.KEY_FAVORITE + " INT,"
                 + MusicInfo.KEY_LRC + " VARCHAR,"
-                + MusicInfo.KEY_ISLOCAL + " INT NOT NULL,"  //没有boolean，0表示false，1表示true
+                + MusicInfo.KEY_ISLOCAL + " INT,"  //没有boolean，0表示false，1表示true
                 + MusicInfo.KEY_SORT  + " VARCHAR,"
-                + TIMEPLAYED + " LONG NOT NULL);");
+                + TIMEPLAYED + " LONG);");
     }
 
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {

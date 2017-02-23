@@ -6,4 +6,5 @@ package com.example.administrator.audioplayer.Ipresenter;
 
 public interface ISongCollectionPresenter {
     void onCreate(String listid);
+    void peformMusicClick(int position);
 }

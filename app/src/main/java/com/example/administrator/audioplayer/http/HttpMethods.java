@@ -75,7 +75,8 @@ public class HttpMethods {
     public HttpMethods() {
         OkHttpClient.Builder httpclientBuilder = new OkHttpClient.Builder();
         httpclientBuilder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true);
 
 
 
@@ -215,7 +216,7 @@ public class HttpMethods {
 
 
     /**
-     * 获取歌曲详细信息和下载地址
+     * 获取歌曲详细信息和下载地址（异步，异步不可以）
      * @param songid
      * @return
      */
@@ -229,6 +230,23 @@ public class HttpMethods {
         printUrlLog(url);
 
         return songService.songInfo(FROM, VERSION, FORMAT, method, songid, ts, e);
+    }
+
+    /**
+     * 获取歌曲详细信息和下载地址（同步）
+     * @param songid
+     * @return
+     */
+    public String songInfoSyn(String songid) {
+        String method = "baidu.ting.song.getInfos";
+        String ts = Long.toString(System.currentTimeMillis());
+        String e = AESTools.encrpty("songid=" + songid + "&ts=" + ts);
+
+        String url = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.song.getInfos"
+                + "&songid=" + songid + "&ts=" + ts  + "&e=" + e;
+        printUrlLog(url);
+
+        return url;
     }
 
 
@@ -338,7 +356,7 @@ public class HttpMethods {
 
 
     /**
-     * 搜索对应歌词
+     * 搜索对应歌词（异步，异步有问题）
      * @param songname
      * @param artist
      */
@@ -355,6 +373,26 @@ public class HttpMethods {
 
 
         return searchService.searchLrcPic(FROM, VERSION, FORMAT, method, query, ts, type, e);
+    }
+
+
+    /**
+     * 搜索对应歌词（同步）
+     * @param songname
+     * @param artist
+     */
+    public String searchLrcPicSyn(String songname, String artist) {
+        String method = "baidu.ting.search.lrcpic";
+        String type = "2";
+        String ts = Long.toString(System.currentTimeMillis());
+        String query = encode(songname) + "$$" + encode(artist);
+        String e = AESTools.encrpty("query=" + songname + "$$" + artist + "&ts=" + ts);
+
+        String url = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.search.lrcpic&query=" + query
+                + "&ts=" + ts + "&type=" + type + "&e=" + e;
+        printUrlLog(url);
+
+        return url;
     }
 
 

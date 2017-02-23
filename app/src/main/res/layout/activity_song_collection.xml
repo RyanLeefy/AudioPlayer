@@ -50,18 +50,26 @@
         android:id="@+id/fl_songcollection_state_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="350dp">
+        android:layout_marginTop="270dp">
 
-        <TextView
-            android:id="@+id/ttry_again"
-            android:layout_marginTop="50dp"
-            android:gravity="center_horizontal|bottom"
-            android:visibility="gone"
-            android:textSize="13sp"
-            android:layout_gravity="center_horizontal"
-            android:text="请连接网络后点击屏幕重试"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp" />
+            android:layout_height="match_parent">
+
+            <include layout="@layout/layout_loading_view"
+                android:id="@+id/layout_loading_view"/>
+
+            <TextView
+                android:id="@+id/tv_try_again"
+                android:layout_marginTop="50dp"
+                android:gravity="center_horizontal|bottom"
+                android:visibility="gone"
+                android:textSize="15sp"
+                android:layout_gravity="center_horizontal"
+                android:text="请连接网络后点击屏幕重试"
+                android:layout_width="match_parent"
+                android:layout_height="60dp" />
+        </RelativeLayout>
     </FrameLayout>
 
     <FrameLayout

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -84,7 +87,12 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
     private LinearLayout collection_layout, share_layout, dowm_layout;
     //收藏textView，显示是否已经收藏
     private TextView collection_text;
-
+    //加载中动画视图
+    private View loadingView;
+    //加载动画视图中的动态ImageView
+    private ImageView anim_image;
+    //网络失败重试TextView
+    private TextView try_again;
 
     private ISongCollectionPresenter presenter;
 
@@ -171,6 +179,25 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         View emptyView = findViewById(R.id.id_empty_view);
         recyclerView.setEmptyView(emptyView);
 
+
+        loadingView = findViewById(R.id.layout_loading_view);
+        anim_image = (ImageView) findViewById(R.id.anim_image);
+
+        //设置重试文本的格式，把重试两个字设为点击事件，点击开始重新读取列表
+        SpannableString spanString = new SpannableString("请连接网络后点击重试");
+        spanString.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                loadingView.setVisibility(View.VISIBLE);
+                try_again.setVisibility(View.INVISIBLE);
+                presenter.onCreate(songListId);
+            }
+        }, 8, 10, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        try_again = (TextView) findViewById(R.id.tv_try_again);
+        try_again.setText(spanString);
+        try_again.setMovementMethod(LinkMovementMethod.getInstance());
+
+
         mActionBarSize = CommonUtils.getActionBarHeight(this);
         mFlexibleSpaceImageHeight = getResources().getDimensionPixelSize(R.dimen.FlexibleSpaceImageHeight);
 
@@ -179,11 +206,23 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         setHeaderView();
         setHeaderViewListener();
 
-
         presenter = new SongCollectionPresenter(this);
         presenter.onCreate(songListId);
 
     }
+
+    /**
+     * 在窗口加载完之后，加载动画才可以运行
+     * @param hasFocus
+     */
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        anim_image.setBackgroundResource(R.drawable.loading_animation);
+        AnimationDrawable anim = (AnimationDrawable) anim_image.getBackground();
+        anim.start();
+    }
+
 
     /**
      * 初始化toolbar，设置paddingTop
@@ -336,8 +375,28 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
 
     @Override
     public void setAdapter(MusicAdapter adapter) {
+        adapter.setOnMusicItemClickListener(new MusicAdapter.OnMusicItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                presenter.peformMusicClick(position);
+            }
+
+            @Override
+            public void onMoreClick(View view, int position) {
+
+            }
+        });
+
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        loadingView.setVisibility(View.GONE);
     }
+
+    @Override
+    public void showTryAgain() {
+        loadingView.setVisibility(View.GONE);
+        try_again.setVisibility(View.VISIBLE);
+    }
+
 
 }

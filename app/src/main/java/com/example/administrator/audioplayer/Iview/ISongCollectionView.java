@@ -9,4 +9,5 @@ import com.example.administrator.audioplayer.adapter.MusicAdapter;
 
 public interface ISongCollectionView {
     void setAdapter(MusicAdapter adapter);
+    void showTryAgain();
 }

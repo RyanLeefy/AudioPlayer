@@ -62,11 +62,11 @@ public class CommonUtils {
 
     /**
      * 检查是否有网络
-     * @param pContext
+     * @param Context
      * @return
      */
-    public static boolean isConnectInternet(final Context pContext) {
-        final ConnectivityManager conManager = (ConnectivityManager) pContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static boolean isConnectInternet(final Context Context) {
+        final ConnectivityManager conManager = (ConnectivityManager) Context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo networkInfo = conManager.getActiveNetworkInfo();
 
         if (networkInfo != null) {
