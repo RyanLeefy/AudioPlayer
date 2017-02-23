@@ -118,7 +118,7 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Logger.e("Error", throwable);
+                        Logger.e("Error", throwable.toString());
                         //因为有一些歌单有版权问题，所以没有content，所以用retrofit解析的时候会报错
                         //所以在这里直接传一个空的列表设置adapter，显示空视图，即没有版权的视图
                         ((SongCollectionActivity)view).runOnUiThread(new Runnable() {

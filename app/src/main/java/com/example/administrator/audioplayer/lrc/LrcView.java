@@ -338,7 +338,8 @@ public class LrcView extends View implements ILrcView {
             case MotionEvent.ACTION_CANCEL:
                 if (!canDrag) {
                     if (onLrcClickListener != null) {
-                        onLrcClickListener.onClick();
+                        if(firstY == event.getRawY() && lastX == event.getRawX())
+                            onLrcClickListener.onClick();
                     }
                 } else {
                     if (onSeekToListener != null && mCurRow != -1) {

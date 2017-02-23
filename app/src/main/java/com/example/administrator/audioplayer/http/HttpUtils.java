@@ -36,8 +36,8 @@ public class HttpUtils {
      */
     public static String getResposeString(String action1) {
         try {
-            builder.connectTimeout(1000, TimeUnit.MINUTES);
-            builder.readTimeout(1000, TimeUnit.MINUTES);
+            builder.connectTimeout(10000, TimeUnit.MINUTES);
+            builder.readTimeout(10000, TimeUnit.MINUTES);
             Request request = new Request.Builder()
                     .url(action1)
                     .build();
@@ -70,8 +70,8 @@ public class HttpUtils {
             Cache cache = new Cache(sdcache.getAbsoluteFile(), 1024 * 1024 * 30); //30Mb
             builder.cache(cache);
 
-            builder.connectTimeout(1000, TimeUnit.MINUTES);
-            builder.readTimeout(1000, TimeUnit.MINUTES);
+            builder.connectTimeout(10000, TimeUnit.MINUTES);
+            builder.readTimeout(10000, TimeUnit.MINUTES);
             Request.Builder requestBuilder = new Request.Builder()
                     .url(action1);
             if (forceCache) {

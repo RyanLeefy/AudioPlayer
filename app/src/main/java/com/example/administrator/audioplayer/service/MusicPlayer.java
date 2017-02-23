@@ -265,14 +265,14 @@ public class MusicPlayer {
      * @return
      */
 
-    public static final String getAlbumPath() {
+    public static String getAlbumPath() {
         if (mService != null) {
             return mService.getAlbumPath();
         }
         return null;
     }
 
-    public static final String[] getAlbumPathAll() {
+    public static String[] getAlbumPathAll() {
         if (mService != null) {
             return mService.getAlbumPathAll();
         }
@@ -281,11 +281,22 @@ public class MusicPlayer {
 
 
     /**
+     * 返回歌曲是否是本地歌曲
+     * @return
+     */
+    public static boolean isTrackLocal() {
+        if (mService != null) {
+            return mService.isTrackLocal();
+        }
+        return false;
+    }
+
+    /**
      * 歌单中移除歌曲
      * @param id 音频id
      * @return
      */
-    public static final int removeTrack(final long id) {
+    public static int removeTrack(final long id) {
         if (mService != null) {
             return mService.removeTrack(id);
         }

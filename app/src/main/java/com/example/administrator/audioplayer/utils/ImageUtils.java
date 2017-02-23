@@ -22,16 +22,27 @@ public class ImageUtils {
 
 
     /**
-     * 根据一个bitmap创建一个模糊的drawable，利用RenderScript
+     * 根据一个bitmap创建一个模糊的drawable，利用RenderScript,默认压缩倍数20倍
      * @param bitmap
      * @param context
      * @return
      */
     public static Drawable createBlurredImageFromBitmap(Bitmap bitmap, Context context) {
-
         //设置压缩倍数，让其更加模糊
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 20;
+        return createBlurredImageFromBitmap(bitmap, context, options);
+    }
+
+
+    /**
+     * 根据一个bitmap创建一个模糊的drawable，利用RenderScript
+     * @param bitmap
+     * @param context
+     * @Param options 图片的参数
+     * @return
+     */
+    public static Drawable createBlurredImageFromBitmap(Bitmap bitmap, Context context, BitmapFactory.Options options) {
 
         //把传进来的bitmap进行内存压缩
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

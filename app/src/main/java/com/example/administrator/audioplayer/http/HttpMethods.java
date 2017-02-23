@@ -57,7 +57,7 @@ public class HttpMethods {
 
     public static final String FORMAT = "json";
 
-    public static final int DEFAULT_TIMEOUT = 5;
+    public static final int DEFAULT_TIMEOUT = 10;
 
     private Retrofit retrofit;
 

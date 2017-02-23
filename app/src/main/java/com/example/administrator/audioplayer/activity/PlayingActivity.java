@@ -4,6 +4,11 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +17,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -24,6 +30,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -45,11 +52,20 @@ import com.example.administrator.audioplayer.service.MediaService;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.GlobalHandler;
+import com.example.administrator.audioplayer.utils.ImageUtils;
+import com.example.administrator.audioplayer.utils.PrintLog;
 import com.example.administrator.audioplayer.widget.AlbumViewPager;
 import com.example.administrator.audioplayer.widget.PlayingSeekBar;
+import com.facebook.binaryresource.BinaryResource;
+import com.facebook.binaryresource.FileBinaryResource;
+import com.facebook.cache.common.CacheKey;
+import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
+import com.facebook.imagepipeline.core.ImagePipelineFactory;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.orhanobut.logger.Logger;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,6 +74,11 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.List;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class PlayingActivity extends BaseActivity {
 
@@ -187,6 +208,9 @@ public class PlayingActivity extends BaseActivity {
             return;
         }
 
+        //设置虚化背景图片
+        setHeaderBlurBackground();
+
         //歌曲更新时候刷新歌曲名和歌手名
         ab.setTitle(MusicPlayer.getTrackName());
         ab.setSubtitle(MusicPlayer.getArtistName());
@@ -249,8 +273,10 @@ public class PlayingActivity extends BaseActivity {
                     mNeedleAnim.setInterpolator(new LinearInterpolator());
                 }
 
-                mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
-                mAnimatorSet.start();
+                if(!mNeedleAnim.isRunning()) {
+                    mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
+                    mAnimatorSet.start();
+                }
             }
 
         } else {
@@ -310,7 +336,7 @@ public class PlayingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
-
+        mBackAlbum = (ImageView) findViewById(R.id.albumArt);
         mAlbumLayout = (FrameLayout) findViewById(R.id.headerView);
         mLrcViewContainer = (RelativeLayout) findViewById(R.id.lrcviewContainer);
         mLrcView = (LrcView) findViewById(R.id.lrcview);
@@ -322,7 +348,6 @@ public class PlayingActivity extends BaseActivity {
 
 
         mVolumeSeek = (SeekBar) findViewById(R.id.volume_seek);
-        mBackAlbum = (ImageView) findViewById(R.id.albumArt);
         mPlayingmode = (ImageView) findViewById(R.id.playing_mode);
         mPlayorPause = (ImageView) findViewById(R.id.playing_play);
         mNext = (ImageView) findViewById(R.id.playing_next);
@@ -411,6 +436,98 @@ public class PlayingActivity extends BaseActivity {
         super.onBackPressed();
         //设置activity退出动画
         overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+    }
+
+
+    /**
+     * 初始化背景的虚化背景
+     */
+    public void setHeaderBlurBackground() {
+        //异步进行图片的处理，然后返回处理后的图片进行视图的设置
+        Observable.create(new Observable.OnSubscribe<Drawable>() {
+            @Override
+            public void call(Subscriber<? super Drawable> subscriber) {
+                //设置图片参数
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 20;
+                //options.inPreferredConfig = Bitmap.Config.RGB_565;
+
+                String albumpath = MusicPlayer.getAlbumPath();
+                Drawable drawable = null;
+                if(albumpath != null && albumpath.length() != 0) {
+                    //如果有album地址
+                    if (!MusicPlayer.isTrackLocal()) {
+                        //如果是网络歌曲
+                        //从缓存中读取图片资源文件
+                        ImageRequest request = ImageRequest.fromUri(albumpath);
+                        CacheKey cacheKey = DefaultCacheKeyFactory.getInstance().getEncodedCacheKey(request);
+                        BinaryResource binaryResource = ImagePipelineFactory.getInstance().getMainDiskStorageCache().getResource(cacheKey);
+                        File file = ((FileBinaryResource) binaryResource).getFile();
+
+                        if (file != null) {
+                            //获取屏幕的高度和宽度
+                            Point mSize = new Point();
+                            getWindowManager().getDefaultDisplay().getSize(mSize);
+                            //获取压缩图片
+                            Bitmap Background = ImageUtils.getCompassImage(file, mSize.x, mSize.y);
+                            //创建模糊图片并给ImageView设置上
+                            drawable = ImageUtils.createBlurredImageFromBitmap(Background, MyApplication.getContext(), options);
+                        }
+                    } else {
+                        //如果是本地歌曲
+                        try {
+                            Uri art = Uri.parse(albumpath);
+                            ParcelFileDescriptor fd = null;
+                            try {
+                                fd = getContentResolver().openFileDescriptor(art, "r");
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                            if (fd != null) {
+                                Bitmap Background = BitmapFactory.decodeFileDescriptor(fd.getFileDescriptor(), null, null);
+                                drawable = ImageUtils.createBlurredImageFromBitmap(Background, MyApplication.getContext(), options);
+                            } else {
+                                drawable = ImageUtils.createBlurredImageFromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.login_bg_night), MyApplication.getContext(), options);
+
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    drawable = ImageUtils.createBlurredImageFromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.login_bg_night), MyApplication.getContext(), options);
+                }
+
+                subscriber.onNext(drawable);
+                subscriber.onCompleted();
+            }})
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Drawable>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.e(e.toString());
+                    }
+
+                    @Override
+                    public void onNext(Drawable drawable) {
+                        if (mBackAlbum.getDrawable() != null && !isFromOutSide) {
+                            //如果原来已有背景，则添加背景切换过渡时间
+                            TransitionDrawable td =
+                                    new TransitionDrawable(new Drawable[]{mBackAlbum.getDrawable(), drawable});
+                            mBackAlbum.setImageDrawable(td);
+                            //去除过度绘制
+                            td.setCrossFadeEnabled(true);
+                            td.startTransition(1000);
+
+                        } else {
+                            mBackAlbum.setImageDrawable(drawable);
+                        }
+                    }
+                });
     }
 
 
@@ -589,12 +706,12 @@ public class PlayingActivity extends BaseActivity {
                 } else {
                     if (!isNextOrPreSetPage) {
                         if (pPosition < MusicPlayer.getQueuePosition() + 1) {
-                            //前一首，发送消息到Handler中处理
+                            //前一首
                             MusicPlayer.previous();
                             Logger.d("Message:PRE");
 
                         } else if (pPosition > MusicPlayer.getQueuePosition() + 1) {
-                            //下一首，发送消息到Handler中处理
+                            //下一首
                             MusicPlayer.next();
                             Logger.d("Message:Next");
                         }
@@ -614,6 +731,7 @@ public class PlayingActivity extends BaseActivity {
 
             @Override
             public void onPageScrollStateChanged(int pState) {
+                isFromOutSide = false;
             }
         });
 
@@ -641,7 +759,7 @@ public class PlayingActivity extends BaseActivity {
             }
         });
 
-        /*
+        //单击隐藏歌词框和MusicTool框，显示ViewPager唱片
         mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
             @Override
             public void onClick() {
@@ -651,7 +769,7 @@ public class PlayingActivity extends BaseActivity {
                     mMusicTool.setVisibility(View.VISIBLE);
                 }
             }
-        });*/
+        });
 
         //单击隐藏歌词框和MusicTool框，显示ViewPager唱片
         mLrcViewContainer.setOnClickListener(new View.OnClickListener() {
