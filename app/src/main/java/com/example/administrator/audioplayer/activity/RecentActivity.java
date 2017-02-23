@@ -93,7 +93,7 @@ public class RecentActivity extends BaseActivity implements IRecentView {
         adapter.setOnPlayAllItemClickListener(new MusicAdapter.OnPlayAllItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(RecentActivity.this, "播放全部", Toast.LENGTH_SHORT).show();
+                presenter.peformMusicClick(0);
             }
 
             @Override
@@ -108,7 +108,7 @@ public class RecentActivity extends BaseActivity implements IRecentView {
                 //获取点击的MusicInfo实体类((LocalMusicAdapter)rv.getAdapter()).getItem(position)
                 //调用presenter的方法，播放该实体代表的歌曲
 
-                presenter.pefromMusicClick(position);
+                presenter.peformMusicClick(position);
 
                 Toast.makeText(RecentActivity.this, ((MusicAdapter)rv.getAdapter()).getItem(position).getMusicName(), Toast.LENGTH_SHORT).show();
             }

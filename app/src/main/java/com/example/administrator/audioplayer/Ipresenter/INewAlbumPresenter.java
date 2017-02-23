@@ -1,11 +1,10 @@
 package com.example.administrator.audioplayer.Ipresenter;
 
 /**
- * RecentActivity
- * Created by on 2017/2/3.
+ * Created by on 2017/2/23 0023.
  */
 
-public interface IRecentPresenter {
-    void onCreate();
+public interface INewAlbumPresenter {
+    void onCreate(String albumid);
     void peformMusicClick(int position);
 }

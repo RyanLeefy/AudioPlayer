@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -16,7 +15,6 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -25,13 +23,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.administrator.audioplayer.Ipresenter.INewAlbumPresenter;
 import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
-import com.example.administrator.audioplayer.Iview.ISongCollectionView;
+import com.example.administrator.audioplayer.Iview.INewAlbumView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
-import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
+import com.example.administrator.audioplayer.presenterImp.NewAlbumPresenter;
 import com.example.administrator.audioplayer.presenterImp.SongCollectionPresenter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
@@ -40,23 +38,21 @@ import com.example.administrator.audioplayer.widget.ObserableRecyclerViewWithEmp
 import com.facebook.binaryresource.BinaryResource;
 import com.facebook.binaryresource.FileBinaryResource;
 import com.facebook.cache.common.CacheKey;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
-import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.nineoldandroids.view.ViewHelper;
 
 import java.io.File;
 
+/**
+ * Created by on 2017/2/23 0023.
+ */
 
-public class SongCollectionActivity extends BaseActivity implements ObservableScrollViewCallbacks,ISongCollectionView {
+public class NewAlbumActivity extends BaseActivity implements ObservableScrollViewCallbacks,INewAlbumView {
 
     //状态栏高度
     private int mStatusSize;
@@ -69,19 +65,20 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
     private ActionBar actionbar;
     private ObserableRecyclerViewWithEmptyView recyclerView;
     //头部框
-    private FrameLayout songcollection_header;
+    private FrameLayout newalbum_header;
     //头部内容框
-    private RelativeLayout songcollection_header_detail;
+    private RelativeLayout newalbum_header_detail;
     //headerView的背景图片
     private ImageView albumart;
-    //歌单封面图片
+    //专辑封面图片
     private SimpleDraweeView photo;
-    //收听人数
-    private TextView playlist_listen_count;
-    //歌单名
-    private TextView songCollection_title;
-    //歌单详情
-    private TextView songCollection_describe;
+    //专辑名
+    private TextView newAlbum_title;
+    //歌手名
+    private TextView newAlbum_author;
+    //发布时间
+    private TextView newAlbum_publishtime;
+    
     //三个框，收藏框，分享框，下载框（暂没有评论）
     private LinearLayout collection_layout, share_layout, dowm_layout;
     //收藏textView，显示是否已经收藏
@@ -93,43 +90,43 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
     //网络失败重试TextView
     private TextView try_again;
 
-    private ISongCollectionPresenter presenter;
+    private INewAlbumPresenter presenter;
 
 
     //创建activity时需要传入的数据
-    //是不是本地歌单
-    private Boolean isLocal;
-    //歌单id
-    private String songListId;
+    //专辑id
+    private String albumid;
     //图片地址
     private String pic;
-    //播放/收藏次数
-    private String songCollectionCount;
-    //歌单名
+    //专辑名
     private String title;
-    //标签
-    private String tag;
+    //歌手名
+    private String author;
+    //歌手id
+    private String artist_id;
+    //发布时间
+    private String publishtime;
 
 
     /**
      * 创建Activity，要传入需要的数据
      * @param context
-     * @param islocal
-     * @param listid
+     * @param albumid
      * @param pic
-     * @param listenum
      * @param title
-     * @param tag
+     * @param author
+     * @param artist_id
+     * @param publishtime
      */
-    public static void startActivity(Context context, Boolean islocal, String listid,
-                                     String pic, String listenum, String title,String tag) {
-        Intent intent = new Intent(context, SongCollectionActivity.class);
-        intent.putExtra("islocal", islocal);
-        intent.putExtra("listid", listid);
+    public static void startActivity(Context context, String albumid, String pic,
+                                     String title, String author, String artist_id, String publishtime) {
+        Intent intent = new Intent(context, NewAlbumActivity.class);
+        intent.putExtra("albumid", albumid);
         intent.putExtra("pic", pic);
-        intent.putExtra("listenum", listenum);
         intent.putExtra("title", title);
-        intent.putExtra("tag", tag);
+        intent.putExtra("author", author);
+        intent.putExtra("artist_id", artist_id);
+        intent.putExtra("publishtime", publishtime);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
@@ -140,37 +137,37 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         super.onCreate(savedInstanceState);
         //让布局覆盖状态栏显示
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        setContentView(R.layout.activity_song_collection);
+        setContentView(R.layout.activity_new_album);
 
         //读取传入的数据
         if(getIntent().getExtras() != null) {
-            isLocal = getIntent().getBooleanExtra("islocal", false);
-            songListId = getIntent().getStringExtra("listid");
+            albumid = getIntent().getStringExtra("albumid");
             pic = getIntent().getStringExtra("pic");
-            songCollectionCount = getIntent().getStringExtra("listenum");
             title = getIntent().getStringExtra("title");
-            tag = getIntent().getStringExtra("tag");
+            author = getIntent().getStringExtra("author");
+            artist_id = getIntent().getStringExtra("artist_id");
+            publishtime = getIntent().getStringExtra("publishtime");
         }
 
-        toolbar = (Toolbar) findViewById(R.id.tb_songcollection);
+        toolbar = (Toolbar) findViewById(R.id.tb_newalbum);
 
-        songcollection_header = (FrameLayout) findViewById(R.id.fl_songcollection_header);
-        songcollection_header_detail = (RelativeLayout) findViewById(R.id.rl_songcollection_header_detail);
+        newalbum_header = (FrameLayout) findViewById(R.id.fl_newalbum_header);
+        newalbum_header_detail = (RelativeLayout) findViewById(R.id.rl_newalbum_header_detail);
 
         albumart = (ImageView) findViewById(R.id.img_album_art);
+        
+        photo = (SimpleDraweeView) findViewById(R.id.sdv_newalbum_photo);
 
-        playlist_listen_count = (TextView) findViewById(R.id.tv_songcollection_count);
-        photo = (SimpleDraweeView) findViewById(R.id.sdv_songcollection_photo);
-
-        songCollection_title = (TextView) findViewById(R.id.tv_songcollection_title);
-        songCollection_describe = (TextView) findViewById(R.id.tv_songcollection_describe) ;
+        newAlbum_title = (TextView) findViewById(R.id.tv_newalbum_title);
+        newAlbum_author = (TextView) findViewById(R.id.tv_newalbum_author);
+        newAlbum_publishtime = (TextView) findViewById(R.id.tv_newalbum_publistime);
 
 
-        collection_layout = (LinearLayout) findViewById(R.id.ll_songcollection_collect);
-        share_layout = (LinearLayout) findViewById(R.id.ll_songcollection_share);
-        dowm_layout = (LinearLayout) findViewById(R.id.ll_songcollection_down);
+        collection_layout = (LinearLayout) findViewById(R.id.ll_newalbum_collect);
+        share_layout = (LinearLayout) findViewById(R.id.ll_newalbum_share);
+        dowm_layout = (LinearLayout) findViewById(R.id.ll_newalbum_down);
 
-        recyclerView = (ObserableRecyclerViewWithEmptyView) findViewById(R.id.orv_songcollection);
+        recyclerView = (ObserableRecyclerViewWithEmptyView) findViewById(R.id.orv_newalbum);
         recyclerView.setScrollViewCallbacks(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
@@ -189,7 +186,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
             public void onClick(View widget) {
                 loadingView.setVisibility(View.VISIBLE);
                 try_again.setVisibility(View.INVISIBLE);
-                presenter.onCreate(songListId);
+                presenter.onCreate(albumid);
             }
         }, 8, 10, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         try_again = (TextView) findViewById(R.id.tv_try_again);
@@ -205,8 +202,8 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         setHeaderView();
         setHeaderViewListener();
 
-        presenter = new SongCollectionPresenter(this);
-        presenter.onCreate(songListId);
+        presenter = new NewAlbumPresenter(this);
+        presenter.onCreate(albumid);
 
     }
 
@@ -227,7 +224,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
      * 初始化toolbar，设置paddingTop
      */
     private void setToolbar() {
-        toolbar.setTitle("歌单");
+        toolbar.setTitle("专辑");
         //计算状态栏的高度，然后给toolbar设置paddingTop
         mStatusSize = CommonUtils.getStatusHeight(this);
         toolbar.setPadding(0, mStatusSize, 0, 0);
@@ -264,32 +261,19 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
 
 
     /**
-     * 初始化头部的视图，歌单名，歌单图片，歌单收听人数，歌单详情
+     * 初始化头部的视图，专辑名，专辑图片，专辑收听人数，专辑详情
      */
     public void setHeaderView() {
-        //设置收听人数
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.index_icn_earphone);
-        ImageSpan imageSpan = new ImageSpan(this, bitmap, ImageSpan.ALIGN_BASELINE);
-        SpannableString spanString = new SpannableString("icon");
-        spanString.setSpan(imageSpan, 0, 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        int count = Integer.parseInt(songCollectionCount);
-        if (count > 10000) {
-            count = count / 10000;
-            playlist_listen_count.append(" " + count + "万");
-        } else {
-            playlist_listen_count.append(" " + songCollectionCount);
-        }
-
-        //若有歌单图片，则设置图片
+        
+        //若有专辑图片，则设置图片
         if(pic != null) {
             photo.setImageURI(Uri.parse(pic));
         }
 
-        songCollection_title.setText(title);
-        songCollection_describe.setText(tag);
-
-
+        newAlbum_title.setText(title);
+        newAlbum_author.setText("歌手：" + author);
+        newAlbum_publishtime.setText("发布时间：" + publishtime);
+        
     }
 
 
@@ -326,11 +310,11 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
 
     protected void updateViews(int scrollY, boolean animated) {
         // Translate header
-        ViewHelper.setTranslationY(songcollection_header, getHeaderTranslationY(scrollY));
+        ViewHelper.setTranslationY(newalbum_header, getHeaderTranslationY(scrollY));
     }
 
     protected float getHeaderTranslationY(int scrollY) {
-        final int headerHeight = songcollection_header.getHeight();
+        final int headerHeight = newalbum_header.getHeight();
         int headerTranslationY = mActionBarSize + mStatusSize - headerHeight;
         if (mActionBarSize + mStatusSize <= -scrollY + headerHeight) {
             headerTranslationY = -scrollY;
@@ -345,11 +329,11 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
 
         if (scrollY > 0 && scrollY < mFlexibleSpaceImageHeight - mActionBarSize - mStatusSize) {
             toolbar.setTitle(title);
-            toolbar.setSubtitle(tag);
+            toolbar.setSubtitle(author);
             actionbar.setBackgroundDrawable(getResources().getDrawable(R.drawable.toolbar_background));
         }
         if (scrollY == 0) {
-            toolbar.setTitle("歌单");
+            toolbar.setTitle("专辑");
             toolbar.setSubtitle("");
             actionbar.setBackgroundDrawable(null);
         }
@@ -358,7 +342,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         }
 
         float a = (float) scrollY / (mFlexibleSpaceImageHeight - mActionBarSize - mStatusSize);
-        songcollection_header_detail.setAlpha(1f - a);
+        newalbum_header_detail.setAlpha(1f - a);
 
     }
 

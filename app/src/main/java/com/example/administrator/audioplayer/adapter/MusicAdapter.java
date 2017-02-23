@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
@@ -142,7 +143,7 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             case 0:
                 ((PlayAllItemViewHolder) holder).textView.setText("(共" + mList.size() + "首)");
                 if(onPlayAllItemClickListener != null) {
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    ((PlayAllItemViewHolder) holder).layout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             onPlayAllItemClickListener.onItemClick(holder.itemView, position);
@@ -243,7 +244,7 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     } else {
                         ((MusicItemWithNumberViewHolder) holder).playState.setVisibility(View.GONE);
                         ((MusicItemWithNumberViewHolder) holder).trackNumber.setVisibility(View.VISIBLE);
-                        ((MusicItemWithNumberViewHolder) holder).trackNumber.setText(realPosition + "");
+                        ((MusicItemWithNumberViewHolder) holder).trackNumber.setText(position + "");
                     }
 
 
@@ -328,11 +329,15 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     //播放全部Item的Holder
     public static class PlayAllItemViewHolder extends RecyclerView.ViewHolder {
+
+        RelativeLayout layout;
         TextView textView;
         ImageView select;
 
+
         PlayAllItemViewHolder(View view) {
             super(view);
+            this.layout = (RelativeLayout) view.findViewById(R.id.play_all_layout);
             this.textView = (TextView) view.findViewById(R.id.play_all_number);
             this.select = (ImageView) view.findViewById(R.id.select);
         }

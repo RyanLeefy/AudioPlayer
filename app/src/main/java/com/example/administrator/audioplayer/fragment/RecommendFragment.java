@@ -18,6 +18,7 @@ import com.example.administrator.audioplayer.Ipresenter.IRecommendPresenter;
 import com.example.administrator.audioplayer.Iview.IRecommendView;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.NewAlbumActivity;
 import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.RecommendNewAlbumAdapter;
 import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
@@ -148,6 +149,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
     @Override
     public void setRecommendNewAlbumAdapter(RecommendNewAlbumAdapter albumAdapter) {
         mNewAlbumRecycle.setAdapter(albumAdapter);
+        albumAdapter.setOnItemClickListener(new RecommendNewAlbumAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
+                RecommendNewAlbumAdapter.ViewHolder holder = ((RecommendNewAlbumAdapter.ViewHolder)viewHolder);
+                NewAlbumActivity.startActivity(MyApplication.getContext(),
+                        holder.albumid, holder.pic, holder.title, holder.author, holder.artist_id, holder.publishtime);
+            }
+        });
         albumAdapter.notifyDataSetChanged();
     }
 }

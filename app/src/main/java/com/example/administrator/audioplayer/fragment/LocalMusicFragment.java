@@ -151,7 +151,7 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
         adapter.setOnPlayAllItemClickListener(new MusicAdapter.OnPlayAllItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(getActivity(), "播放全部", Toast.LENGTH_SHORT).show();
+                presenter.peformMusicClick(0);
             }
 
             @Override

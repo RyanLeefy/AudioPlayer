@@ -9,10 +9,8 @@ import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.http.HttpMethods;
 import com.example.administrator.audioplayer.jsonbean.SongBaseInfo;
-import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
 import com.example.administrator.audioplayer.modelImp.SongCollectionModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
@@ -156,18 +154,6 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
                 })
         );
 
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
 
@@ -223,18 +209,8 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
         //position应该大于等于1
         if(position == 0) {
             //点击播放全部按钮
-            MusicPlayer.playAll(adapterList, 1, false);
+            MusicPlayer.playAll(adapterList, 0, false);
         } else {
-            /*
-            long[] list = new long[mList.size()];
-            HashMap<Long, MusicInfo> infos = new HashMap();
-            for (int i = 0; i < mList.size(); i++) {
-                MusicInfo info = mList.get(i);
-                list[i] = info.getAudioId();
-                info.setIslocal(true);
-                //info.albumData = MusicUtils.getAlbumArtUri(info.albumId) + "";
-                infos.put(list[i], mList.get(i));
-            }*/
 
             //position - 1 对应歌单中的位置
             MusicPlayer.playAll(adapterList, position - 1, false);
