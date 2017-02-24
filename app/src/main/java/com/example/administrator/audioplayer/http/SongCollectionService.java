@@ -26,7 +26,7 @@ public interface SongCollectionService {
      */
     @GET("v1/restserver/ting")
     Observable<SongCollection> geDan(@Query("from") String from, @Query("version") String version, @Query("format") String format,
-                                     @Query("method") String method, @Query("page_size") int page_size, @Query("page_no") int page_no);
+                                     @Query("method") String method, @Query("page_no") int page_no, @Query("page_size") int page_size);
 
 
     /**

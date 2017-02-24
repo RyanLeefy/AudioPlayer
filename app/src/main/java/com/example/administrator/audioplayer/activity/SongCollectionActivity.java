@@ -47,8 +47,6 @@ import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.nineoldandroids.view.ViewHelper;
@@ -93,8 +91,9 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
     //网络失败重试TextView
     private TextView try_again;
 
-    private ISongCollectionPresenter presenter;
+    private MusicAdapter adapter;
 
+    private ISongCollectionPresenter presenter;
 
     //创建activity时需要传入的数据
     //是不是本地歌单
@@ -134,6 +133,15 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         context.startActivity(intent);
     }
 
+    /**
+     * 重写该方法，当歌曲进行变换的时候刷新界面
+     */
+    @Override
+    public void onMetaChange() {
+        if (adapter != null){
+            adapter.notifyDataSetChanged();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -399,6 +407,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
             }
         });
 
+        this.adapter = adapter;
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         loadingView.setVisibility(View.GONE);

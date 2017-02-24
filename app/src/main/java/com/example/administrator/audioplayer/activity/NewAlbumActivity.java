@@ -90,6 +90,8 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
     //网络失败重试TextView
     private TextView try_again;
 
+    private MusicAdapter adapter;
+
     private INewAlbumPresenter presenter;
 
 
@@ -129,6 +131,17 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         intent.putExtra("publishtime", publishtime);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+
+    /**
+     * 重写该方法，当歌曲进行变换的时候刷新界面
+     */
+    @Override
+    public void onMetaChange() {
+        if (adapter != null){
+            adapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -383,6 +396,7 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
             }
         });
 
+        this.adapter = adapter;
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         loadingView.setVisibility(View.GONE);

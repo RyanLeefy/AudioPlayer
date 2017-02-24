@@ -1,5 +1,6 @@
 package com.example.administrator.audioplayer.activity;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -30,6 +32,9 @@ import java.util.ArrayList;
  */
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
+    //是否重新启动的应用，用来判断要不要显示引导页
+    private Boolean isInit = false;
+
     private Handler mHandler = new Handler();
 
     private ImageView img_menu,img_net, img_music, img_search;
@@ -47,7 +52,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
 
         final SplashScreen mSplashScreen = new SplashScreen(this);
-        mSplashScreen.show(R.drawable.art_login_bg, SplashScreen.FADE_OUT);
+        //第一次进入
+        if(!isInit) {
+            mSplashScreen.show(R.drawable.art_login_bg, SplashScreen.FADE_OUT);
+            isInit = true;
+        }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -67,7 +76,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void run() {
                 mSplashScreen.dismiss();
             }
-        }, 0);
+        }, 1500);
 
         setToolbar();  //初始化toolbar
         setViewPager();  //初始化viewpager
@@ -76,18 +85,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
+    @Override
+    public void onDestroy() {
+        //把标志设为false，下一次重新进入会显示引导页
+        isInit = false;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent home = new Intent(Intent.ACTION_MAIN);
+            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            home.addCategory(Intent.CATEGORY_HOME);
+            startActivity(home);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     private void setToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
-
-        //toolbar.setNavigationIcon(R.drawable.actionbar_menu);
-        //ActionBar ab = getSupportActionBar();
-
-        //ab.setDisplayHomeAsUpEnabled(true);
-        //ab.setHomeAsUpIndicator(R.drawable.actionbar_menu);
-
-
     }
 
 

@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.adapter.MainPagerAdapter;
 import com.example.administrator.audioplayer.adapter.NetFragmentPagerAdapter;
 
 /**
@@ -17,7 +16,7 @@ import com.example.administrator.audioplayer.adapter.NetFragmentPagerAdapter;
  * Created on 2017/1/22.
  */
 
-public class NetFragment extends Fragment {
+public class NetFragment extends Fragment implements ChangeViewPagerCallBack {
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
@@ -39,14 +38,6 @@ public class NetFragment extends Fragment {
         tabLayout.setTabTextColors(getResources().getColor(R.color.text_color),getResources().getColor(R.color.colorPrimary));
         tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.colorPrimary));
 
-        /*
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                tabLayout.setupWithViewPager(viewPager);
-            }
-        }).start();*/
-
         setViewPager();
 
         return v;
@@ -57,12 +48,30 @@ public class NetFragment extends Fragment {
     private void setViewPager() {
         NetFragmentPagerAdapter netFragmentPagerAdapter = new NetFragmentPagerAdapter(getChildFragmentManager());
 
-        netFragmentPagerAdapter.addFragment(new RecommendFragment(), "新曲");
-        netFragmentPagerAdapter.addFragment(new NetSongListFragment(), "歌单");
-        netFragmentPagerAdapter.addFragment(new RankingFragment(), "排行榜");
+        RecommendFragment recommendFragment = new RecommendFragment();
+        recommendFragment.setChangeViewPagerCallBack(this);
+
+        NetSongListFragment netSongListFragment = new NetSongListFragment();
+        netSongListFragment.setChangeViewPagerCallBack(this);
+
+        RankingFragment rankingFragment = new RankingFragment();
+        rankingFragment.setChangeViewPagerCallBack(this);
+
+        netFragmentPagerAdapter.addFragment(recommendFragment, "新曲");
+        netFragmentPagerAdapter.addFragment(netSongListFragment, "歌单");
+        netFragmentPagerAdapter.addFragment(rankingFragment, "排行榜");
 
         viewPager.setAdapter(netFragmentPagerAdapter);
         viewPager.setCurrentItem(0);
+        viewPager.setOffscreenPageLimit(2);
         tabLayout.setupWithViewPager(viewPager);
     }
+
+
+    @Override
+    public void changeViewPagerTo(int position) {
+        viewPager.setCurrentItem(position);
+    }
+
+
 }

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.administrator.audioplayer.Ipresenter.IRecommendPresenter;
 import com.example.administrator.audioplayer.Iview.IRecommendView;
@@ -34,6 +35,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
     private Context mContext;
     private LayoutInflater mInflater;
 
+
     //放轮播图的layout
     private LinearLayout cfvlayout;
 
@@ -46,6 +48,9 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
     //推荐歌单view
     private View mSongColletionView;
 
+    //推荐歌单更多
+    private TextView more;
+
     //新专辑上架view
     private View mNewAlbumView;
 
@@ -55,7 +60,11 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
 
     private IRecommendPresenter presenter;
 
+    private ChangeViewPagerCallBack callBack;
 
+    public void setChangeViewPagerCallBack(ChangeViewPagerCallBack callBack) {
+        this.callBack = callBack;
+    }
 
 
 
@@ -69,7 +78,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_recommend, container, false);
 
@@ -96,6 +104,17 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
 
         //初始化推荐歌单模块
         mSongColletionView = mInflater.inflate(R.layout.layout_recommend_songcollection_view, container, false);
+        //歌单更多按钮,点击跳转到歌单页
+        more = (TextView) mSongColletionView.findViewById(R.id.more);
+        more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(callBack != null) {
+                    callBack.changeViewPagerTo(1);
+                }
+            }
+        });
+
         mSongCollectionRecycle = (RecyclerView) mSongColletionView.findViewById(R.id.recommend_playlist_recyclerview);
         //recycle排列方式，表格排列，一行3个
         gridLayoutManager = new GridLayoutManager(mContext, 3);
@@ -114,27 +133,28 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
         //setAdapter
 
 
-        presenter = new RecommendPresenter(this);
-        presenter.onCreateView();
-
         //往内容布局添加推荐歌单模块
         mContentlayout.addView(mSongColletionView);
         //往内容布局添加新专辑上架模块
         mContentlayout.addView(mNewAlbumView);
 
 
+        presenter = new RecommendPresenter(this);
+        presenter.onCreateView();
+
         return view;
     }
 
+
     @Override
-    public void onDestroy(){
-        super.onDestroy();
+    public final void onDestroyView() {
+        super.onDestroyView();
         cfv.onDestroy();
     }
 
+
     @Override
     public void setRecommendSongCollectionAdapter(RecommendSongCollectionAdapter adapter) {
-        mSongCollectionRecycle.setAdapter(adapter);
         adapter.setOnItemClickListener(new RecommendSongCollectionAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
@@ -143,12 +163,12 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
                         holder.listid, holder.pic, holder.listenum, holder.title, holder.tag);
             }
         });
+        mSongCollectionRecycle.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 
     @Override
     public void setRecommendNewAlbumAdapter(RecommendNewAlbumAdapter albumAdapter) {
-        mNewAlbumRecycle.setAdapter(albumAdapter);
         albumAdapter.setOnItemClickListener(new RecommendNewAlbumAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
@@ -157,6 +177,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
                         holder.albumid, holder.pic, holder.title, holder.author, holder.artist_id, holder.publishtime);
             }
         });
+        mNewAlbumRecycle.setAdapter(albumAdapter);
         albumAdapter.notifyDataSetChanged();
     }
 }

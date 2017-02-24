@@ -4,10 +4,41 @@
     android:layout_height="match_parent"
     tools:context="com.example.administrator.audioplayer.fragment.NetSongListFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_net_song_list_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="歌单界面" />
+        android:layout_marginRight="9dp" />
+
+    <!-- 加载画面 与 重连画面-->
+    <FrameLayout
+        android:id="@+id/fl_netsonglist_state_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include layout="@layout/layout_loading_view"
+                android:id="@+id/layout_loading_view"/>
+
+            <TextView
+                android:id="@+id/tv_try_again"
+                android:gravity="center_horizontal"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                android:textSize="15sp"
+                android:layout_gravity="center_horizontal"
+                android:text="请连接网络后点击重试"
+                android:layout_width="match_parent"
+                android:layout_height="60dp" />
+        </RelativeLayout>
+
+
+    </FrameLayout>
 
 </FrameLayout>
