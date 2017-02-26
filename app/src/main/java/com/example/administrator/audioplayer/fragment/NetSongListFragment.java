@@ -62,11 +62,6 @@ public class NetSongListFragment extends BaseFragment implements INetSongListVie
 
     private INetSongListPresenter presenter;
 
-    private ChangeViewPagerCallBack callBack;
-
-    public void setChangeViewPagerCallBack(ChangeViewPagerCallBack callBack) {
-        this.callBack = callBack;
-    }
 
 
     @Override

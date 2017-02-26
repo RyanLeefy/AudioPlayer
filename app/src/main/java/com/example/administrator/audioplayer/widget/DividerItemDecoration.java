@@ -12,6 +12,7 @@ import android.view.View;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
+import com.example.administrator.audioplayer.adapter.RankingAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 
@@ -117,6 +118,17 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             if(parent.getChildViewHolder(child) instanceof MusicAdapter.MusicItemWithNumberViewHolder) {
                 MusicAdapter.MusicItemWithNumberViewHolder viewHolder = (MusicAdapter.MusicItemWithNumberViewHolder)parent.getChildViewHolder(child);
                 left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 40) + CommonUtils.dip2px(MyApplication.getContext(), 13);
+            }
+
+            //音乐榜单页面头部header不画线
+            if(parent.getChildViewHolder(child) instanceof RankingAdapter.HeaderItemViewHolder) {
+                continue;
+            }
+
+            //音乐榜单榜单Item画线
+            if(parent.getChildViewHolder(child) instanceof RankingAdapter.CommonItemViewHolder) {
+                RankingAdapter.CommonItemViewHolder viewHolder = (RankingAdapter.CommonItemViewHolder)parent.getChildViewHolder(child);
+                left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 10) +  viewHolder.item_image.getWidth() + CommonUtils.dip2px(MyApplication.getContext(), 14);
             }
 
 

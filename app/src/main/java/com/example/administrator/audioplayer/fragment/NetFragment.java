@@ -52,10 +52,8 @@ public class NetFragment extends Fragment implements ChangeViewPagerCallBack {
         recommendFragment.setChangeViewPagerCallBack(this);
 
         NetSongListFragment netSongListFragment = new NetSongListFragment();
-        netSongListFragment.setChangeViewPagerCallBack(this);
 
         RankingFragment rankingFragment = new RankingFragment();
-        rankingFragment.setChangeViewPagerCallBack(this);
 
         netFragmentPagerAdapter.addFragment(recommendFragment, "新曲");
         netFragmentPagerAdapter.addFragment(netSongListFragment, "歌单");

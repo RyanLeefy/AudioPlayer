@@ -38,6 +38,7 @@
         <activity android:name=".activity.PlayingActivity" />
         <activity android:name=".activity.SongCollectionActivity"/>
         <activity android:name=".activity.NewAlbumActivity"/>
+        <activity android:name=".activity.BillBoardActivity"/>
 
     </application>
 

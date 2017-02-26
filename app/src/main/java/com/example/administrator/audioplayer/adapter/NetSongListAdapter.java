@@ -196,9 +196,9 @@ public class NetSongListAdapter extends RecyclerView.Adapter {
 
 
 
-    public static class HeaderItemViewHolder extends RecyclerView.ViewHolder{
+     static class HeaderItemViewHolder extends RecyclerView.ViewHolder{
 
-        public HeaderItemViewHolder(View itemView) {
+         public HeaderItemViewHolder(View itemView) {
             super(itemView);
         }
     }

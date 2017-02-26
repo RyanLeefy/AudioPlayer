@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:id="@+id/item_image"
+                android:scaleType="centerCrop"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp" />
+
+            <TextView
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="5dp"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:text="每天更新"
+                android:gravity="right"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:id="@+id/playlist_listen_count" />
+
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_gravity="center_vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/rank_first_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.知足"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="#7D7D7D"
+                android:textSize="13sp"
+                android:layout_margin="4dp" />
+
+            <TextView
+                android:id="@+id/rank_second_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2.温柔"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="#7D7D7D"
+                android:textSize="13sp"
+                android:layout_margin="4dp" />
+
+            <TextView
+                android:id="@+id/rank_third_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3.干杯"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="#7D7D7D"
+                android:textSize="13sp"
+                android:layout_margin="4dp" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>
