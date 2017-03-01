@@ -10,7 +10,6 @@ import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.orhanobut.logger.Logger;
 
-import java.util.HashMap;
 import java.util.List;
 
 import rx.Observable;

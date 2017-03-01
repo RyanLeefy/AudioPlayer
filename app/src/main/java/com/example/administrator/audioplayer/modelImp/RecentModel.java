@@ -3,7 +3,6 @@ package com.example.administrator.audioplayer.modelImp;
 import com.example.administrator.audioplayer.Imodel.IRecentModel;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.db.RecentMusicDB;
-import com.orhanobut.logger.Logger;
 
 import java.util.List;
 

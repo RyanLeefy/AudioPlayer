@@ -1,7 +1,6 @@
 package com.example.administrator.audioplayer.widget;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -13,6 +12,8 @@ import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.RankingAdapter;
+import com.example.administrator.audioplayer.adapter.SearchAlbumAdapter;
+import com.example.administrator.audioplayer.adapter.SearchHistoryAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 
@@ -131,6 +132,17 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
                 left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 10) +  viewHolder.item_image.getWidth() + CommonUtils.dip2px(MyApplication.getContext(), 14);
             }
 
+            //搜索历史画线
+            if(parent.getChildViewHolder(child) instanceof SearchHistoryAdapter.ViewHolder) {
+                SearchHistoryAdapter.ViewHolder viewHolder = (SearchHistoryAdapter.ViewHolder)parent.getChildViewHolder(child);
+                left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 15) + viewHolder.icon.getWidth() + CommonUtils.dip2px(MyApplication.getContext(), 15);
+            }
+
+            //搜索专辑画线
+            if(parent.getChildViewHolder(child) instanceof SearchAlbumAdapter.CommonItemViewHolder) {
+                SearchAlbumAdapter.CommonItemViewHolder viewHolder = (SearchAlbumAdapter.CommonItemViewHolder)parent.getChildViewHolder(child);
+                left = parent.getPaddingLeft() + CommonUtils.dip2px(MyApplication.getContext(), 10) + viewHolder.art.getWidth() + CommonUtils.dip2px(MyApplication.getContext(), 20);
+            }
 
 
             android.support.v7.widget.RecyclerView v = new android.support.v7.widget.RecyclerView(parent.getContext());

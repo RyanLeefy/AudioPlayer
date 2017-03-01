@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.bean.BillBoardItem;
-import com.example.administrator.audioplayer.jsonbean.BillBoard;
-import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
 

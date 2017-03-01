@@ -1,17 +1,16 @@
 package com.example.administrator.audioplayer.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -22,7 +21,6 @@ import com.example.administrator.audioplayer.adapter.MainPagerAdapter;
 import com.example.administrator.audioplayer.fragment.MusicFragment;
 import com.example.administrator.audioplayer.fragment.NetFragment;
 import com.example.administrator.audioplayer.widget.SplashScreen;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
@@ -61,6 +59,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //初始化底部播放栏，由父类BaseActivity在onStart()中显示
+        bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
+
         img_menu = (ImageView) findViewById(R.id.bar_menu);
         img_net = (ImageView) findViewById(R.id.bar_net);
         img_music = (ImageView) findViewById(R.id.bar_music);
@@ -91,9 +92,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         isInit = false;
     }
 
+    /**
+     * 重写该方法，当按下手机返回键时候，不直接退出activity，而是返回桌面
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -220,6 +226,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.bar_search:
                 //跳转到搜索activity
+                NetSearchActivity.startActivity(this);
                 break;
         }
     }

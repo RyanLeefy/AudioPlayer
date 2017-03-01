@@ -16,10 +16,6 @@
 
 package com.example.administrator.audioplayer.service;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-
 /**
  * This is used by the music playback service to track the music tracks it is playing
  * It has extra meta data to determine where the track came from so that we can show the appropriate

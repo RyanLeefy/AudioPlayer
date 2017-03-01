@@ -4,9 +4,7 @@ package com.example.administrator.audioplayer.fragment;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -25,7 +23,6 @@ import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.NetSongListAdapter;
-import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
 import com.example.administrator.audioplayer.presenterImp.NetSongListPresenter;
 
 import java.util.List;

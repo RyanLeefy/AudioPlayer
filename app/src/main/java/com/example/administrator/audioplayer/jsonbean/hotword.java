@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * Created by on 2017/2/15.
+ * http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&method=baidu.ting.search.hot
  */
 
 public class HotWord {

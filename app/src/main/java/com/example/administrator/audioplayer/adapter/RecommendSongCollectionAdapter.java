@@ -3,7 +3,6 @@ package com.example.administrator.audioplayer.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.bean.RecommendSongCollectionItem;
 import com.example.administrator.audioplayer.jsonbean.RecommendSongCollection;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;

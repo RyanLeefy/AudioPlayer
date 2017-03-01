@@ -1,6 +1,5 @@
 package com.example.administrator.audioplayer.service;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -9,7 +8,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,7 +16,6 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.MediaPlayer;
@@ -38,58 +35,36 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import com.example.administrator.audioplayer.MyApplication;
-import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.activity.MainActivity;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.db.RecentMusicDB;
 import com.example.administrator.audioplayer.http.HttpMethods;
 import com.example.administrator.audioplayer.http.HttpUtils;
-import com.example.administrator.audioplayer.jsonbean.Lru;
 import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.PreferencesUtils;
 import com.example.administrator.audioplayer.utils.PrintLog;
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.orhanobut.logger.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.TreeSet;
-
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 
 /**
@@ -931,8 +906,8 @@ public class MediaService extends Service {
                     Gson gson = new Gson();
                     SongExtraInfo.SongurlBean.UrlBean urlBean = gson.fromJson(jsonArray.get(0), SongExtraInfo.SongurlBean.UrlBean.class);
 
-                    //Log.e(TAG, String.valueOf(songExtraInfo.getSonginfo() == null));
-                    //Log.e(TAG, String.valueOf(songExtraInfo.getError_code()));
+                    Log.e(TAG, String.valueOf(urlBean.getShow_link() == null));
+                    Log.e(TAG, String.valueOf(urlBean.getShow_link()));
                     url = urlBean.getShow_link();
                     PreferencesUtils.getInstance(MediaService.this).setPlayLink(id, url);
 

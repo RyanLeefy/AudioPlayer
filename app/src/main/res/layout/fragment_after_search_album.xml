@@ -1,0 +1,23 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.administrator.audioplayer.fragment.AfterSearchAlbumFragment">
+
+    <RelativeLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView
+            android:id="@+id/rv_after_search_album_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/id_empty_view"
+            layout="@layout/nosearchalbum_emptyview_recycleview"/>
+
+    </RelativeLayout>
+
+
+</FrameLayout>

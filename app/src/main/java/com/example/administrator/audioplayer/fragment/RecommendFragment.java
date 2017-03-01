@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +24,7 @@ import com.example.administrator.audioplayer.adapter.RecommendNewAlbumAdapter;
 import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
 import com.example.administrator.audioplayer.presenterImp.RecommendPresenter;
 import com.example.administrator.audioplayer.widget.CarouselFigureView;
+import com.example.administrator.audioplayer.widget.FullyGridLayoutManager;
 
 /**
  * Netfragment下的新曲推荐fragment
@@ -120,7 +120,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
         gridLayoutManager = new GridLayoutManager(mContext, 3);
         mSongCollectionRecycle.setLayoutManager(gridLayoutManager);
         mSongCollectionRecycle.setHasFixedSize(true);
-        //setAdapter
+        //设置不可滚动
+        mSongCollectionRecycle.setNestedScrollingEnabled(false);
 
 
         //初始化新专辑上架模块
@@ -130,7 +131,9 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
         gridLayoutManager = new GridLayoutManager(mContext, 3);
         mNewAlbumRecycle.setLayoutManager(gridLayoutManager);
         mNewAlbumRecycle.setHasFixedSize(true);
-        //setAdapter
+        //设置不可滚动
+        mNewAlbumRecycle.setNestedScrollingEnabled(false);
+
 
 
         //往内容布局添加推荐歌单模块

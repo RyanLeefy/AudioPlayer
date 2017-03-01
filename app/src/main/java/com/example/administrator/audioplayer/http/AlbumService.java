@@ -1,12 +1,9 @@
 package com.example.administrator.audioplayer.http;
 
 import com.example.administrator.audioplayer.jsonbean.Album;
-import com.example.administrator.audioplayer.jsonbean.Artist;
-import com.example.administrator.audioplayer.jsonbean.HotWord;
 import com.example.administrator.audioplayer.jsonbean.RecommendNewAlbum;
 
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import rx.Observable;
 

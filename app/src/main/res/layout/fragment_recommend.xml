@@ -28,14 +28,12 @@
                 android:layout_marginTop="15dp"
                 android:background="#E0E0E0" />
 
+
             <LinearLayout
                 android:id="@+id/ly_recommend_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <!--<include layout="@layout/recommend_playlist" />-->
-                <!--<include layout="@layout/recommend_newalbums"/>-->
-                <!--<include layout="@layout/recommend_radio"/>-->
 
                 <!--添加布局的位置-->
 

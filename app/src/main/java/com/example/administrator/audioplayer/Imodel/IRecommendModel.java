@@ -4,7 +4,6 @@ package com.example.administrator.audioplayer.Imodel;
 import com.example.administrator.audioplayer.jsonbean.RecommendNewAlbum;
 import com.example.administrator.audioplayer.jsonbean.RecommendSongCollection;
 
-
 import rx.Observable;
 
 /**

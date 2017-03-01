@@ -2,12 +2,9 @@ package com.example.administrator.audioplayer.fragment;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,24 +23,17 @@ import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Ipresenter.IMusicPresenter;
 import com.example.administrator.audioplayer.Iview.IMusicView;
-import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.LocalMusicActivity;
 import com.example.administrator.audioplayer.activity.RecentActivity;
-import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
-import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
-import com.example.administrator.audioplayer.db.RecentMusicDB;
-import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
 import com.example.administrator.audioplayer.presenterImp.MusicPresenter;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
-import com.orhanobut.logger.Logger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

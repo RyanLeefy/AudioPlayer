@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,29 +23,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.Ipresenter.IBillBoardPresenter;
-import com.example.administrator.audioplayer.Ipresenter.INewAlbumPresenter;
 import com.example.administrator.audioplayer.Iview.IBillBoardView;
-import com.example.administrator.audioplayer.Iview.INewAlbumView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.presenterImp.BillBoardPresenter;
-import com.example.administrator.audioplayer.presenterImp.NewAlbumPresenter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.ObserableRecyclerViewWithEmptyView;
-import com.facebook.binaryresource.BinaryResource;
-import com.facebook.binaryresource.FileBinaryResource;
-import com.facebook.cache.common.CacheKey;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
-import com.facebook.imagepipeline.core.ImagePipelineFactory;
-import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.nineoldandroids.view.ViewHelper;
-
-import java.io.File;
 
 /**
  * Created by on 2017/2/23 0023.
@@ -133,6 +120,9 @@ public class BillBoardActivity extends BaseActivity implements ObservableScrollV
         //让布局覆盖状态栏显示
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_billboard);
+
+        //初始化底部播放栏，由父类BaseActivity在onStart()中显示
+        bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
 
         //读取传入的数据
         if(getIntent().getExtras() != null) {

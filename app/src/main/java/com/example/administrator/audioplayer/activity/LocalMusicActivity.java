@@ -2,12 +2,11 @@ package com.example.administrator.audioplayer.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.os.Bundle;
-import android.widget.Toast;
+import android.widget.FrameLayout;
 
-import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
@@ -38,13 +37,20 @@ public class LocalMusicActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_music);
 
+        //初始化底部播放栏，由父类BaseActivity在onStart()中显示
+        bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
+
         //两个Fragment  LocalMusicFragment， LocalSearchFragment
-        localMusicFragment = new LocalMusicFragment();
+
         localSearchFragment = new LocalSearchFragment();
         fragmentManager = getSupportFragmentManager();
-        transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.localmusic_fragment_container, localMusicFragment);
-        transaction.commit();
+        //如果还没有初始化fragment，就初始化fragment并放入container中
+        if(localMusicFragment == null) {
+            transaction = fragmentManager.beginTransaction();
+            localMusicFragment = new LocalMusicFragment();
+            transaction.add(R.id.localmusic_fragment_container, localMusicFragment);
+            transaction.commit();
+        }
 
     }
 

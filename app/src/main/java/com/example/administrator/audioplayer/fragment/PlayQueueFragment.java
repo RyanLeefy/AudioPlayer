@@ -1,7 +1,6 @@
 package com.example.administrator.audioplayer.fragment;
 
 
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,9 +9,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,10 +21,8 @@ import com.example.administrator.audioplayer.activity.BaseActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.presenterImp.PlayQueuePresenter;
-import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

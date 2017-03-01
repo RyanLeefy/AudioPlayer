@@ -81,7 +81,7 @@ public class RecommendNewAlbumAdapter extends RecyclerView.Adapter {
                 .build();
 
         //设置图片
-        ((ViewHolder)holder).art.setController(controller);
+        ((ViewHolder) holder).art.setController(controller);
 
         ((ViewHolder) holder).albumName.setText(newAlbum.getTitle());
         ((ViewHolder) holder).artsit.setText(newAlbum.getAuthor());

@@ -31,9 +31,6 @@ public class LocalSearchFragment extends BaseFragment implements ILocalSearchVie
     private RecycleViewWithEmptyView rv;
     private ILocalSearchPresenter presenter;
 
-    public LocalSearchFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -64,11 +61,12 @@ public class LocalSearchFragment extends BaseFragment implements ILocalSearchVie
         //mImm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         mSearchView = (SearchView) view.findViewById(R.id.sv_local_search_fragment);
+        //默认展开
+        mSearchView.setIconified(false);
+        //默认搜索图标再外面
+        mSearchView.setIconifiedByDefault(false);
         mSearchView.setQueryHint("搜索本地歌曲");
         mSearchView.setOnQueryTextListener(this);
-
-        mSearchView.setIconified(false);
-        mSearchView.setIconifiedByDefault(false);
 
 
         rv = (RecycleViewWithEmptyView) view.findViewById(R.id.rv_local_search_fragment);

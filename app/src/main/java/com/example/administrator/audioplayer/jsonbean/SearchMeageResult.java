@@ -8,6 +8,7 @@ package com.example.administrator.audioplayer.jsonbean;
 >>>>>>> 94da056a946089a352ec0b5585b01ee41be00c90
  */
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -251,7 +252,7 @@ public class SearchMeageResult {
                 this.album_list = album_list;
             }
 
-            public static class AlbumListBean {
+            public static class AlbumListBean implements Serializable {
                 /**
                  * all_artist_id : 19064521
                  * publishtime : 2012-03-26
@@ -383,7 +384,7 @@ public class SearchMeageResult {
                 this.song_list = song_list;
             }
 
-            public static class SongListBean {
+            public static class SongListBean implements Serializable  {
                 /**
                  * resource_type_ext : 0
                  * resource_type : 0

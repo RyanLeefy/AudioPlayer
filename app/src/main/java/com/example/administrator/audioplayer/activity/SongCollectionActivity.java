@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -16,7 +15,6 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -25,13 +23,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
 import com.example.administrator.audioplayer.Iview.ISongCollectionView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
-import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
 import com.example.administrator.audioplayer.presenterImp.SongCollectionPresenter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
@@ -40,11 +36,8 @@ import com.example.administrator.audioplayer.widget.ObserableRecyclerViewWithEmp
 import com.facebook.binaryresource.BinaryResource;
 import com.facebook.binaryresource.FileBinaryResource;
 import com.facebook.cache.common.CacheKey;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
-import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
@@ -150,6 +143,9 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_song_collection);
 
+        //初始化底部播放栏，由父类BaseActivity在onStart()中显示
+        bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
+
         //读取传入的数据
         if(getIntent().getExtras() != null) {
             isLocal = getIntent().getBooleanExtra("islocal", false);
@@ -217,6 +213,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         presenter.onCreate(songListId);
 
     }
+
 
     /**
      * 在窗口加载完之后，加载动画才可以运行

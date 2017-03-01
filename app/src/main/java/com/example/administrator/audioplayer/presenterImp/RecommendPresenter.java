@@ -5,8 +5,6 @@ import com.example.administrator.audioplayer.Ipresenter.IRecommendPresenter;
 import com.example.administrator.audioplayer.Iview.IRecommendView;
 import com.example.administrator.audioplayer.adapter.RecommendNewAlbumAdapter;
 import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
-import com.example.administrator.audioplayer.bean.RecommendNewAlbumItem;
-import com.example.administrator.audioplayer.bean.RecommendSongCollectionItem;
 import com.example.administrator.audioplayer.fragment.RecommendFragment;
 import com.example.administrator.audioplayer.jsonbean.RecommendNewAlbum;
 import com.example.administrator.audioplayer.jsonbean.RecommendSongCollection;
@@ -52,7 +50,7 @@ public class RecommendPresenter implements IRecommendPresenter{
 
             @Override
             public void onError(Throwable e) {
-                Logger.e("Error", e);
+                Logger.e(e.toString());
             }
 
             @Override
@@ -85,7 +83,7 @@ public class RecommendPresenter implements IRecommendPresenter{
 
             @Override
             public void onError(Throwable e) {
-                Logger.e("Error", e);
+                Logger.e(e.toString());
             }
 
             @Override

@@ -3,7 +3,6 @@ package com.example.administrator.audioplayer.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.ImageSpan;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -25,12 +23,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.Ipresenter.INewAlbumPresenter;
-import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
 import com.example.administrator.audioplayer.Iview.INewAlbumView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.presenterImp.NewAlbumPresenter;
-import com.example.administrator.audioplayer.presenterImp.SongCollectionPresenter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
@@ -151,6 +147,8 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         //让布局覆盖状态栏显示
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_new_album);
+        //初始化底部播放栏，由父类BaseActivity在onStart()中显示
+        bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
 
         //读取传入的数据
         if(getIntent().getExtras() != null) {

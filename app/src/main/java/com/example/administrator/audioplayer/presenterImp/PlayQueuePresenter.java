@@ -4,7 +4,6 @@ import com.example.administrator.audioplayer.Ipresenter.IPlayQueuePresenter;
 import com.example.administrator.audioplayer.Iview.IPlayQueueView;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.PlayQueueFragment;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.orhanobut.logger.Logger;

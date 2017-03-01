@@ -18,4 +18,6 @@
 
     <color name="dividerColor">#e9e6e6</color>
     <color name="dividerColorForMusicItem">#c7c5c5</color>
+
+    <color name="grey">#c7c5c5</color>
 </resources>

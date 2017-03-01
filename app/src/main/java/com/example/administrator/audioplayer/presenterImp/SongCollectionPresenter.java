@@ -1,7 +1,5 @@
 package com.example.administrator.audioplayer.presenterImp;
 
-import android.util.Log;
-
 import com.example.administrator.audioplayer.Imodel.ISongCollectionModel;
 import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
 import com.example.administrator.audioplayer.Iview.ISongCollectionView;
@@ -27,7 +25,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**

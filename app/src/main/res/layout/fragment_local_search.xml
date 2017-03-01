@@ -14,15 +14,14 @@
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:fitsSystemWindows="true"
-        app:contentInsetStart="0dp"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <android.support.v7.widget.SearchView
             android:id="@+id/sv_local_search_fragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+            android:layout_height="wrap_content"
+            app:searchIcon="@drawable/actionbar_search" />
 
     </android.support.v7.widget.Toolbar>
 

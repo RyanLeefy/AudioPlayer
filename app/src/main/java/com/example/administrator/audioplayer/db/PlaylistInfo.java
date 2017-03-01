@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-
 import com.example.administrator.audioplayer.bean.Playlist;
 
 import java.util.ArrayList;

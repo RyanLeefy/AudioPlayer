@@ -1,11 +1,9 @@
 package com.example.administrator.audioplayer.http;
 
 
-
 import com.example.administrator.audioplayer.jsonbean.HotWord;
 import com.example.administrator.audioplayer.jsonbean.Lru;
 import com.example.administrator.audioplayer.jsonbean.SearchMeageResult;
-
 
 import retrofit2.http.GET;
 import retrofit2.http.Query;

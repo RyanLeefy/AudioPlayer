@@ -1,19 +1,16 @@
 package com.example.administrator.audioplayer.activity;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.fragment.BottomPlayBarFragment;
@@ -45,6 +42,8 @@ public class BaseActivity extends AppCompatActivity {
     private MusicPlayer.ServiceToken mToken;
     private BottomPlayBarFragment fragment;   //底部播放条
 
+    FrameLayout bottom_container_framelayout;
+
     private PlaybackStatus mPlaybackStatus; //receiver 接受播放状态变化等
 
     private ArrayList<MusicStateListener> mMusicListener = new ArrayList<>();  //用来存储
@@ -59,8 +58,10 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //绑定服务，初始化MusicPlayer
-        mToken = MusicPlayer.bindToService(this);
 
+        //bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
+
+        mToken = MusicPlayer.bindToService(this);
 
 
         //注册接收的动作
@@ -81,37 +82,53 @@ public class BaseActivity extends AppCompatActivity {
         mPlaybackStatus = new PlaybackStatus(this);
 
         //默认显示底部播放栏
-        showQuickControl(true);
+        //showQuickControl(true);
 
         //注册receiver
         registerReceiver(mPlaybackStatus, new IntentFilter(f));
     }
 
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        //默认显示底部播放栏
+        showQuickControl(true);
+    }
 
     /**
      * @param show 显示或关闭底部播放控制栏
      */
     protected void showQuickControl(boolean show) {
         Logger.d(MusicPlayer.getQueue().size());
+        Logger.d(bottom_container_framelayout == null);
+        //if(bottom_container_framelayout == null) {
+        //    bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
+        //}
+        Logger.d(bottom_container_framelayout == null);
         //当有播放列表的时候才显示
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if(MusicPlayer.getQueue().size() != 0) {
             if (show) {
                 if (fragment == null) {
+                    bottom_container_framelayout.setVisibility(View.VISIBLE);
                     fragment = BottomPlayBarFragment.newInstance();
                     ft.add(R.id.bottom_container, fragment).commitAllowingStateLoss();
                 } else {
+                    bottom_container_framelayout.setVisibility(View.VISIBLE);
                     ft.show(fragment).commitAllowingStateLoss();
                 }
             } else {
-                if (fragment != null)
+                if (fragment != null) {
                     ft.hide(fragment).commitAllowingStateLoss();
+                    bottom_container_framelayout.setVisibility(View.GONE);
+                }
             }
         } else {
-            if (fragment != null)
+            if (fragment != null) {
                 ft.hide(fragment).commitAllowingStateLoss();
+                bottom_container_framelayout.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -191,6 +208,8 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -258,7 +277,7 @@ public class BaseActivity extends AppCompatActivity {
                     baseActivity.onQueueChange();
                     //播放列表变为0的时候隐藏播放栏
                     if(MusicPlayer.getQueueSize() == 0) {
-                        baseActivity.showQuickControl(true);
+                        baseActivity.showQuickControl(false);
                     } else {
                         //否则显示播放栏
                         baseActivity.showQuickControl(true);

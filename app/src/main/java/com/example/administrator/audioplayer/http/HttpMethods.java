@@ -15,8 +15,6 @@ import com.example.administrator.audioplayer.jsonbean.SongBaseInfo;
 import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
 import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
-
-
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.PrintLog;
 

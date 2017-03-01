@@ -17,13 +17,10 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.administrator.audioplayer.bean.MusicInfo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
 

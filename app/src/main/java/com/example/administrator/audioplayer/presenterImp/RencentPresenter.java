@@ -1,16 +1,11 @@
 package com.example.administrator.audioplayer.presenterImp;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.example.administrator.audioplayer.Imodel.IRecentModel;
 import com.example.administrator.audioplayer.Ipresenter.IRecentPresenter;
 import com.example.administrator.audioplayer.Iview.IRecentView;
-import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.activity.RecentActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.modelImp.RecentModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.orhanobut.logger.Logger;

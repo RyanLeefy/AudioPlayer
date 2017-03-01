@@ -13,24 +13,16 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -53,7 +45,6 @@ import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.GlobalHandler;
 import com.example.administrator.audioplayer.utils.ImageUtils;
-import com.example.administrator.audioplayer.utils.PrintLog;
 import com.example.administrator.audioplayer.widget.AlbumViewPager;
 import com.example.administrator.audioplayer.widget.PlayingSeekBar;
 import com.facebook.binaryresource.BinaryResource;
@@ -72,7 +63,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.util.List;
 
 import rx.Observable;
@@ -388,7 +378,7 @@ public class PlayingActivity extends BaseActivity {
 
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         //设置ViewPager的默认项
         //因为左右两边各加了一个，所以全部推后一个
@@ -398,7 +388,15 @@ public class PlayingActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        //updateNowplayingCard();
+        //更新歌词
+        updateLrc();
+
+        //更新播放或暂停的状态
+        if(MusicPlayer.isPlaying()) {
+            mPlayorPause.setImageResource(R.drawable.play_rdi_btn_pause);
+        } else {
+            mPlayorPause.setImageResource(R.drawable.play_rdi_btn_play);
+        }
 
     }
 
@@ -536,8 +534,8 @@ public class PlayingActivity extends BaseActivity {
      */
     private void setToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("一首歌名");
-        toolbar.setSubtitle("歌手名");
+        toolbar.setTitle("歌曲名");
+        toolbar.setSubtitle("歌手");
         setSupportActionBar(toolbar);
 
         ab = getSupportActionBar();

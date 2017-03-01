@@ -6,8 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.orhanobut.logger.Logger;
-
 /**
  * 自定义RecycleView,重写AdapterDataObserver，监听数据的变动，重写setAdapter，为adapter设置该该Observer
  * Created on 2017/1/26.

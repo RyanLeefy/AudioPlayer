@@ -1,6 +1,5 @@
 package com.example.administrator.audioplayer.presenterImp;
 
-import com.example.administrator.audioplayer.Imodel.IMusicModel;
 import com.example.administrator.audioplayer.Ipresenter.IMusicPresenter;
 import com.example.administrator.audioplayer.Iview.IMusicView;
 import com.example.administrator.audioplayer.MyApplication;

@@ -1,9 +1,8 @@
 package com.example.administrator.audioplayer.adapter;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +14,7 @@ import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import bolts.Bolts;
 
 /**
  * Created on 2017/1/26.
@@ -44,10 +40,14 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     //默认没有左边的序号
     private boolean HasTrackNumber = false;
 
+    //默认没有加载更多的footer
+    private boolean HasFooter = false;
+
     //末尾是更多还是删除
     private boolean isMore = true;
     final static int FIRST_ITEM = 0;
     final static int ITEM = 1;
+    final static int FOOTER_ITEM = 2;
     private Context mContext;
     private LayoutInflater mInflater;
     private List<MusicInfo> mList;
@@ -82,6 +82,10 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.mList = list;
     }
 
+    public void updateAdapterWithMoreList(List list) {
+        this.mList.addAll(list);
+    }
+
     public void setHorizontal(boolean horizontal) {
         this.isHorizontal = horizontal;
     }
@@ -98,22 +102,38 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.HasTrackNumber = hasTrackNumber;
     }
 
+    public void setHasFooter(Boolean hasFooter) {
+        this.HasFooter = hasFooter;
+    }
+
+    public List getList() {
+        return mList;
+    }
+
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //先判断有无playitem
         if(!HasPlayItem) {
             if(isHorizontal){
-                //播放列表的item
-                return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_playlist, parent, false), isHorizontal);
+                if (viewType == ITEM) {
+                    //播放列表的item
+                    return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_playlist, parent, false), isHorizontal);
+                } else {
+                    return new FooterItemViewHolder(mInflater.inflate(R.layout.list_item_footer_songcolletion, parent, false));
+                }
             } else {
                 //正常列表的item
                 //没有序号
-                if(!HasTrackNumber) {
-                    return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
+                if(viewType == ITEM) {
+                    if (!HasTrackNumber) {
+                        return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
+                    } else {
+                        //有序号
+                        return new MusicItemWithNumberViewHolder(mInflater.inflate(R.layout.list_item_music_withnumber, parent, false), isHorizontal);
+                    }
                 } else {
-                    //有序号
-                    return new MusicItemWithNumberViewHolder(mInflater.inflate(R.layout.list_item_music_withnumber, parent, false), isHorizontal);
+                    return new FooterItemViewHolder(mInflater.inflate(R.layout.list_item_footer_songcolletion, parent, false));
                 }
             }
         } else {
@@ -126,12 +146,14 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     return new PlayAllItemViewHolder(mInflater.inflate(R.layout.list_item_playallitem_withmargin, parent, false));
                 }
             }
-            else {
+            else if (viewType == ITEM) {
                 if(!HasTrackNumber) {
                     return new MusicItemViewHolder(mInflater.inflate(R.layout.list_item_music, parent, false), isHorizontal);
                 } else {
                     return new MusicItemWithNumberViewHolder(mInflater.inflate(R.layout.list_item_music_withnumber, parent, false), isHorizontal);
                 }
+            } else {
+                return new FooterItemViewHolder(mInflater.inflate(R.layout.list_item_footer_songcolletion, parent, false));
             }
         }
     }
@@ -286,9 +308,27 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         else if (mList.isEmpty()) {
             return 0;
         } else if(HasPlayItem) {
-            return  mList.size() + 1;
+            if(!HasFooter) {
+                return mList.size() + 1;
+            } else {
+                //有footer的话，判断mList的大小，如果不是10的倍数，则表示已经读完了，则不用显示footer，否则显示footer
+                if(mList.size() % 10 == 0) {
+                    return mList.size() + 2;
+                } else {
+                    return mList.size() + 1;
+                }
+            }
         } else {
-            return mList.size();
+            if(!HasFooter) {
+                return mList.size();
+            } else {
+                //有footer的话，判断mList的大小，如果不是10的倍数，则表示已经读完了，则不用显示footer，否则显示footer
+                if(mList.size() % 10 == 0) {
+                    return mList.size() + 1;
+                } else {
+                    return mList.size();
+                }
+            }
         }
     }
 
@@ -296,9 +336,35 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemViewType(int position) {
         if(!HasPlayItem) {
-            return ITEM;
+            if(HasFooter) {
+                //有footer的话，判断mList的大小，如果不是10的倍数，则表示已经读完了，则不用显示footer，否则显示footer
+                if(mList.size() % 10 == 0) {
+                    if (position == mList.size()) {
+                        return FOOTER_ITEM;
+                    } else {
+                        return ITEM;
+                    }
+                } else {
+                    return ITEM;
+                }
+            } else {
+                return ITEM;
+            }
         } else {
-            return position == FIRST_ITEM ? FIRST_ITEM : ITEM;
+            if(HasFooter){
+                //有footer的话，判断mList的大小，如果不是10的倍数，则表示已经读完了，则不用显示footer，否则显示footer
+                if(mList.size() % 10 == 0) {
+                    if (position == mList.size()) {
+                        return FOOTER_ITEM;
+                    } else {
+                        return position == FIRST_ITEM ? FIRST_ITEM : ITEM;
+                    }
+                } else {
+                    return position == FIRST_ITEM ? FIRST_ITEM : ITEM;
+                }
+            } else {
+                return position == FIRST_ITEM ? FIRST_ITEM : ITEM;
+            }
         }
     }
 
@@ -389,5 +455,17 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
 
+    public static class FooterItemViewHolder extends RecyclerView.ViewHolder{
 
+        private ImageView anim_image;
+
+        public FooterItemViewHolder(View itemView) {
+            super(itemView);
+            //加载画面的帧动画
+            anim_image = (ImageView) itemView.findViewById(R.id.anim_image);
+            anim_image.setBackgroundResource(R.drawable.loading_animation);
+            AnimationDrawable anim = (AnimationDrawable) anim_image.getBackground();
+            anim.start();
+        }
+    }
 }

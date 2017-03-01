@@ -1,16 +1,6 @@
 package com.example.administrator.audioplayer.db;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
-
-import com.example.administrator.audioplayer.MyApplication;
-import com.example.administrator.audioplayer.bean.MusicInfo;
 //import com.example.administrator.audioplayer.service.MusicTrack;
-
-import java.util.ArrayList;
 
 /*
 public class PlaylistsManager {

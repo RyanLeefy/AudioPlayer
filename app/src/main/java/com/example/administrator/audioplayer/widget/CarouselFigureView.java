@@ -6,7 +6,6 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
@@ -21,15 +20,10 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.example.administrator.audioplayer.Iview.IRecentView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.MainActivity;
-import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
-import com.example.administrator.audioplayer.bean.RecommendSongCollectionItem;
-import com.example.administrator.audioplayer.fragment.RecommendFragment;
 import com.example.administrator.audioplayer.http.HttpMethods;
 import com.example.administrator.audioplayer.jsonbean.CarouselFigure;
-import com.example.administrator.audioplayer.utils.PrintLog;
 import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
@@ -40,10 +34,7 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.orhanobut.logger.Logger;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,7 +158,7 @@ public class CarouselFigureView extends FrameLayout {
 
                 @Override
                 public void onError(Throwable e) {
-                    Logger.e(e, "error");
+                    Logger.e(e.toString());
                 }
 
                 @Override

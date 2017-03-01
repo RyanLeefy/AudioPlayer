@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="没有找到该歌曲"
+        android:text="没有找到相关歌曲"
         android:textSize="16sp"/>
 
 </LinearLayout>
