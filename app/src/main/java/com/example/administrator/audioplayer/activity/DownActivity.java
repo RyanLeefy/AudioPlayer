@@ -24,6 +24,7 @@ import com.example.administrator.audioplayer.adapter.DownLoadAdapter;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.download.DownloadService;
 import com.example.administrator.audioplayer.presenterImp.DownPresenter;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.utils.PrintLog;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
@@ -55,6 +56,9 @@ public class DownActivity extends BaseActivity implements IDownView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         setContentView(R.layout.activity_down);
 
         //初始化底部播放栏，由父类BaseActivity在onStart()中显示

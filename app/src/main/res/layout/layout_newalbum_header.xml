@@ -22,7 +22,7 @@
 
     <RelativeLayout
         android:id="@+id/rl_newalbum_header_detail"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="80dp"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:orientation="horizontal"
@@ -36,8 +36,8 @@
             android:orientation="horizontal">
 
             <FrameLayout
-                android:layout_width="123dp"
-                android:layout_height="123dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_marginLeft="5dp"
                 android:id="@+id/fra">
 
@@ -51,11 +51,10 @@
 
             </FrameLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_marginRight="10dp"
@@ -77,8 +76,10 @@
                     android:paddingTop="3dp"
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="10dp"
+                    android:layout_marginBottom="5dp"
                     android:textColor="#ffffff"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:layout_above="@+id/tv_newalbum_publistime"/>
 
                 <TextView
                     android:id="@+id/tv_newalbum_publistime"
@@ -87,42 +88,76 @@
                     android:paddingTop="3dp"
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="10dp"
+                    android:layout_marginBottom="25dp"
                     android:textColor="#ffffff"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:layout_above="@+id/ll_songcollection"/>
+
+                <LinearLayout
+                    android:id="@+id/ll_songcollection"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/ll_newalbum_collect"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_gravity="center"
+                            android:id="@+id/img_newalbum_collect_view"
+                            android:src="@drawable/list_detail_icn_fav"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_newalbum_collect_state"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:gravity="center"
+                            android:text="收藏"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                <LinearLayout
+                    android:background="?android:selectableItemBackground"
+                    android:id="@+id/ll_newalbum_down"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/img_newalbum_dowm_view"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:src="@drawable/list_detail_icn_dld"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tv_newalbum_down"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:text="下载"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
             </LinearLayout>
+
+            </RelativeLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_marginBottom="10dp"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:id="@+id/ll_newalbum_collect"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
 
-                <ImageView
-                    android:layout_gravity="center"
-                    android:id="@+id/img_newalbum_collect_view"
-                    android:src="@drawable/list_detail_icn_fav"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/tv_newalbum_collect_state"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:text="收藏"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
+            <!--
             <LinearLayout
                 android:layout_weight="1"
                 android:orientation="vertical"
@@ -145,8 +180,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>
-
-
+            -->
+            <!--
             <LinearLayout
                 android:id="@+id/ll_newalbum_share"
                 android:layout_weight="1"
@@ -169,35 +204,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>
+            -->
 
 
-            <LinearLayout
-                android:background="?android:selectableItemBackground"
-                android:id="@+id/ll_newalbum_down"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/img_newalbum_dowm_view"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:src="@drawable/list_detail_icn_dld"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/tv_newalbum_down"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:text="下载"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-        </LinearLayout>
 
     </RelativeLayout>
 

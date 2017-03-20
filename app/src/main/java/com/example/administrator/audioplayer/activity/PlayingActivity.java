@@ -42,6 +42,7 @@ import com.example.administrator.audioplayer.lrc.LrcRow;
 import com.example.administrator.audioplayer.lrc.LrcView;
 import com.example.administrator.audioplayer.service.MediaService;
 import com.example.administrator.audioplayer.service.MusicPlayer;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.GlobalHandler;
 import com.example.administrator.audioplayer.utils.ImageUtils;
@@ -99,10 +100,10 @@ public class PlayingActivity extends BaseActivity {
     private ImageView mNeedle;
 
     //musicTool框
-    private LinearLayout mMusicTool;
+    //private LinearLayout mMusicTool;
 
     //musicTool框里面四个按钮的图片，喜欢，下载，评论，更多
-    private ImageView  mFav, mDown, mCmt, mMore;
+    //private ImageView  mFav, mDown, mCmt, mMore;
 
     //当前播放时间点和歌曲时常
     private TextView mTimePlayed, mDuration;
@@ -320,6 +321,9 @@ public class PlayingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         setContentView(R.layout.activity_playing);
 
         mBackAlbum = (ImageView) findViewById(R.id.albumArt);
@@ -327,7 +331,7 @@ public class PlayingActivity extends BaseActivity {
         mLrcViewContainer = (RelativeLayout) findViewById(R.id.lrcviewContainer);
         mLrcView = (LrcView) findViewById(R.id.lrcview);
         mTryGetLrc = (TextView) findViewById(R.id.tragetlrc);
-        mMusicTool = (LinearLayout) findViewById(R.id.music_tool);
+        //mMusicTool = (LinearLayout) findViewById(R.id.music_tool);
 
 
         setToolbar();
@@ -339,10 +343,10 @@ public class PlayingActivity extends BaseActivity {
         mNext = (ImageView) findViewById(R.id.playing_next);
         mPre = (ImageView) findViewById(R.id.playing_pre);
         mPlaylist = (ImageView) findViewById(R.id.playing_playlist);
-        mMore = (ImageView) findViewById(R.id.playing_more);
-        mCmt = (ImageView) findViewById(R.id.playing_cmt);
-        mFav = (ImageView) findViewById(R.id.playing_fav);
-        mDown = (ImageView) findViewById(R.id.playing_down);
+        //mMore = (ImageView) findViewById(R.id.playing_more);
+        //mCmt = (ImageView) findViewById(R.id.playing_cmt);
+        //mFav = (ImageView) findViewById(R.id.playing_fav);
+        //mDown = (ImageView) findViewById(R.id.playing_down);
         mTimePlayed = (TextView) findViewById(R.id.music_duration_played);
         mDuration = (TextView) findViewById(R.id.music_duration);
         mProgress = (PlayingSeekBar) findViewById(R.id.play_seek);
@@ -358,9 +362,14 @@ public class PlayingActivity extends BaseActivity {
         initVolumeBar();
         initLrcView();
         setViewPager();
-        setMusicToolListener();
+        //setMusicToolListener();
         setControlToolListener();
         setPlayingSeekBarListener();
+
+
+        //设置歌曲名和歌手名
+        ab.setTitle(MusicPlayer.getTrackName());
+        ab.setSubtitle(MusicPlayer.getArtistName());
 
 
         //开启SeekBar
@@ -543,6 +552,7 @@ public class PlayingActivity extends BaseActivity {
      * @param menu
      * @return
      */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -553,7 +563,7 @@ public class PlayingActivity extends BaseActivity {
     }
 
     /**
-     * 分享按钮的点击事件
+     * toolbar点击事件
      * @param item
      * @return
      */
@@ -570,6 +580,17 @@ public class PlayingActivity extends BaseActivity {
             this.startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.shared_to)));
 
         }*/
+         /*
+        if (item.getItemId() == R.id.menu_love) {
+            MusicInfo musicInfo = MusicUtils.getMusicInfo(PlayingActivity.this, MusicPlayer.getCurrentAudioId());
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + musicInfo.data));
+            shareIntent.setType("audio/*");
+            this.startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.shared_to)));
+
+        }*/
+
         if(item.getItemId() == android.R.id.home) {
             this.finish();
             //设置activity退出动画
@@ -736,7 +757,7 @@ public class PlayingActivity extends BaseActivity {
                 if (mAlbumLayout.getVisibility() == View.VISIBLE) {
                     mAlbumLayout.setVisibility(View.INVISIBLE);
                     mLrcViewContainer.setVisibility(View.VISIBLE);
-                    mMusicTool.setVisibility(View.INVISIBLE);
+                    //mMusicTool.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -760,7 +781,7 @@ public class PlayingActivity extends BaseActivity {
                 if (mLrcViewContainer.getVisibility() == View.VISIBLE) {
                     mLrcViewContainer.setVisibility(View.INVISIBLE);
                     mAlbumLayout.setVisibility(View.VISIBLE);
-                    mMusicTool.setVisibility(View.VISIBLE);
+                    //mMusicTool.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -772,7 +793,7 @@ public class PlayingActivity extends BaseActivity {
                 if (mLrcViewContainer.getVisibility() == View.VISIBLE) {
                     mLrcViewContainer.setVisibility(View.INVISIBLE);
                     mAlbumLayout.setVisibility(View.VISIBLE);
-                    mMusicTool.setVisibility(View.VISIBLE);
+                    //mMusicTool.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -792,6 +813,7 @@ public class PlayingActivity extends BaseActivity {
     /**
      * 设置MusicTool，喜欢，下载，评论，更多
      */
+    /*
     private void setMusicToolListener() {
 
         mMore.setOnClickListener(new View.OnClickListener() {
@@ -807,7 +829,7 @@ public class PlayingActivity extends BaseActivity {
             }
         });
 
-    }
+    }*/
 
     /**
      * 设置ControlTool，播放模式，播放或暂停，下一首，上一首，播放列表

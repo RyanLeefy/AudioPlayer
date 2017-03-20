@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
@@ -18,8 +19,10 @@ import android.widget.ListView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.LeftMenuItemAdapter;
 import com.example.administrator.audioplayer.adapter.MainPagerAdapter;
+import com.example.administrator.audioplayer.fragment.DownLoadConfigFragment;
 import com.example.administrator.audioplayer.fragment.MusicFragment;
 import com.example.administrator.audioplayer.fragment.NetFragment;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.widget.SplashScreen;
 
 import java.util.ArrayList;
@@ -57,6 +60,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
 
         super.onCreate(savedInstanceState);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         setContentView(R.layout.activity_main);
 
         //初始化底部播放栏，由父类BaseActivity在onStart()中显示
@@ -187,10 +193,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     //    break;
                     case 2:
                         //下载音质
+                        DownLoadConfigFragment downLoadConfigFragment = new DownLoadConfigFragment();
+                        downLoadConfigFragment.show(getSupportFragmentManager(), "downloadConfig");
                         drawer.closeDrawers();
                         break;
                     case 3:
-                        //退出
+                        //退出所有Activity
+                        ActivityManager.getInstance().finishAllActivity();
                         drawer.closeDrawers();
                         break;
                 }

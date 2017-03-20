@@ -27,6 +27,7 @@ import com.example.administrator.audioplayer.Iview.IBillBoardView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.presenterImp.BillBoardPresenter;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
@@ -117,6 +118,9 @@ public class BillBoardActivity extends BaseActivity implements ObservableScrollV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         //让布局覆盖状态栏显示
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_billboard);

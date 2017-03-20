@@ -234,7 +234,7 @@ public class AfterSearchMusicFragment extends BaseFragment {
 
 
     /**
-     * 下载单手歌曲
+     * 下载单首歌曲
      * @param position
      */
     public void performDownLoadMusicClick(final int position) {
@@ -249,7 +249,7 @@ public class AfterSearchMusicFragment extends BaseFragment {
                     @Override
                     public void call(Subscriber<? super String> subscriber) {
 
-                        RequestThreadPool.post(new GetDownloadLink(list, position, names, artists, urls));
+                        RequestThreadPool.post(new GetDownloadLink(list, position, names, artists, urls, 1));
 
 
                         //等待所有请求结束

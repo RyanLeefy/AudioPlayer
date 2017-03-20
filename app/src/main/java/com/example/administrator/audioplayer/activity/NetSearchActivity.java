@@ -18,6 +18,7 @@ import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.db.SearchHistory;
 import com.example.administrator.audioplayer.fragment.AfterSearchFragment;
 import com.example.administrator.audioplayer.fragment.PreSearchFragment;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.utils.RequestThreadPool;
 
 /**
@@ -49,6 +50,9 @@ public class NetSearchActivity extends BaseActivity implements  SearchView.OnQue
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         setContentView(R.layout.activity_net_search);
         //初始化底部播放栏，由父类BaseActivity在onStart()中显示
         bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);

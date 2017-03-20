@@ -171,12 +171,13 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             onPlayAllItemClickListener.onItemClick(holder.itemView, position);
                         }
                     });
+                    /*
                     ((PlayAllItemViewHolder) holder).select.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             onPlayAllItemClickListener.onMoreClick(holder.itemView, position);
                         }
-                    });
+                    });*/
                 }
 
                 //select跳转到选择activity
@@ -398,14 +399,14 @@ public class MusicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         RelativeLayout layout;
         TextView textView;
-        ImageView select;
+        //ImageView select;
 
 
         PlayAllItemViewHolder(View view) {
             super(view);
             this.layout = (RelativeLayout) view.findViewById(R.id.play_all_layout);
             this.textView = (TextView) view.findViewById(R.id.play_all_number);
-            this.select = (ImageView) view.findViewById(R.id.select);
+            //this.select = (ImageView) view.findViewById(R.id.select);
         }
     }
 

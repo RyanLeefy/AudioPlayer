@@ -37,6 +37,7 @@ import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.presenterImp.NewAlbumPresenter;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
@@ -161,6 +162,9 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         super.onCreate(savedInstanceState);
         //让布局覆盖状态栏显示
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         setContentView(R.layout.activity_new_album);
 
         mInflater = LayoutInflater.from(this);
@@ -193,7 +197,7 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
 
 
         collection_layout = (LinearLayout) findViewById(R.id.ll_newalbum_collect);
-        share_layout = (LinearLayout) findViewById(R.id.ll_newalbum_share);
+        //share_layout = (LinearLayout) findViewById(R.id.ll_newalbum_share);
         dowm_layout = (LinearLayout) findViewById(R.id.ll_newalbum_down);
 
         recyclerView = (ObserableRecyclerViewWithEmptyView) findViewById(R.id.orv_newalbum);
@@ -320,12 +324,13 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         });
 
         //分享按钮监听
+        /*
         share_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
-        });
+        });*/
 
         //下载按钮监听
         dowm_layout.setOnClickListener(new View.OnClickListener() {

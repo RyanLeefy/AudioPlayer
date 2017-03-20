@@ -2,11 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
+    <!--
     <item
         android:id="@+id/menu_share"
         android:icon="@drawable/actionbar_share"
         android:title=""
         app:showAsAction="ifRoom|collapseActionView"></item>
+    -->
 
+    <item
+        android:id="@+id/menu_love"
+        android:icon="@drawable/actionbar_whitelove"
+        android:title=""
+        app:showAsAction="ifRoom|collapseActionView"></item>
 </menu>

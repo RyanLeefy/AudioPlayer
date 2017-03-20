@@ -52,6 +52,7 @@ import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
 import com.example.administrator.audioplayer.presenterImp.SongCollectionPresenter;
 import com.example.administrator.audioplayer.service.MediaService;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
 import com.example.administrator.audioplayer.utils.PreferencesUtils;
@@ -175,6 +176,9 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         super.onCreate(savedInstanceState);
         //让布局覆盖状态栏显示
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         setContentView(R.layout.activity_song_collection);
 
         mInflater = LayoutInflater.from(this);
@@ -207,7 +211,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
 
 
         collection_layout = (LinearLayout) findViewById(R.id.ll_songcollection_collect);
-        share_layout = (LinearLayout) findViewById(R.id.ll_songcollection_share);
+        //share_layout = (LinearLayout) findViewById(R.id.ll_songcollection_share);
         dowm_layout = (LinearLayout) findViewById(R.id.ll_songcollection_down);
 
         recyclerView = (ObserableRecyclerViewWithEmptyView) findViewById(R.id.orv_songcollection);
@@ -348,12 +352,13 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         });
 
         //分享按钮监听
+        /*
         share_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
-        });
+        });*/
 
         //下载按钮监听
         dowm_layout.setOnClickListener(new View.OnClickListener() {

@@ -133,7 +133,7 @@ public class NewAlbumPresenter implements INewAlbumPresenter {
                     public void call(Subscriber<? super String> subscriber) {
 
                         for(int i = 0; i < list.size(); i++) {
-                            RequestThreadPool.post(new GetDownloadLink(list, i, names, artists, urls));
+                            RequestThreadPool.post(new GetDownloadLink(list, i, names, artists, urls, 0));
                         }
 
                         //等待所有请求结束
@@ -195,7 +195,7 @@ public class NewAlbumPresenter implements INewAlbumPresenter {
                     @Override
                     public void call(Subscriber<? super String> subscriber) {
 
-                        RequestThreadPool.post(new GetDownloadLink(list, position, names, artists, urls));
+                        RequestThreadPool.post(new GetDownloadLink(list, position, names, artists, urls, 1));
 
 
                         //等待所有请求结束

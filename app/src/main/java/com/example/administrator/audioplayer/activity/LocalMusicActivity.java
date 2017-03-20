@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
+import com.example.administrator.audioplayer.utils.ActivityManager;
 
 /**
  * 本地音乐界面
@@ -35,6 +36,9 @@ public class LocalMusicActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //把Activity放入ActivityManager中进行管理，方便一键退出所有
+        ActivityManager.getInstance().pushOneActivity(this);
+
         setContentView(R.layout.activity_local_music);
 
         //初始化底部播放栏，由父类BaseActivity在onStart()中显示
