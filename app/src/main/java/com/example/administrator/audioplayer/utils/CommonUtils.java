@@ -1,11 +1,19 @@
 package com.example.administrator.audioplayer.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 
 import com.example.administrator.audioplayer.R;
 
@@ -113,5 +121,60 @@ public class CommonUtils {
 
         return mActionBarHeight;
     }
+
+
+    /**
+
+     * @param activity 需要弹出的activity
+     * @param popupWindow popupwindow实例
+     * @param view 要出现的位置相关的view
+     * @param layout popupwindow的样式
+     */
+    public static PopupWindow ShowPopUpWindow(final Activity activity, PopupWindow popupWindow, View view, LinearLayout layout) {
+        //初始化并弹出popupWindow
+        if (popupWindow != null && popupWindow.isShowing()) {
+            return null;
+        }
+
+        popupWindow = new PopupWindow(layout,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setAnimationStyle(R.style.Popupwindow);//包括进入和退出两个动画
+
+        //popupwindow获取焦点，点击其他地方消失
+        popupWindow.setFocusable(true);
+        //popupWindow.setOutsideTouchable(true);
+
+        popupWindow.setBackgroundDrawable(new ColorDrawable());
+
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                //popupwindow消失的时候恢复成原来的透明度
+                backgroundAlpha(activity, 1f);
+            }
+        });
+
+        backgroundAlpha(activity, 0.7f);
+        popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
+
+        //返回显示的popupwindow实例，以供dismiss
+        return popupWindow;
+    }
+
+
+    /**
+     * 设置添加屏幕的背景透明度
+     * @param activity
+     * @param bgAlpha
+     */
+    public static void backgroundAlpha(Activity activity, float bgAlpha)
+    {
+        WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+        lp.alpha = bgAlpha; //0.0-1.0
+        activity.getWindow().setAttributes(lp);
+    }
+
 
 }

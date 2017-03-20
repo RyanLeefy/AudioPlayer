@@ -23,7 +23,10 @@
         android:layout_marginTop="7dp"
         android:gravity="center_vertical"
         android:paddingLeft="10dp"
+        android:layout_marginRight="20dp"
         android:textColor="@color/text_color"
+        android:maxLines="1"
+        android:ellipsize="marquee"
         android:textSize="15sp" />
 
 </LinearLayout>

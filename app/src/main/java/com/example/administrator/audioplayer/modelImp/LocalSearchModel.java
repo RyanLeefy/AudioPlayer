@@ -36,6 +36,9 @@ public class LocalSearchModel implements ILocalSearchModel {
                 musicInfo.setMusicName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
                 musicInfo.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
                 musicInfo.setAlbumName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
+                musicInfo.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+                musicInfo.setSize(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)));
+                musicInfo.setData(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
                 arrayList.add(musicInfo);
             }
             while (cursor.moveToNext());
@@ -53,7 +56,7 @@ public class LocalSearchModel implements ILocalSearchModel {
         if (!TextUtils.isEmpty(selection)) {
             selectionStatement.append(" AND " + selection);
         }
-        Cursor cursor = MyApplication.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "title", "artist", "album", "duration", "track", "artist_id", "album_id"}, selectionStatement.toString(), paramArrayOfString, null);
+        Cursor cursor = MyApplication.getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "title", "_data", "artist", "album", "duration", "_size", "artist_id", "album_id"}, selectionStatement.toString(), paramArrayOfString, null);
 
         return cursor;
     }

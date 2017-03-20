@@ -4,7 +4,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion "25.0.0"
     defaultConfig {
-        applicationId "com.example.ryan.audioplayer"
+        applicationId "com.example.administrator.audioplayer"
         minSdkVersion 16
         targetSdkVersion 24
         versionCode 1
@@ -31,7 +31,7 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
-    compile 'com.facebook.fresco:fresco:0.9.0'
+    compile 'com.facebook.fresco:fresco:0.10.0'
     compile 'com.orhanobut:logger:1.15'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'io.reactivex:rxandroid:1.1.0'

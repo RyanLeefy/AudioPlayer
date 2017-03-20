@@ -54,7 +54,7 @@ public class MusicDBOpenHelper extends SQLiteOpenHelper {
         SearchHistory.getInstance(mContext).onCreate(db);
         PlaylistInfo.getInstance(mContext).onCreate(db);
         //PlaylistsManager.getInstance(mContext).onCreate(db);
-        DownFileStore.getInstance(mContext).onCreate(db);
+        DownLoadDB.getInstance(mContext).onCreate(db);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class MusicDBOpenHelper extends SQLiteOpenHelper {
         SearchHistory.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         PlaylistInfo.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         //PlaylistsManager.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
-        DownFileStore.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
+        DownLoadDB.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
     }
 
 

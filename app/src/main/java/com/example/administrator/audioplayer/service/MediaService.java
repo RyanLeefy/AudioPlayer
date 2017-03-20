@@ -37,6 +37,7 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.bean.MusicInfo;
@@ -2198,6 +2199,7 @@ public class MediaService extends Service {
 
 
             mHistory.clear();
+            //设置第一首歌的播放地址，可能是网络可能是本地
             openCurrentAndNextPlay(true);
             if (oldId != getAudioId()) {
                 notifyChange(META_CHANGED);

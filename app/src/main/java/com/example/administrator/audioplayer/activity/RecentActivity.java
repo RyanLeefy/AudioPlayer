@@ -1,23 +1,37 @@
 package com.example.administrator.audioplayer.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Ipresenter.IRecentPresenter;
 import com.example.administrator.audioplayer.Iview.IRecentView;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
+import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
+import com.example.administrator.audioplayer.bean.LeftMenuItem;
+import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.presenterImp.RencentPresenter;
+import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
+
+import java.util.Arrays;
 
 
 /**
@@ -29,6 +43,9 @@ public class RecentActivity extends BaseActivity implements IRecentView {
     private Toolbar toolbar;
     private RecycleViewWithEmptyView rv;
     private IRecentPresenter presenter;
+
+    private LayoutInflater mInflater;
+    private PopupWindow popupWindow;
 
 
     public static void startActivity(Context context) {
@@ -42,6 +59,9 @@ public class RecentActivity extends BaseActivity implements IRecentView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recent);
+
+        mInflater = LayoutInflater.from(this);
+
         //初始化底部播放栏，由父类BaseActivity在onStart()中显示
         bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
 
@@ -90,7 +110,7 @@ public class RecentActivity extends BaseActivity implements IRecentView {
 
 
     @Override
-    public void setAdapter(MusicAdapter adapter) {
+    public void setAdapter(final MusicAdapter adapter) {
         //获取回来的adapter先设置监听事件，然后再设置给recycleView
         adapter.setOnPlayAllItemClickListener(new MusicAdapter.OnPlayAllItemClickListener() {
             @Override
@@ -116,8 +136,34 @@ public class RecentActivity extends BaseActivity implements IRecentView {
             }
 
             @Override
-            public void onMoreClick(View view, int position) {
-                Toast.makeText(RecentActivity.this, ((MusicAdapter)rv.getAdapter()).getItem(position).getMusicName() + "more", Toast.LENGTH_SHORT).show();
+            public void onMoreClick(View view, final int position) {
+                LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.popupwindow_menu_songlistmore, null);
+
+                TextView popuptitle = (TextView) layout.findViewById(R.id.tv_title_popupwindow);
+                ListView popuplistview = (ListView) layout.findViewById(R.id.ls_songlistmore_popupwindow);
+
+                //添加弹窗菜单数据源
+                //获取当前点击的歌曲数据
+                final MusicInfo musicInfo = (MusicInfo) adapter.getList().get(position - 1);
+                popuptitle.setText("歌曲信息:");
+
+                String albumname = musicInfo.getAlbumName();
+                //判断专辑名，如果是没有专辑名字的 在下载之后专辑会变成文件夹名字，所以这里多一步判断是否是文件夹名字
+                if(albumname == null || albumname.length() == 0 || albumname.equals("audioplayer")) {
+                    albumname = "暂无信息";
+                }
+
+                PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(RecentActivity.this,
+                        Arrays.asList( new LeftMenuItem(R.drawable.icon_music_name, "歌曲 —— " + musicInfo.getMusicName()),
+                                new LeftMenuItem(R.drawable.icon_music_artist, "歌手 —— " + musicInfo.getArtist()),
+                                new LeftMenuItem(R.drawable.icon_music_album, "专辑 —— " + albumname)
+                        ));
+                popuplistview.setAdapter(adapter);
+                //添加弹窗菜单点击事件
+
+                //初始化并弹出popupWindow
+                popupWindow = CommonUtils.ShowPopUpWindow(RecentActivity.this, popupWindow, view, layout);
+
             }
         });
 

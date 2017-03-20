@@ -128,7 +128,9 @@ public class MusicPlayer {
             if (position < 0) {
                 position = 0;
             }
+            //创建播放列表并设置第一首歌的播放地址
             mService.open(list, forceShuffle ? -1 : position);
+            //开始播放
             mService.play();
             Log.e("time", System.currentTimeMillis() + "");
         } catch (IllegalStateException e) {

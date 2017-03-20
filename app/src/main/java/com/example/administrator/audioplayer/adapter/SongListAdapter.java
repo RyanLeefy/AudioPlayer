@@ -86,7 +86,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                 MusicFragmentHeaderItem headerItem = (MusicFragmentHeaderItem) allItems.get(position);
                 holder.icon.setImageResource(headerItem.getIcon());
                 holder.title.setText(headerItem.getTitle());
-                holder.count.setText("(" + headerItem.getCount() + ")");
+                //下载管理不显示数字，其他显示数字
+                if(!headerItem.getTitle().equals("下载管理")) {
+                    holder.count.setText("(" + headerItem.getCount() + ")");
+                }
                 //回调点击事件
                 if(onHeaderItemClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {

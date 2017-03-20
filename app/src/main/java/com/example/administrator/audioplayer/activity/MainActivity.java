@@ -181,15 +181,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         //听歌识曲
                         drawer.closeDrawers();
                         break;
-                    case 2:
+                    //case 2:
                         //定时关闭
-                        drawer.closeDrawers();
-                        break;
-                    case 3:
+                    //    drawer.closeDrawers();
+                    //    break;
+                    case 2:
                         //下载音质
                         drawer.closeDrawers();
                         break;
-                    case 4:
+                    case 3:
                         //退出
                         drawer.closeDrawers();
                         break;

@@ -70,8 +70,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             if(parent.getChildViewHolder(child) instanceof SongListAdapter.ItemViewTag) {
                 SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag)parent.getChildViewHolder(child);
 
-                //最后一个头部headerItem不画分割线
-                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0 && i == 3) {
+                //最后一个头部headerItem不画分割线,如果有我的歌手则是3，没有就是2
+                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0 && i == 2) {
                     //left = parent.getPaddingLeft() + itemViewTag.icon.getWidth() +  itemViewTag.icon.getPaddingLeft();
                     continue;
                 }

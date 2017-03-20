@@ -1,5 +1,9 @@
 package com.example.administrator.audioplayer.presenterImp;
 
+import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.example.administrator.audioplayer.Imodel.ISongCollectionModel;
 import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
 import com.example.administrator.audioplayer.Iview.ISongCollectionView;
@@ -7,14 +11,22 @@ import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.download.DownloadService;
 import com.example.administrator.audioplayer.http.HttpMethods;
+import com.example.administrator.audioplayer.http.HttpUtils;
 import com.example.administrator.audioplayer.jsonbean.SongBaseInfo;
+import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
+import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
 import com.example.administrator.audioplayer.modelImp.SongCollectionModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.utils.CommonUtils;
+import com.example.administrator.audioplayer.utils.GetDownloadLink;
+import com.example.administrator.audioplayer.utils.PreferencesUtils;
 import com.example.administrator.audioplayer.utils.PrintLog;
 import com.example.administrator.audioplayer.utils.RequestThreadPool;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -36,7 +48,10 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
     private ISongCollectionView view;
     private ISongCollectionModel model;
 
+    private MusicAdapter adapter;
+
     List<MusicInfo> adapterList = new ArrayList<>();
+
 
     public SongCollectionPresenter(ISongCollectionView view) {
         this.view = view;
@@ -146,11 +161,145 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
                         adapter.setHasTopPadding(true);
                         //设置有序号
                         adapter.setHasTrackNumber(true);
+                        SongCollectionPresenter.this.adapter = adapter;
                         view.setAdapter(adapter);
                     }
                 })
         );
 
+    }
+
+
+    /**
+     * 下载列表所有音乐
+     */
+    @Override
+    public void performDownLoadAllClick() {
+        //用Rxjava进行异步处理
+        //第一步创建Subscriber
+        //第二步创建Observable
+        //第三不用doOnNext对返回的数据进行处理
+        //第三步订阅，并添加到父类的CompositeSubscription中，进行管理
+
+        final List list = adapter.getList();
+        final String[] names = new String[list.size()];
+        final String[] artists = new String[list.size()];
+        final ArrayList<String> urls = new ArrayList<String>();
+
+
+        ((SongCollectionActivity)view).addSubscription(
+        Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+
+                for(int i = 0; i < list.size(); i++) {
+                    RequestThreadPool.post(new GetDownloadLink(list, i, names, artists, urls));
+                }
+
+                //等待所有请求结束
+                int tryCount = 0;
+                while (urls.size() != list.size() && tryCount < 1000) {
+                    tryCount++;
+                    try {
+                        Thread.sleep(30);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                PrintLog.e("urls.size() = " + urls.size());
+
+                subscriber.onNext("onNext");
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.e(e.toString());
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        //调用后台服务开始下载
+                        Intent intent = new Intent();
+                        intent.setAction(DownloadService.ADD_MULTI_DOWNTASK);
+                        intent.putExtra("names", names);
+                        intent.putExtra("artists", artists);
+                        intent.putStringArrayListExtra("urls", urls);
+                        intent.setPackage(DownloadService.PACKAGE);
+                        ((SongCollectionActivity)view).startService(intent);
+                    }
+                })
+        );
+    }
+
+    /**
+     * 下载单个音乐
+     * @param position   音乐位置
+     */
+    @Override
+    public void performDownLoadMusicClick(final int position) {
+        final List list = adapter.getList();
+        final String[] names = new String[list.size()];
+        final String[] artists = new String[list.size()];
+        final ArrayList<String> urls = new ArrayList<String>();
+
+
+        ((SongCollectionActivity)view).addSubscription(
+                Observable.create(new Observable.OnSubscribe<String>() {
+                    @Override
+                    public void call(Subscriber<? super String> subscriber) {
+
+                        RequestThreadPool.post(new GetDownloadLink(list, position, names, artists, urls));
+
+
+                        //等待所有请求结束
+                        int tryCount = 0;
+                        while (urls.size() != 1 && tryCount < 1000) {
+                            tryCount++;
+                            try {
+                                Thread.sleep(30);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        PrintLog.e("urls.size() = " + urls.size());
+
+                        subscriber.onNext("onNext");
+                        subscriber.onCompleted();
+                    }
+                })
+                        .subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribe(new Subscriber<String>() {
+                            @Override
+                            public void onCompleted() {}
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Logger.e(e.toString());
+                            }
+
+                            @Override
+                            public void onNext(String s) {
+                                //调用后台服务开始下载
+                                Intent intent = new Intent();
+                                intent.setAction(DownloadService.ADD_DOWNTASK);
+                                intent.putExtra("name", names[0]);
+                                intent.putExtra("artist", artists[0]);
+                                intent.putExtra("url", urls.get(0));
+                                intent.setPackage(DownloadService.PACKAGE);
+                                ((SongCollectionActivity)view).startService(intent);
+                            }
+                        })
+        );
     }
 
 
@@ -177,6 +326,7 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
                 @Override
                 public void onError(Throwable e) {
                     Logger.e("Error", e);
+                    view.showTryAgain();
                     PrintLog.e(e.toString());
                 }
 
@@ -198,6 +348,7 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
 
         }
     }
+
 
 
 

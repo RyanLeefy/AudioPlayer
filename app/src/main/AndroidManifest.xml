@@ -2,11 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.administrator.audioplayer">
 
+    <!--手机权限-->
+    <!--锁屏cpu-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--存储相关-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <!--获知网络状况-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -25,10 +29,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.MediaService"
-            android:enabled="true"
-            android:exported="true" />
 
         <activity
             android:name=".activity.LocalMusicActivity"
@@ -42,6 +42,28 @@
         <activity android:name=".activity.BillBoardActivity" />
         <activity android:name=".activity.NetSearchActivity"
             android:windowSoftInputMode="adjustPan|adjustResize|stateVisible"/>
+
+
+        <service
+            android:name=".service.MediaService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service android:name=".download.DownloadService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.administrator.audioplayer.downtaskadd"/>
+                <action android:name="com.example.administrator.audioplayer.resumestarttask"/>
+                <action android:name="com.example.administrator.audioplayer.startalltask"/>
+                <action android:name="com.example.administrator.audioplayer.multidowntaskadd"/>
+                <action android:name="com.example.administrator.audioplayer.pausetask"/>
+                <action android:name="com.example.administrator.audioplayer.pausealltask"/>
+                <action android:name="com.example.administrator.audioplayer.cacletask"/>
+                <action android:name="com.example.administrator.audioplayer.caclealltask"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

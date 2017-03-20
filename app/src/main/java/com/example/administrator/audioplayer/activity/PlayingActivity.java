@@ -114,10 +114,6 @@ public class PlayingActivity extends BaseActivity {
     private ImageView mPlayingmode, mPlayorPause, mNext, mPre, mPlaylist;
 
 
-    private static final int VIEWPAGER_SCROLL_TIME = 390;
-    private static final int TIME_DELAY = 500;
-    private static final int NEXT_MUSIC = 0;
-    private static final int PRE_MUSIC = 1;
 
     //需要旋转的视图，这里指RoundFragment的根视图
     private View mRotateView;

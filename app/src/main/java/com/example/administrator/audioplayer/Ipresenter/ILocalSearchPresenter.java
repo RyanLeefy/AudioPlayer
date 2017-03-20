@@ -8,4 +8,6 @@ package com.example.administrator.audioplayer.Ipresenter;
 
 public interface ILocalSearchPresenter {
     void performSearch(String queryString);
+    void peformMusicClick(int position);
+    boolean performMusicDelete(int position);
 }

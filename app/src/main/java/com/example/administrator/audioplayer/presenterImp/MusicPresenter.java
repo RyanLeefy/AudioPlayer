@@ -72,8 +72,8 @@ public class MusicPresenter implements IMusicPresenter {
                 List<MusicFragmentHeaderItem> headerItemList = new ArrayList<>(
                         Arrays.asList(new MusicFragmentHeaderItem(R.drawable.music_icn_local, "本地播放", num_local_music),
                                 new MusicFragmentHeaderItem(R.drawable.music_icn_recent, "最近播放", num_recent_music),
-                                new MusicFragmentHeaderItem(R.drawable.music_icn_download, "下载管理", 0),
-                                new MusicFragmentHeaderItem(R.drawable.music_icn_artist, "我的歌手", 0)));
+                                new MusicFragmentHeaderItem(R.drawable.music_icn_download, "下载管理", 0)));
+                                //new MusicFragmentHeaderItem(R.drawable.music_icn_artist, "我的歌手", 0)));
 
 
                 final List<MusicFragmengSongCollectionItem> create_songCollectionItems = new ArrayList<>();

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.example.administrator.audioplayer.Ipresenter.IMusicPresenter;
 import com.example.administrator.audioplayer.Iview.IMusicView;
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.DownActivity;
 import com.example.administrator.audioplayer.activity.LocalMusicActivity;
 import com.example.administrator.audioplayer.activity.RecentActivity;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
@@ -32,6 +33,7 @@ import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.presenterImp.MusicPresenter;
+import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 
 import java.util.Arrays;
@@ -102,51 +104,6 @@ public class MusicFragment extends BaseFragment implements IMusicView {
         presenter.onCreateView();
     }
 
-    /**
-     * @param view   要出现的位置相关的view
-     * @param layout popupwindow的样式
-     */
-    public void ShowPopUpWindow(View view, LinearLayout layout) {
-        //初始化并弹出popupWindow
-        if (popupWindow != null && popupWindow.isShowing()) {
-            return;
-        }
-
-        popupWindow = new PopupWindow(layout,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        popupWindow.setAnimationStyle(R.style.Popupwindow);//包括进入和退出两个动画
-
-        //popupwindow获取焦点，点击其他地方消失
-        popupWindow.setFocusable(true);
-        //popupWindow.setOutsideTouchable(true);
-
-        popupWindow.setBackgroundDrawable(new ColorDrawable());
-
-
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                //popupwindow消失的时候恢复成原来的透明度
-                backgroundAlpha(1f);
-            }
-        });
-
-        backgroundAlpha(0.7f);
-        popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
-    }
-
-
-    /**
-     * 设置添加屏幕的背景透明度
-     * @param bgAlpha
-     */
-    public void backgroundAlpha(float bgAlpha)
-    {
-        WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
-        lp.alpha = bgAlpha; //0.0-1.0
-        getActivity().getWindow().setAttributes(lp);
-    }
 
 
     @Override
@@ -173,6 +130,7 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                         break;
                     case 2:
                         //跳转到DownActivity
+                        DownActivity.startActivity(mContext);
                         Toast.makeText(mContext, "下载管理", Toast.LENGTH_SHORT).show();
                         break;
                     case 3:
@@ -270,7 +228,7 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                     }
                 });
                 //初始化并弹出popupWindow
-                ShowPopUpWindow(view, layout);
+                popupWindow = CommonUtils.ShowPopUpWindow(getActivity(), popupWindow, view, layout);
             }
         });
         //给歌单添加点击事件
@@ -303,13 +261,19 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                         MusicFragmengSongCollectionItem songCollectionItem = (MusicFragmengSongCollectionItem)allItems.get(position);
                         if(childposition == 0) {
                             Toast.makeText(mContext, "删除:" + songCollectionItem.getName(), Toast.LENGTH_SHORT).show();
+                            if (popupWindow != null) {
+                                popupWindow.dismiss();
+                            }
                         } else if (childposition == 1) {
                             Toast.makeText(mContext, "编辑歌单信息:" + songCollectionItem.getName(), Toast.LENGTH_SHORT).show();
+                            if (popupWindow != null) {
+                                popupWindow.dismiss();
+                            }
                         }
                     }
                 });
                 //初始化并弹出popupWindow
-                ShowPopUpWindow(view, layout);
+                popupWindow = CommonUtils.ShowPopUpWindow(getActivity(), popupWindow, view, layout);
             }
         });
 

@@ -23,7 +23,7 @@ public class LeftMenuItemAdapter extends BaseAdapter {
 
     private List<LeftMenuItem> list = new ArrayList<>(    Arrays.asList(
             new LeftMenuItem(R.drawable.leftmenu_icn_identify, "听歌识曲"),
-            new LeftMenuItem(R.drawable.leftmenu_icn_time, "定时关闭音乐"),
+            //new LeftMenuItem(R.drawable.leftmenu_icn_time, "定时关闭音乐"),
             new LeftMenuItem(R.drawable.leftmenu_icn_vip, "下载歌曲品质"),
             new LeftMenuItem(R.drawable.leftmenu_icn_exit, "退出")
 

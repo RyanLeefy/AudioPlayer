@@ -1,13 +1,17 @@
 package com.example.administrator.audioplayer.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
@@ -15,22 +19,43 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
 import com.example.administrator.audioplayer.Iview.ISongCollectionView;
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
+import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
+import com.example.administrator.audioplayer.bean.LeftMenuItem;
+import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
+import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.download.DownloadService;
+import com.example.administrator.audioplayer.http.HttpMethods;
+import com.example.administrator.audioplayer.http.HttpUtils;
+import com.example.administrator.audioplayer.jsonbean.SongCollection;
+import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
 import com.example.administrator.audioplayer.presenterImp.SongCollectionPresenter;
+import com.example.administrator.audioplayer.service.MediaService;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
+import com.example.administrator.audioplayer.utils.PreferencesUtils;
+import com.example.administrator.audioplayer.utils.PrintLog;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.ObserableRecyclerViewWithEmptyView;
 import com.facebook.binaryresource.BinaryResource;
@@ -42,9 +67,14 @@ import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.nineoldandroids.view.ViewHelper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class SongCollectionActivity extends BaseActivity implements ObservableScrollViewCallbacks,ISongCollectionView {
@@ -83,6 +113,10 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
     private ImageView anim_image;
     //网络失败重试TextView
     private TextView try_again;
+
+    private LayoutInflater mInflater;
+
+    private PopupWindow popupWindow;
 
     private MusicAdapter adapter;
 
@@ -142,6 +176,8 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         //让布局覆盖状态栏显示
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_song_collection);
+
+        mInflater = LayoutInflater.from(this);
 
         //初始化底部播放栏，由父类BaseActivity在onStart()中显示
         bottom_container_framelayout = (FrameLayout) findViewById(R.id.bottom_container);
@@ -323,7 +359,21 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         dowm_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                new AlertDialog.Builder(SongCollectionActivity.this).setTitle("下载该歌单内所有歌曲？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //下载所有歌曲
+                                presenter.performDownLoadAllClick();
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
             }
         });
     }
@@ -377,8 +427,10 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
 
     }
 
+
+
     @Override
-    public void setAdapter(MusicAdapter adapter) {
+    public void setAdapter(final MusicAdapter adapter) {
         //获取回来的adapter先设置监听事件，然后再设置给recycleView
         adapter.setOnPlayAllItemClickListener(new MusicAdapter.OnPlayAllItemClickListener() {
             @Override
@@ -399,8 +451,60 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
             }
 
             @Override
-            public void onMoreClick(View view, int position) {
+            public void onMoreClick(View view, final int position) {
+                LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.popupwindow_menu_songlistmore, null);
 
+                TextView popuptitle = (TextView) layout.findViewById(R.id.tv_title_popupwindow);
+                ListView popuplistview = (ListView) layout.findViewById(R.id.ls_songlistmore_popupwindow);
+
+                //添加弹窗菜单数据源
+                //获取当前点击的歌曲数据
+                final MusicInfo musicInfo = (MusicInfo) adapter.getList().get(position - 1);
+                popuptitle.setText("歌曲信息:");
+
+                String albumname = musicInfo.getAlbumName();
+                if(albumname == null || albumname.length() == 0) {
+                    albumname = "暂无信息";
+                }
+                PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(SongCollectionActivity.this,
+                        Arrays.asList( new LeftMenuItem(R.drawable.icon_music_name, "歌曲 —— " + musicInfo.getMusicName()),
+                                new LeftMenuItem(R.drawable.icon_music_artist, "歌手 —— " + musicInfo.getArtist()),
+                                new LeftMenuItem(R.drawable.icon_music_album, "专辑 —— " + albumname),
+                                new LeftMenuItem(R.drawable.icon_music_download, "下载歌曲" )
+                                ));
+                popuplistview.setAdapter(adapter);
+                //添加弹窗菜单点击事件
+
+                popuplistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View childview, int childposition, long id) {
+
+                        //点击第四个按钮，下载按钮，弹框确认是否下载
+                        if(childposition == 3) {
+                            new AlertDialog.Builder(SongCollectionActivity.this).setTitle("确定下载该歌曲吗？")
+                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            //下载该歌曲
+                                            presenter.performDownLoadMusicClick(position - 1);
+                                            if (popupWindow != null) {
+                                                popupWindow.dismiss();
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .show();
+
+                        }
+                    }
+                });
+                //初始化并弹出popupWindow
+                popupWindow = CommonUtils.ShowPopUpWindow(SongCollectionActivity.this, popupWindow, view, layout);
             }
         });
 

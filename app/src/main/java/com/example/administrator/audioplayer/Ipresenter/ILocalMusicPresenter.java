@@ -8,4 +8,5 @@ package com.example.administrator.audioplayer.Ipresenter;
 public interface ILocalMusicPresenter {
     void onCreateView();
     void peformMusicClick(int position);
+    boolean performMusicDelete(int position);
 }

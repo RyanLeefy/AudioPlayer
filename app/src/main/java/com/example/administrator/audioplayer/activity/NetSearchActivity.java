@@ -63,6 +63,8 @@ public class NetSearchActivity extends BaseActivity implements  SearchView.OnQue
         mSearchView.setQueryHint("搜索歌曲、歌手、专辑");
         mSearchView.setOnQueryTextListener(this);
 
+        mSearchView.clearFocus();
+
         mimm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         //两个Fragment  PreSearchFragment， AfterSearchFragment
