@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
+import com.example.administrator.audioplayer.bean.CollectionInfo;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -71,7 +71,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
             case 2:
                 return new ItemViewTag(mInflater.inflate(R.layout.list_item_expand, parent, false));
             case 3:
-                return new ItemViewTag(mInflater.inflate(R.layout.list_item_expand, parent, false));
+                return new ItemViewTag(mInflater.inflate(R.layout.list_item_expand_withoutmore, parent, false));
         }
         return null;
     }
@@ -102,9 +102,14 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                 break;
             //歌单
             case 1:
-                MusicFragmengSongCollectionItem create_songCollectionItems = (MusicFragmengSongCollectionItem) allItems.get(position);
-                holder.cover.setImageURI(Uri.parse(create_songCollectionItems.getCover_uri()));
-                holder.name.setText(create_songCollectionItems.getName());
+                CollectionInfo create_songCollectionItems = (CollectionInfo) allItems.get(position);
+                //如果封面地址不为空则设置封面，否则不设置，为默认封面
+                String albumArt = create_songCollectionItems.getAlbumArt();
+                if(albumArt != null && albumArt.length() != 0) {
+                    holder.cover.setImageURI(Uri.parse(albumArt));
+                }
+
+                holder.name.setText(create_songCollectionItems.getCollectionName());
                 holder.songcount.setText(create_songCollectionItems.getSongCount() + "首");
                 holder.songcollectionmore.setImageResource(R.drawable.list_icn_more);
 
@@ -130,7 +135,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                 holder.arrow.setImageResource(R.drawable.list_icn_arr_right);
                 holder.type.setText(expandItem.getTitle());
                 holder.songcollectioncount.setText("(" +expandItem.getSongCollectionCount() + ")");
-                //回调点击事件
+                //回调点击事件,只有第一个创建的歌单有more点击事件
                 if(onExpandItemClickListener != null) {
                     holder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -138,12 +143,14 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                             onExpandItemClickListener.onItemClick(holder, position);
                         }
                     });
-                    holder.more.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onExpandItemClickListener.onMoreClick(holder.itemView, position);
-                        }
-                    });
+                    if(getItemViewType(position) == 2) {
+                        holder.more.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onExpandItemClickListener.onMoreClick(holder.itemView, position);
+                            }
+                        });
+                    }
                 }
                 break;
         }
@@ -167,7 +174,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
         if (allItems.get(position) instanceof MusicFragmentHeaderItem)
             return 0;
         //如果是歌单，返回type为1
-        if (allItems.get(position) instanceof MusicFragmengSongCollectionItem) {
+        if (allItems.get(position) instanceof CollectionInfo) {
             return 1;
         }
         if (allItems.get(position) instanceof MusicFragmentExpandItem) {

@@ -1,16 +1,19 @@
 package com.example.administrator.audioplayer.presenterImp;
 
+import com.example.administrator.audioplayer.Imodel.IMusicModel;
 import com.example.administrator.audioplayer.Ipresenter.IMusicPresenter;
 import com.example.administrator.audioplayer.Iview.IMusicView;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
-import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
+import com.example.administrator.audioplayer.bean.CollectionInfo;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentHeaderItem;
 import com.example.administrator.audioplayer.db.RecentMusicDB;
+import com.example.administrator.audioplayer.db.SongCollectionDB;
 import com.example.administrator.audioplayer.fragment.MusicFragment;
 import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
+import com.example.administrator.audioplayer.modelImp.MusicModel;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -31,13 +34,14 @@ import rx.schedulers.Schedulers;
 public class MusicPresenter implements IMusicPresenter {
 
     private IMusicView view;
-
+    private IMusicModel model;
 
     private List allItems;
 
 
     public MusicPresenter(IMusicView view) {
         this.view = view;
+        model = new MusicModel();
     }
 
 
@@ -69,6 +73,7 @@ public class MusicPresenter implements IMusicPresenter {
                 int num_local_music = map.get("num_local_music") == null ? 0 : map.get("num_local_music");
                 int num_recent_music = map.get("num_recent_music") == null ? 0 : map.get("num_recent_music");
 
+                //初始化头部item数据
                 List<MusicFragmentHeaderItem> headerItemList = new ArrayList<>(
                         Arrays.asList(new MusicFragmentHeaderItem(R.drawable.music_icn_local, "本地播放", num_local_music),
                                 new MusicFragmentHeaderItem(R.drawable.music_icn_recent, "最近播放", num_recent_music),
@@ -76,14 +81,24 @@ public class MusicPresenter implements IMusicPresenter {
                                 //new MusicFragmentHeaderItem(R.drawable.music_icn_artist, "我的歌手", 0)));
 
 
-                final List<MusicFragmengSongCollectionItem> create_songCollectionItems = new ArrayList<>();
-                create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我喜欢的音乐", 0));
-                create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "粤语歌单", 0));
+                //final List<MusicFragmengSongCollectionItem> create_songCollectionItems = new ArrayList<>();
+                //create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我喜欢的音乐", 0));
+                //create_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "粤语歌单", 0));
 
-                final List<MusicFragmengSongCollectionItem> collect_songCollectionItems = new ArrayList<>();
-                collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我收藏的音乐", 0));
-                collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "英文歌", 0));
+                //final List<MusicFragmengSongCollectionItem> collect_songCollectionItems = new ArrayList<>();
+                //collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "我收藏的音乐", 0));
+                //collect_songCollectionItems.add(new MusicFragmengSongCollectionItem(R.drawable.cover_faveriate_songcollection, "英文歌", 0));
 
+                //获取创建的歌单列表
+                List<CollectionInfo> create_songCollectionItems = model.getCreateSongCollection();
+
+                //获取收藏的歌单列表
+                List<CollectionInfo> collect_songCollectionItems = model.getNetSongCollection();
+
+
+
+
+                //初始化扩展栏item数据
                 final List<MusicFragmentExpandItem> expandItemList = new ArrayList<>(
                         Arrays.asList(new MusicFragmentExpandItem(MusicFragmentExpandItem.TYPE_CREATE, "创建的歌单", create_songCollectionItems.size()),
                                 new MusicFragmentExpandItem(MusicFragmentExpandItem.TYPE_COLLECT, "收藏的歌单", collect_songCollectionItems.size())));
@@ -127,5 +142,43 @@ public class MusicPresenter implements IMusicPresenter {
                         .unsubscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(subscriber));
+    }
+
+
+    /**
+     * 创建新歌单
+     * @param name
+     * @return
+     */
+    @Override
+    public boolean createNewCollection(String name) {
+        if(SongCollectionDB.getInstance(MyApplication.getContext()).isExist(name)){
+            return false;
+        } else {
+            SongCollectionDB.getInstance(MyApplication.getContext()).addCreateSongCollection(1, name, 0, null);
+            return true;
+        }
+
+    }
+
+    /**
+     * 更新歌单信息
+     * @param id
+     * @param newName
+     * @return
+     */
+    @Override
+    public boolean updateCollection(int id, String newName) {
+        if(SongCollectionDB.getInstance(MyApplication.getContext()).isExist(newName)){
+            return false;
+        } else {
+            SongCollectionDB.getInstance(MyApplication.getContext()).updateCreateSongCollection(id, newName);
+            return true;
+        }
+    }
+
+    @Override
+    public void deleteCollection(long id) {
+        SongCollectionDB.getInstance(MyApplication.getContext()).deleteSongCollection(id);
     }
 }

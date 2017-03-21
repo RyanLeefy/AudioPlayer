@@ -43,7 +43,6 @@ import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
-import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.download.DownloadService;
 import com.example.administrator.audioplayer.http.HttpMethods;

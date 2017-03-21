@@ -213,7 +213,7 @@ public class RecentMusicDB {
                         MusicInfo.KEY_FAVORITE,
                         MusicInfo.KEY_LRC,
                         MusicInfo.KEY_ISLOCAL,
-                        MusicInfo.KEY_SORT,}, null, null, null, null, TIMEPLAYED + " DESC");
+                        MusicInfo.KEY_SORT}, null, null, null, null, TIMEPLAYED + " DESC");
         return cursor;
     }
     
@@ -240,7 +240,7 @@ public class RecentMusicDB {
                         MusicInfo.KEY_FAVORITE,
                         MusicInfo.KEY_LRC,
                         MusicInfo.KEY_ISLOCAL,
-                        MusicInfo.KEY_SORT,}, null, null, null, null, TIMEPLAYED + " DESC", limit);
+                        MusicInfo.KEY_SORT}, null, null, null, null, TIMEPLAYED + " DESC", limit);
         List<MusicInfo> list = new ArrayList<>();
         while(cursor != null && cursor.moveToNext()) {
             MusicInfo musicInfo = new MusicInfo();

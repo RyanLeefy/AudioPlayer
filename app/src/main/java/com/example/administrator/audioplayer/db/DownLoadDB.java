@@ -41,13 +41,13 @@ public class DownLoadDB {
     public void onCreate(final SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + DownLoadInfo.KEY_DOWNLOAD_ID + " TEXT NOT NULL PRIMARY KEY,"
-                + DownLoadInfo.KEY_TOTALSIZE + " INT NOT NULL,"
-                + DownLoadInfo.KEY_COMPLETEDSIZE + " INT NOT NULL, "
+                + DownLoadInfo.KEY_TOTALSIZE + " INTEGER NOT NULL,"
+                + DownLoadInfo.KEY_COMPLETEDSIZE + " INTEGER NOT NULL, "
                 + DownLoadInfo.KEY_URL + " TEXT NOT NULL,"
                 + DownLoadInfo.KEY_SAVEDIRPATH + " TEXT NOT NULL,"
                 + DownLoadInfo.KEY_FILENAME + " TEXT NOT NULL,"
                 + DownLoadInfo.KEY_ARTIST + " TEXT NOT NULL,"
-                + DownLoadInfo.KEY_DOWNLOADSTATUS + " INT NOT NULL);");
+                + DownLoadInfo.KEY_DOWNLOADSTATUS + " INTEGER NOT NULL);");
     }
 
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {

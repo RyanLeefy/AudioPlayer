@@ -6,6 +6,7 @@ package com.example.administrator.audioplayer.bean;
  * Created by on 2017/1/23.
  */
 
+/*
 public class MusicFragmengSongCollectionItem {
 
     private long id;   //暂无用，以后用于区分
@@ -56,4 +57,4 @@ public class MusicFragmengSongCollectionItem {
     }
 
 
-}
+}*/

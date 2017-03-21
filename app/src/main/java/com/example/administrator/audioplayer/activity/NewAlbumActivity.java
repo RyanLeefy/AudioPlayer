@@ -471,6 +471,9 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
+                                            if (popupWindow != null) {
+                                                popupWindow.dismiss();
+                                            }
                                         }
                                     })
                                     .show();

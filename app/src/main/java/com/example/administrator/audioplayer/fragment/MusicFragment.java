@@ -2,10 +2,12 @@ package com.example.administrator.audioplayer.fragment;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -23,14 +26,15 @@ import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Ipresenter.IMusicPresenter;
 import com.example.administrator.audioplayer.Iview.IMusicView;
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.DownActivity;
 import com.example.administrator.audioplayer.activity.LocalMusicActivity;
 import com.example.administrator.audioplayer.activity.RecentActivity;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
+import com.example.administrator.audioplayer.bean.CollectionInfo;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
-import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 import com.example.administrator.audioplayer.presenterImp.MusicPresenter;
 import com.example.administrator.audioplayer.utils.CommonUtils;
@@ -91,6 +95,7 @@ public class MusicFragment extends BaseFragment implements IMusicView {
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL_LIST));
 
+
         presenter = new MusicPresenter(this);
         presenter.onCreateView();
 
@@ -105,12 +110,11 @@ public class MusicFragment extends BaseFragment implements IMusicView {
     }
 
 
-
     @Override
     public void setAdapter(final SongListAdapter adapter,
                            final List allItems,
-                           final List<MusicFragmengSongCollectionItem> create_songCollectionItems,
-                           final List<MusicFragmengSongCollectionItem> collect_songCollectionItems,
+                           final List<CollectionInfo> create_songCollectionItems,
+                           final List<CollectionInfo> collect_songCollectionItems,
                            final List<MusicFragmentExpandItem> expandItemList) {
 
         //给headeritem添加点击事件
@@ -121,22 +125,18 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                     case 0:
                         //跳转到LocalMusicActivity
                         LocalMusicActivity.startActivity(mContext);
-                        Toast.makeText(mContext, "本地播放", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
                         //跳转到RecentActivity
                         RecentActivity.startActivity(mContext);
-                        Toast.makeText(mContext, "最近播放", Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
                         //跳转到DownActivity
                         DownActivity.startActivity(mContext);
-                        Toast.makeText(mContext, "下载管理", Toast.LENGTH_SHORT).show();
                         break;
-                    case 3:
-                        //跳转到MyArtistActivity
-                        Toast.makeText(mContext, "我的歌手", Toast.LENGTH_SHORT).show();
-                        break;
+                    //case 3:
+                    //跳转到MyArtistActivity
+                    //break;
                 }
             }
         });
@@ -145,7 +145,7 @@ public class MusicFragment extends BaseFragment implements IMusicView {
             @Override
             public void onItemClick(RecyclerView.ViewHolder holder, int position) {
 
-                SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag)holder;
+                SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag) holder;
                 ObjectAnimator anim = ObjectAnimator.ofFloat(itemViewTag.arrow, "rotation", 90, 0);
                 anim.setDuration(100);
                 anim.setRepeatCount(0);
@@ -166,7 +166,7 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                         //这里要分情况，分收藏的歌单是否打开
                         //若打开了，则要先去掉收藏的歌单，最后再添加上  否则不用处理收藏的歌单
                         //这里根据本地的collectExpanded变量来进行判断，因为无法获取到下一个expanditem里面的collectExpanded状态
-                        if(collectExpanded) {
+                        if (collectExpanded) {
                             allItems.removeAll(collect_songCollectionItems);
                             allItems.remove(expandItemList.get(1));
                             allItems.addAll(create_songCollectionItems);
@@ -222,8 +222,40 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         //点击创建新歌单
-                        if(position == 0) {
-                            Toast.makeText(mContext, "创建新歌单", Toast.LENGTH_SHORT).show();
+                        if (position == 0) {
+                            if (popupWindow != null) {
+                                popupWindow.dismiss();
+                            }
+                            //创建新歌单的弹框视图
+                            View newCollection_dialogView = mInflater.inflate(R.layout.layout_create_new_collection, null, false);
+                            final EditText editText = (EditText) newCollection_dialogView.findViewById(R.id.et_collection_name);
+                            //弹出新建歌单窗口
+                            new AlertDialog.Builder(mContext).setTitle("创建新歌单")
+                                    .setView(newCollection_dialogView)
+                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (editText.getText().toString().length() == 0) {
+                                                Toast.makeText(mContext, "歌单名不能为空", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                //创建歌单，插入数据库
+                                                if (presenter.createNewCollection(editText.getText().toString())) {
+                                                    Toast.makeText(mContext, "创建成功", Toast.LENGTH_SHORT).show();
+                                                    //刷新页面
+                                                    presenter.onCreateView();
+                                                } else {
+                                                    Toast.makeText(mContext, "已有同名歌单，创建失败", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).show();
+
                         }
                     }
                 });
@@ -236,42 +268,146 @@ public class MusicFragment extends BaseFragment implements IMusicView {
             @Override
             public void onItemClick(View view, int position) {
                 //跳转到歌单里面
-                MusicFragmengSongCollectionItem songCollectionItem = (MusicFragmengSongCollectionItem)allItems.get(position);
-                Toast.makeText(mContext, "进入歌单:" + songCollectionItem.getName(),Toast.LENGTH_SHORT).show();
+                CollectionInfo songCollectionItem = (CollectionInfo) allItems.get(position);
             }
+
             @Override
-            public void onMoreClick(View view, final int position){
+            public void onMoreClick(View view, final int position) {
                 LinearLayout layout = (LinearLayout) mInflater.inflate(R.layout.popupwindow_menu_songlistmore, null);
 
                 TextView popuptitle = (TextView) layout.findViewById(R.id.tv_title_popupwindow);
                 ListView popuplistview = (ListView) layout.findViewById(R.id.ls_songlistmore_popupwindow);
 
                 //添加弹窗菜单数据源
-                MusicFragmengSongCollectionItem create_songCollectionItems = (MusicFragmengSongCollectionItem) allItems.get(position);
-                popuptitle.setText("歌单:  " + create_songCollectionItems.getName());
-                PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(mContext,
-                        Arrays.asList( new LeftMenuItem(R.drawable.popupwindow_menu_delete, "删除"),
-                                new LeftMenuItem(R.drawable.popupwindow_menu_manage, "编辑歌单信息")));
-                popuplistview.setAdapter(adapter);
+                final CollectionInfo songCollectionItems = (CollectionInfo) allItems.get(position);
+                popuptitle.setText("歌单:  " + songCollectionItems.getCollectionName());
+                //如果是我喜欢的音乐，则没有删除
+                PopUpWindowMenuAdapter popupwindowadapter = null;
+                if (songCollectionItems.getType() == 0) {
+                    popupwindowadapter = new PopUpWindowMenuAdapter(mContext,
+                            Arrays.asList(new LeftMenuItem(R.drawable.popupwindow_menu_manage, "编辑歌单信息")));
+                } else {
+                    popupwindowadapter = new PopUpWindowMenuAdapter(mContext,
+                            Arrays.asList(new LeftMenuItem(R.drawable.popupwindow_menu_delete, "删除"),
+                                    new LeftMenuItem(R.drawable.popupwindow_menu_manage, "编辑歌单信息")));
+                }
+
+                popuplistview.setAdapter(popupwindowadapter);
                 //添加弹窗菜单点击事件
                 popuplistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View childview, int childposition, long id) {
-                        //点击创建新歌单
-                        MusicFragmengSongCollectionItem songCollectionItem = (MusicFragmengSongCollectionItem)allItems.get(position);
-                        if(childposition == 0) {
-                            Toast.makeText(mContext, "删除:" + songCollectionItem.getName(), Toast.LENGTH_SHORT).show();
-                            if (popupWindow != null) {
-                                popupWindow.dismiss();
+                        //弹出编辑歌单
+                        //如果是我喜欢的音乐，则没有删除点击事件,只有修改歌单信息
+                        if (songCollectionItems.getType() == 0) {
+
+                            if (childposition == 0) {
+                                if (popupWindow != null) {
+                                    popupWindow.dismiss();
+                                }
+                                //创建修改歌单弹框视图
+                                View updateCollection_alertView = mInflater.inflate(R.layout.layout_update_collection_info, null, false);
+                                final EditText editText2 = (EditText) updateCollection_alertView.findViewById(R.id.et_collection_name);
+                                //设置输入框初始文字为原始歌单名，并把光标移到最后
+                                editText2.setText(songCollectionItems.getCollectionName());
+                                editText2.setSelection(songCollectionItems.getCollectionName().length());
+                                //弹出修改歌单窗口
+                                new AlertDialog.Builder(mContext).setTitle("修改歌单信息")
+                                        .setView(updateCollection_alertView)
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                if (editText2.getText().toString().length() == 0) {
+                                                    Toast.makeText(mContext, "歌单名不能为空", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    //修改歌单，更新数据库
+                                                    if (presenter.updateCollection(songCollectionItems.getId(), editText2.getText().toString())) {
+                                                        Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT).show();
+                                                        //刷新页面
+                                                        presenter.onCreateView();
+                                                    } else {
+                                                        Toast.makeText(mContext, "已有同名歌单，修改失败", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }).show();
                             }
-                        } else if (childposition == 1) {
-                            Toast.makeText(mContext, "编辑歌单信息:" + songCollectionItem.getName(), Toast.LENGTH_SHORT).show();
-                            if (popupWindow != null) {
-                                popupWindow.dismiss();
+
+                        } else {
+
+                            if (childposition == 0) {
+                                if (popupWindow != null) {
+                                    popupWindow.dismiss();
+                                }
+                                //弹框是否删除
+                                new AlertDialog.Builder(mContext).setTitle("确定删除 " + songCollectionItems.getCollectionName() + " 吗？")
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                presenter.deleteCollection(songCollectionItems.getId());
+                                                Toast.makeText(mContext, "删除成功", Toast.LENGTH_SHORT).show();
+                                                //刷新页面
+                                                presenter.onCreateView();
+                                            }
+                                        })
+                                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }).show();
+
+
+                            } else if (childposition == 1) {
+                                if (popupWindow != null) {
+                                    popupWindow.dismiss();
+                                }
+                                //创建修改歌单弹框视图
+                                View updateCollection_alertView = mInflater.inflate(R.layout.layout_update_collection_info, null, false);
+                                final EditText editText2 = (EditText) updateCollection_alertView.findViewById(R.id.et_collection_name);
+                                //设置输入框初始文字为原始歌单名，并把光标移到最后
+                                editText2.setText(songCollectionItems.getCollectionName());
+                                editText2.setSelection(songCollectionItems.getCollectionName().length());
+                                //弹出修改歌单窗口
+                                new AlertDialog.Builder(mContext).setTitle("修改歌单信息")
+                                        .setView(updateCollection_alertView)
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                if (editText2.getText().toString().length() == 0) {
+                                                    Toast.makeText(mContext, "歌单名不能为空", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    //修改歌单，更新数据库
+                                                    if (presenter.updateCollection(songCollectionItems.getId(), editText2.getText().toString())) {
+                                                        Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT).show();
+                                                        //刷新页面
+                                                        presenter.onCreateView();
+                                                    } else {
+                                                        Toast.makeText(mContext, "已有同名歌单，修改失败", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }).show();
                             }
                         }
+
                     }
+
                 });
+
+
                 //初始化并弹出popupWindow
                 popupWindow = CommonUtils.ShowPopUpWindow(getActivity(), popupWindow, view, layout);
             }

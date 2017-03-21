@@ -1,7 +1,8 @@
 package com.example.administrator.audioplayer.Iview;
 
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
-import com.example.administrator.audioplayer.bean.MusicFragmengSongCollectionItem;
+import com.example.administrator.audioplayer.bean.CollectionInfo;
+
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface IMusicView {
     void setAdapter( SongListAdapter adapter,
                             List allItems,
-                            List<MusicFragmengSongCollectionItem> create_songCollectionItems,
-                            List<MusicFragmengSongCollectionItem> collect_songCollectionItems,
+                            List<CollectionInfo> create_songCollectionItems,
+                            List<CollectionInfo> collect_songCollectionItems,
                             List<MusicFragmentExpandItem> expandItemList);
 }
