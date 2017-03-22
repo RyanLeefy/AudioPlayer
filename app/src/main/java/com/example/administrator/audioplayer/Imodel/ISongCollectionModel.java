@@ -10,4 +10,5 @@ import rx.Observable;
 
 public interface ISongCollectionModel {
     Observable<SongCollectionInfo> getSongCollectionInfo(String listid);
+    boolean collect(String title, int SongCount, String pic, String songListId, String tag, String songCollectionCount);
 }

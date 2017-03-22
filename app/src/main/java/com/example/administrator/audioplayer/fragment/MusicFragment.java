@@ -28,9 +28,12 @@ import com.example.administrator.audioplayer.Ipresenter.IMusicPresenter;
 import com.example.administrator.audioplayer.Iview.IMusicView;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
+import com.example.administrator.audioplayer.activity.CreatedCollectionActivity;
 import com.example.administrator.audioplayer.activity.DownActivity;
 import com.example.administrator.audioplayer.activity.LocalMusicActivity;
+import com.example.administrator.audioplayer.activity.NewAlbumActivity;
 import com.example.administrator.audioplayer.activity.RecentActivity;
+import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.bean.CollectionInfo;
@@ -269,6 +272,45 @@ public class MusicFragment extends BaseFragment implements IMusicView {
             public void onItemClick(View view, int position) {
                 //跳转到歌单里面
                 CollectionInfo songCollectionItem = (CollectionInfo) allItems.get(position);
+                switch (songCollectionItem.getType()) {
+                    //我喜欢的音乐
+                    case 0:
+                        CreatedCollectionActivity.startActivity(
+                                MyApplication.getContext(),
+                                songCollectionItem.getId(),
+                                songCollectionItem.getAlbumArt(),
+                                songCollectionItem.getCollectionName());
+                        break;
+                    //其他自建歌单
+                    case 1:
+                        CreatedCollectionActivity.startActivity(
+                                getActivity(),
+                                songCollectionItem.getId(),
+                                songCollectionItem.getAlbumArt(),
+                                songCollectionItem.getCollectionName());
+                        break;
+                    //收藏的网络歌单
+                    case 2:
+                        SongCollectionActivity.startActivity(
+                                getActivity(),
+                                false,
+                                String.valueOf(songCollectionItem.getListId()),
+                                songCollectionItem.getAlbumArt(),
+                                songCollectionItem.getListenCount(),
+                                songCollectionItem.getCollectionName(),
+                                songCollectionItem.getCollectionTag());
+                        break;
+                    //收藏的网络专辑
+                    case 3:
+                        NewAlbumActivity.startActivity(
+                                getActivity(),
+                                String.valueOf(songCollectionItem.getListId()),
+                                songCollectionItem.getAlbumArt(),
+                                songCollectionItem.getCollectionName(),
+                                songCollectionItem.getAuthor(),
+                                songCollectionItem.getPublishTime());
+                        break;
+                }
             }
 
             @Override
@@ -281,15 +323,19 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                 //添加弹窗菜单数据源
                 final CollectionInfo songCollectionItems = (CollectionInfo) allItems.get(position);
                 popuptitle.setText("歌单:  " + songCollectionItems.getCollectionName());
-                //如果是我喜欢的音乐，则没有删除
+
+                //如果是我喜欢的音乐，则没有删除,如果是其他自创建的则有删除也有修改，若是网络的则只有删除
                 PopUpWindowMenuAdapter popupwindowadapter = null;
                 if (songCollectionItems.getType() == 0) {
                     popupwindowadapter = new PopUpWindowMenuAdapter(mContext,
                             Arrays.asList(new LeftMenuItem(R.drawable.popupwindow_menu_manage, "编辑歌单信息")));
-                } else {
+                } else if(songCollectionItems.getType() == 1) {
                     popupwindowadapter = new PopUpWindowMenuAdapter(mContext,
                             Arrays.asList(new LeftMenuItem(R.drawable.popupwindow_menu_delete, "删除"),
                                     new LeftMenuItem(R.drawable.popupwindow_menu_manage, "编辑歌单信息")));
+                } else {
+                    popupwindowadapter = new PopUpWindowMenuAdapter(mContext,
+                            Arrays.asList(new LeftMenuItem(R.drawable.popupwindow_menu_delete, "删除")));
                 }
 
                 popuplistview.setAdapter(popupwindowadapter);
@@ -340,7 +386,7 @@ public class MusicFragment extends BaseFragment implements IMusicView {
                             }
 
                         } else {
-
+                            //如果是其他自建歌单，则有删除点击事件,也有修改歌单信息
                             if (childposition == 0) {
                                 if (popupWindow != null) {
                                     popupWindow.dismiss();

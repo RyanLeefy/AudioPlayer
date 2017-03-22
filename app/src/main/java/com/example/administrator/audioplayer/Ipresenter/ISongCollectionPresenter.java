@@ -9,4 +9,5 @@ public interface ISongCollectionPresenter {
     void performDownLoadAllClick();
     void performDownLoadMusicClick(int position);
     void peformMusicClick(int position);
+    boolean peformCollect(String title, int SongCount, String pic, String songListId, String tag, String songCollectionCount);
 }

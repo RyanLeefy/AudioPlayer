@@ -709,7 +709,7 @@ public class MediaService extends Service {
 
     private void stop(final boolean goToIdle) {
         if (D) Log.d(TAG, "Stopping playback, goToIdle = " + goToIdle);
-        if (mPlayer.isInitialized()) {
+        if (mPlayer.isTrackPrepared()) {
             mPlayer.stop();
         }
         mFileToPlay = null;
@@ -915,7 +915,7 @@ public class MediaService extends Service {
                     if (url != null) {
                         PrintLog.e(TAG, "current url = " + url);
                     } else {
-                        gotoNext(true);
+                        //gotoNext(true);
                     }
                     if (!stop) {
                         mPlayer.setDataSource(url);
@@ -1125,9 +1125,11 @@ public class MediaService extends Service {
                     notifyChange(PLAYSTATE_CHANGED);
                     Logger.d("openCurrentAndMaybeNext");
                 }
-            } else if (openNext) {
-                setNextTrack();
             }
+            /*
+            else if (openNext) {
+                setNextTrack();
+            }*/
         }
     }
 
@@ -2213,7 +2215,8 @@ public class MediaService extends Service {
     }
 
     public void play() {
-        play(true);
+        //play(true);
+        play(false);
     }
 
     /**
@@ -2239,11 +2242,11 @@ public class MediaService extends Service {
         //        MediaButtonIntentReceiver.class.getName()));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             mSession.setActive(true);
-        if (createNewNextTrack) {
-            setNextTrack();
-        } else {
-            setNextTrack(mNextPlayPos);
-        }
+        //if (createNewNextTrack) {
+        //    setNextTrack();
+        //} else {
+            setNextTrack(getNextPosition(true));
+        //}
         if (mPlayer.isTrackPrepared()) {
             final long duration = mPlayer.duration();
             if (mRepeatMode != REPEAT_CURRENT && duration > 2000
@@ -2568,13 +2571,14 @@ public class MediaService extends Service {
             try {
                 mCurrentMediaPlayer.setNextMediaPlayer(null);
             } catch (IllegalArgumentException e) {
+                Logger.e(e.toString());
                 Log.i(TAG, "Next media player is current one, continuing");
             } catch (IllegalStateException e) {
                 Log.e(TAG, "Media player not initialized!");
                 return;
             }
             if (mNextMediaPlayer != null) {
-                mNextMediaPlayer.release();
+                mNextMediaPlayer.reset();
                 mNextMediaPlayer = null;
             }
             if (path == null) {
@@ -2588,12 +2592,17 @@ public class MediaService extends Service {
 
             if (setNextDataSourceImpl(mNextMediaPlayer, path)) {
                 mNextMediaPath = path;
-                mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
+                try {
+                    mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
+                } catch (IllegalArgumentException e) {
+                    Logger.e(e.toString());
+                }
+
                 // mHandler.post(setNextMediaPlayerIfPrepared);
 
             } else {
                 if (mNextMediaPlayer != null) {
-                    mNextMediaPlayer.release();
+                    mNextMediaPlayer.reset();
                     mNextMediaPlayer = null;
                 }
             }
@@ -2648,6 +2657,7 @@ public class MediaService extends Service {
          * @return
          */
         private boolean setNextDataSourceImpl(MediaPlayer player, String path) {
+            mIsTrackNet = false;
             mIsNextInitialized = false;
             mIsNextTrackPrepared = false;
 
@@ -2853,7 +2863,7 @@ public class MediaService extends Service {
             Logger.d(TAG, "completion");
             //若是当前播放器结束且有下一播放器，则切换到下一播放器
             if (mp == mCurrentMediaPlayer && mNextMediaPlayer != null) {
-                mCurrentMediaPlayer.release();
+                mCurrentMediaPlayer.reset();
                 mCurrentMediaPlayer = mNextMediaPlayer;
                 mNextMediaPath = null;
                 mNextMediaPlayer = null;

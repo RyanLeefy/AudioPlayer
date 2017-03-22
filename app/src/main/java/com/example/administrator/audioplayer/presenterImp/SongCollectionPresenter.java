@@ -365,4 +365,20 @@ public class SongCollectionPresenter implements ISongCollectionPresenter {
         }
     }
 
+    /**
+     * 收藏歌单或取消收藏
+     * @param title
+     * @param SongCount
+     * @param pic
+     * @param songListId
+     * @param tag
+     * @param listenCount
+     */
+    @Override
+    public boolean peformCollect(String title, int SongCount, String pic, String songListId, String tag, String listenCount) {
+        return model.collect(title, SongCount, pic, songListId, tag, listenCount);
+    }
+
+
+
 }

@@ -30,6 +30,8 @@ public class SongCollectionDB {
     public static final String SONG_COUNT = "count";
     //歌单标签（收藏的是其他歌单中有）
     public static final String SONGCOLLECTION_TAG = "songcollection_tag";
+    //收听人数（收藏的是其他歌单中有）
+    public static final String SONGCOLLECTION_LISTEN_COUNT = "songcollection_listen_count";
     //歌单封面
     public static final String ALBUM_ART = "album_art";
     //歌手（收藏的是新专辑中有）
@@ -57,10 +59,11 @@ public class SongCollectionDB {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + SONGCOLLECTION_ID + " INTEGER NOT NULL PRIMARY KEY autoincrement, "
                 + SONGCOLLECTION_TYPE + " INTEGER NOT NULL, "
-                + SONGCOLLECTION_LISTID + "LONG, "
+                + SONGCOLLECTION_LISTID + " VARCHAR, "
                 + SONGCOLLECTION_NAME + " VARCHAR NOT NULL, "
                 + SONG_COUNT + " INTEGER NOT NULL, "
-                + SONGCOLLECTION_TAG + "VARCHAR, "
+                + SONGCOLLECTION_TAG + " VARCHAR,"
+                + SONGCOLLECTION_LISTEN_COUNT + " VARCHAR, "
                 + ALBUM_ART + " VARCHAR, "
                 + AUTHOR + " VARCHAR, "
                 + PUBLISH_TIME + " VARCHAR "
@@ -93,7 +96,7 @@ public class SongCollectionDB {
                                                      String albumart) {
         database.beginTransaction();
         try {
-            ContentValues values = new ContentValues(9);
+            ContentValues values = new ContentValues(4);
             values.put(SONGCOLLECTION_TYPE, type);
             values.put(SONGCOLLECTION_NAME, name);
             values.put(SONG_COUNT, count);
@@ -118,27 +121,33 @@ public class SongCollectionDB {
                 new String[]{name}, null, null, null);
 
         if(cursor.getCount() == 0) {
+            cursor.close();
             return false;
         } else {
+            cursor.close();
             return true;
         }
     }
 
     /**
-     * 判断收藏的歌单是否已经收藏
+     * 判断收藏的歌单是否已经收藏,不存在返回-1，存在返回其id
      * @return  false:不存在   true:存在
      */
-    public synchronized boolean isCollected(String list_id) {
+    public synchronized int isCollected(String list_id) {
         SQLiteDatabase database = mMusicDatabase.getReadableDatabase();
-        Cursor cursor = database.query(TABLE_NAME, null,
-                    "(songcollection_type = 2 or songcollection_type = 3) and songcollection_listid = ?",
+        Cursor cursor = database.query(TABLE_NAME, new String[]{SONGCOLLECTION_ID},
+                "(songcollection_type = 2 or songcollection_type = 3) and songcollection_listid = ?",
                     new String[]{list_id}, null, null, null);
 
 
         if(cursor.getCount() == 0) {
-            return false;
+            cursor.close();
+            return -1;
         } else {
-            return true;
+            cursor.moveToFirst();
+            int result = cursor.getInt(cursor.getColumnIndex(SONGCOLLECTION_ID));
+            cursor.close();
+            return result;
         }
     }
 
@@ -188,10 +197,11 @@ public class SongCollectionDB {
             CollectionInfo collectionInfo = new CollectionInfo();
             collectionInfo.setId(cursor.getInt(cursor.getColumnIndex(SONGCOLLECTION_ID)));
             collectionInfo.setType(cursor.getInt(cursor.getColumnIndex(SONGCOLLECTION_TYPE)));
-            collectionInfo.setListId(cursor.getLong(cursor.getColumnIndex(SONGCOLLECTION_LISTID)));
+            collectionInfo.setListId(Long.parseLong(cursor.getString(cursor.getColumnIndex(SONGCOLLECTION_LISTID))));
             collectionInfo.setCollectionName(cursor.getString(cursor.getColumnIndex(SONGCOLLECTION_NAME)));
             collectionInfo.setSongCount(cursor.getInt(cursor.getColumnIndex(SONG_COUNT)));
             collectionInfo.setCollectionTag(cursor.getString(cursor.getColumnIndex(SONGCOLLECTION_TAG)));
+            collectionInfo.setListenCount(cursor.getString(cursor.getColumnIndex(SONGCOLLECTION_LISTEN_COUNT)));
             collectionInfo.setAlbumArt(cursor.getString(cursor.getColumnIndex(ALBUM_ART)));
             collectionInfo.setAuthor(cursor.getString(cursor.getColumnIndex(AUTHOR)));
             collectionInfo.setPublishTime(cursor.getString(cursor.getColumnIndex(PUBLISH_TIME)));
@@ -210,7 +220,6 @@ public class SongCollectionDB {
 
 
 
-
     /**
      * 添加自创建歌单
      * @param type
@@ -223,7 +232,7 @@ public class SongCollectionDB {
         final SQLiteDatabase database = mMusicDatabase.getWritableDatabase();
         database.beginTransaction();
         try {
-            ContentValues values = new ContentValues(9);
+            ContentValues values = new ContentValues(4);
             values.put(SONGCOLLECTION_TYPE, type);
             values.put(SONGCOLLECTION_NAME, name);
             values.put(SONG_COUNT, count);
@@ -248,17 +257,18 @@ public class SongCollectionDB {
      * @param tag
      */
     public synchronized void addNetSongCollection(int type, long listid, String name,
-                                                  int count, String albumart, String tag) {
+                                                  int count, String albumart, String tag, String songCollectionCount) {
         final SQLiteDatabase database = mMusicDatabase.getWritableDatabase();
         database.beginTransaction();
         try {
-            ContentValues values = new ContentValues(9);
+            ContentValues values = new ContentValues(7);
             values.put(SONGCOLLECTION_TYPE, type);
             values.put(SONGCOLLECTION_LISTID, listid);
             values.put(SONGCOLLECTION_NAME, name);
             values.put(SONG_COUNT, count);
             values.put(ALBUM_ART, albumart);
             values.put(SONGCOLLECTION_TAG, tag);
+            values.put(SONGCOLLECTION_LISTEN_COUNT, songCollectionCount);
 
             database.insert(TABLE_NAME, null, values);
             database.setTransactionSuccessful();
@@ -284,7 +294,7 @@ public class SongCollectionDB {
         final SQLiteDatabase database = mMusicDatabase.getWritableDatabase();
         database.beginTransaction();
         try {
-            ContentValues values = new ContentValues(9);
+            ContentValues values = new ContentValues(7);
             values.put(SONGCOLLECTION_TYPE, type);
             values.put(SONGCOLLECTION_LISTID, albumid);
             values.put(SONGCOLLECTION_NAME, name);
@@ -321,14 +331,18 @@ public class SongCollectionDB {
 
 
     /**
-     * 删除创建的歌单或收藏的歌单
+     * 删除创建的歌单或收藏的歌单，先删除歌单，然后删除歌单歌曲数据库里面相关歌曲
      * @param id
      */
-    public synchronized void deleteSongCollection(long id) {
+    public synchronized void deleteSongCollection(int id) {
         SQLiteDatabase database = mMusicDatabase.getWritableDatabase();
         database.beginTransaction();
         try {
-            database.delete(TABLE_NAME, SONGCOLLECTION_ID + " = " + id, null);
+            //删除歌单
+            database.delete(TABLE_NAME, SONGCOLLECTION_ID + " = ?", new String[]{String.valueOf(id)});
+            //删除歌曲
+            database.delete("songcollectionsong", SONGCOLLECTION_ID + " = ?", new String[]{String.valueOf(id)});
+
             database.setTransactionSuccessful();
         } finally {
             database.endTransaction();

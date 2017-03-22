@@ -64,7 +64,7 @@ public class PlayQueueFragment extends DialogFragment implements IPlayQueueView,
 
         View view = inflater.inflate(R.layout.fragment_playqueue, container);
 
-        mCollect = (TextView) view.findViewById(R.id.playlist_addto);
+        //mCollect = (TextView) view.findViewById(R.id.playlist_addto);
         mTitle = (TextView) view.findViewById(R.id.play_list_number);
         mClear = (TextView) view.findViewById(R.id.playlist_clear_all);
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,8 +31,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.administrator.audioplayer.Ipresenter.INewAlbumPresenter;
-import com.example.administrator.audioplayer.Iview.INewAlbumView;
+import com.example.administrator.audioplayer.Ipresenter.ICreatedCollectionPresenter;
+import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
+import com.example.administrator.audioplayer.Iview.ICreatedCollectionView;
+import com.example.administrator.audioplayer.Iview.ISongCollectionView;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
@@ -38,8 +42,8 @@ import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.db.SongCollectionDB;
-import com.example.administrator.audioplayer.fragment.ChooseCollectionFragment;
-import com.example.administrator.audioplayer.presenterImp.NewAlbumPresenter;
+import com.example.administrator.audioplayer.presenterImp.CreatedCollectionPresenter;
+import com.example.administrator.audioplayer.presenterImp.SongCollectionPresenter;
 import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.ImageUtils;
@@ -59,11 +63,8 @@ import com.nineoldandroids.view.ViewHelper;
 import java.io.File;
 import java.util.Arrays;
 
-/**
- * Created by on 2017/2/23 0023.
- */
 
-public class NewAlbumActivity extends BaseActivity implements ObservableScrollViewCallbacks,INewAlbumView {
+public class CreatedCollectionActivity extends BaseActivity implements ObservableScrollViewCallbacks,ICreatedCollectionView {
 
     //状态栏高度
     private int mStatusSize;
@@ -76,20 +77,15 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
     private ActionBar actionbar;
     private ObserableRecyclerViewWithEmptyView recyclerView;
     //头部框
-    private FrameLayout newalbum_header;
+    private FrameLayout songcollection_header;
     //头部内容框
-    private RelativeLayout newalbum_header_detail;
+    private RelativeLayout songcollection_header_detail;
     //headerView的背景图片
     private ImageView albumart;
-    //专辑封面图片
+    //歌单封面图片
     private SimpleDraweeView photo;
-    //专辑名
-    private TextView newAlbum_title;
-    //歌手名
-    private TextView newAlbum_author;
-    //发布时间
-    private TextView newAlbum_publishtime;
-    
+    //歌单名
+    private TextView songCollection_title;
     //三个框，收藏框，分享框，下载框（暂没有评论）
     private LinearLayout collection_layout, share_layout, dowm_layout;
     //收藏textView，显示是否已经收藏
@@ -107,43 +103,32 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
 
     private MusicAdapter adapter;
 
-    private INewAlbumPresenter presenter;
-
+    private ICreatedCollectionPresenter presenter;
 
     //创建activity时需要传入的数据
-    //专辑id
-    private String albumid;
+    //歌单在数据库中的id
+    private int id;
     //图片地址
     private String pic;
-    //专辑名
+    //歌单名
     private String title;
-    //歌手名
-    private String author;
-    //发布时间
-    private String publishtime;
+
 
 
     /**
      * 创建Activity，要传入需要的数据
      * @param context
-     * @param albumid
      * @param pic
      * @param title
-     * @param author
-     * @param publishtime
      */
-    public static void startActivity(Context context, String albumid, String pic,
-                                     String title, String author, String publishtime) {
-        Intent intent = new Intent(context, NewAlbumActivity.class);
-        intent.putExtra("albumid", albumid);
+    public static void startActivity(Context context, int id, String pic, String title) {
+        Intent intent = new Intent(context, CreatedCollectionActivity.class);
+        intent.putExtra("id", id);
         intent.putExtra("pic", pic);
         intent.putExtra("title", title);
-        intent.putExtra("author", author);
-        intent.putExtra("publishtime", publishtime);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
-
 
     /**
      * 重写该方法，当歌曲进行变换的时候刷新界面
@@ -155,7 +140,6 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,7 +148,7 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         //把Activity放入ActivityManager中进行管理，方便一键退出所有
         ActivityManager.getInstance().pushOneActivity(this);
 
-        setContentView(R.layout.activity_new_album);
+        setContentView(R.layout.activity_created_collection);
 
         mInflater = LayoutInflater.from(this);
 
@@ -173,34 +157,29 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
 
         //读取传入的数据
         if(getIntent().getExtras() != null) {
-            albumid = getIntent().getStringExtra("albumid");
+            id = getIntent().getIntExtra("id", -1);
             pic = getIntent().getStringExtra("pic");
             title = getIntent().getStringExtra("title");
-            author = getIntent().getStringExtra("author");
-            publishtime = getIntent().getStringExtra("publishtime");
         }
 
-        toolbar = (Toolbar) findViewById(R.id.tb_newalbum);
+        toolbar = (Toolbar) findViewById(R.id.tb_songcollection);
 
-        newalbum_header = (FrameLayout) findViewById(R.id.fl_newalbum_header);
-        newalbum_header_detail = (RelativeLayout) findViewById(R.id.rl_newalbum_header_detail);
+        songcollection_header = (FrameLayout) findViewById(R.id.fl_songcollection_header);
+        songcollection_header_detail = (RelativeLayout) findViewById(R.id.rl_songcollection_header_detail);
 
         albumart = (ImageView) findViewById(R.id.img_album_art);
-        
-        photo = (SimpleDraweeView) findViewById(R.id.sdv_newalbum_photo);
 
-        newAlbum_title = (TextView) findViewById(R.id.tv_newalbum_title);
-        newAlbum_author = (TextView) findViewById(R.id.tv_newalbum_author);
-        newAlbum_publishtime = (TextView) findViewById(R.id.tv_newalbum_publistime);
+        photo = (SimpleDraweeView) findViewById(R.id.sdv_songcollection_photo);
 
+        songCollection_title = (TextView) findViewById(R.id.tv_songcollection_title);
 
-        collection_layout = (LinearLayout) findViewById(R.id.ll_newalbum_collect);
-        //share_layout = (LinearLayout) findViewById(R.id.ll_newalbum_share);
-        dowm_layout = (LinearLayout) findViewById(R.id.ll_newalbum_down);
+        collection_layout = (LinearLayout) findViewById(R.id.ll_songcollection_collect);
+        //share_layout = (LinearLayout) findViewById(R.id.ll_songcollection_share);
+        dowm_layout = (LinearLayout) findViewById(R.id.ll_songcollection_down);
 
-        collection_text = (TextView) findViewById(R.id.tv_newalbum_collect_state);
+        collection_text = (TextView) findViewById(R.id.tv_songcollection_collect_state);
 
-        recyclerView = (ObserableRecyclerViewWithEmptyView) findViewById(R.id.orv_newalbum);
+        recyclerView = (ObserableRecyclerViewWithEmptyView) findViewById(R.id.orv_songcollection);
         recyclerView.setScrollViewCallbacks(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
@@ -219,7 +198,7 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
             public void onClick(View widget) {
                 loadingView.setVisibility(View.VISIBLE);
                 try_again.setVisibility(View.INVISIBLE);
-                presenter.onCreate(albumid);
+                presenter.onCreate(id);
             }
         }, 8, 10, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         try_again = (TextView) findViewById(R.id.tv_try_again);
@@ -231,15 +210,17 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         mFlexibleSpaceImageHeight = getResources().getDimensionPixelSize(R.dimen.FlexibleSpaceImageHeight);
 
         setToolbar();
-        setHeaderBlurBackground();
+        if(pic != null && pic.length() != 0) {
+            setHeaderBlurBackground();
+        }
         setHeaderView();
-        setHeaderViewListener();
-        setCollection();
 
-        presenter = new NewAlbumPresenter(this);
-        presenter.onCreate(albumid);
+
+        presenter = new CreatedCollectionPresenter(this);
+        presenter.onCreate(id);
 
     }
+
 
     /**
      * 在窗口加载完之后，加载动画才可以运行
@@ -258,7 +239,7 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
      * 初始化toolbar，设置paddingTop
      */
     private void setToolbar() {
-        toolbar.setTitle("专辑");
+        toolbar.setTitle("歌单");
         //计算状态栏的高度，然后给toolbar设置paddingTop
         mStatusSize = CommonUtils.getStatusHeight(this);
         toolbar.setPadding(0, mStatusSize, 0, 0);
@@ -295,95 +276,26 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
 
 
     /**
-     * 初始化头部的视图，专辑名，专辑图片，专辑收听人数，专辑详情
+     * 初始化头部的视图，歌单名，歌单图片，歌单收听人数，歌单详情
      */
     public void setHeaderView() {
-        
-        //若有专辑图片，则设置图片
+        //若有歌单图片，则设置图片
         if(pic != null) {
             photo.setImageURI(Uri.parse(pic));
         }
 
-        newAlbum_title.setText(title);
-        newAlbum_author.setText("歌手：" + author);
-        newAlbum_publishtime.setText("发布时间：" + publishtime);
-        
+        songCollection_title.setText(title);
     }
 
 
-    /**
-     * 初始化头部的监听事件，收藏，分享，评论，下载
-     */
-    public void setHeaderViewListener() {
-
-        //收藏按钮监听
-        collection_layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(presenter.peformCollect(albumid, title, adapter.getList().size(), pic, author, publishtime)) {
-                    //收藏
-                    //文字变已收藏
-                    collection_text.setText("已收藏");
-                    Toast.makeText(NewAlbumActivity.this, "收藏成功", Toast.LENGTH_SHORT).show();
-                } else {
-                    //取消收藏
-                    //文字变收藏
-                    collection_text.setText("收藏");
-                    Toast.makeText(NewAlbumActivity.this, "已取消收藏", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        //分享按钮监听
-        /*
-        share_layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });*/
-
-        //下载按钮监听
-        dowm_layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(NewAlbumActivity.this).setTitle("下载该歌单内所有歌曲？")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //下载所有歌曲
-                                presenter.performDownLoadAllClick();
-                            }
-                        })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
-            }
-        });
-    }
-
-
-    public void setCollection() {
-        int result = SongCollectionDB.getInstance(MyApplication.getContext()).isCollected(albumid);
-        if(result != -1) {
-            //已经收藏，则显示已收藏
-            collection_text.setText("已收藏");
-        }
-    }
 
     protected void updateViews(int scrollY, boolean animated) {
         // Translate header
-        ViewHelper.setTranslationY(newalbum_header, getHeaderTranslationY(scrollY));
+        ViewHelper.setTranslationY(songcollection_header, getHeaderTranslationY(scrollY));
     }
 
-
-
     protected float getHeaderTranslationY(int scrollY) {
-        final int headerHeight = newalbum_header.getHeight();
+        final int headerHeight = songcollection_header.getHeight();
         int headerTranslationY = mActionBarSize + mStatusSize - headerHeight;
         if (mActionBarSize + mStatusSize <= -scrollY + headerHeight) {
             headerTranslationY = -scrollY;
@@ -398,11 +310,10 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
 
         if (scrollY > 0 && scrollY < mFlexibleSpaceImageHeight - mActionBarSize - mStatusSize) {
             toolbar.setTitle(title);
-            toolbar.setSubtitle(author);
             actionbar.setBackgroundDrawable(getResources().getDrawable(R.drawable.toolbar_background));
         }
         if (scrollY == 0) {
-            toolbar.setTitle("专辑");
+            toolbar.setTitle("歌单");
             toolbar.setSubtitle("");
             actionbar.setBackgroundDrawable(null);
         }
@@ -411,7 +322,7 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
         }
 
         float a = (float) scrollY / (mFlexibleSpaceImageHeight - mActionBarSize - mStatusSize);
-        newalbum_header_detail.setAlpha(1f - a);
+        songcollection_header_detail.setAlpha(1f - a);
 
     }
 
@@ -424,6 +335,8 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
 
     }
+
+
 
     @Override
     public void setAdapter(final MusicAdapter adapter) {
@@ -462,51 +375,40 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
                 if(albumname == null || albumname.length() == 0) {
                     albumname = "暂无信息";
                 }
-                PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(NewAlbumActivity.this,
+                final PopUpWindowMenuAdapter adapter = new PopUpWindowMenuAdapter(CreatedCollectionActivity.this,
                         Arrays.asList( new LeftMenuItem(R.drawable.icon_music_name, "歌曲 —— " + musicInfo.getMusicName()),
                                 new LeftMenuItem(R.drawable.icon_music_artist, "歌手 —— " + musicInfo.getArtist()),
                                 new LeftMenuItem(R.drawable.icon_music_album, "专辑 —— " + albumname),
-                                new LeftMenuItem(R.drawable.icon_music_collect, "收藏到歌单"),
-                                new LeftMenuItem(R.drawable.icon_music_download, "下载歌曲" )
-                        ));
+                                new LeftMenuItem(R.drawable.icon_music_cancelcollection, "取消收藏" )
+                                ));
                 popuplistview.setAdapter(adapter);
                 //添加弹窗菜单点击事件
+
 
                 popuplistview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View childview, int childposition, long id) {
 
-
-                        //点击第4个按钮，收藏到歌单，弹出fragment选择添加到的歌单
+                        //点击第四个按钮，取消收藏按钮，弹框确认是否下载
                         if(childposition == 3) {
-                            //TODO 收藏
-                            if (popupWindow != null) {
-                                popupWindow.dismiss();
-                            }
-                            ChooseCollectionFragment chooseCollectionFragment = ChooseCollectionFragment.newInstance(musicInfo);
-                            chooseCollectionFragment.show(getSupportFragmentManager(), "chooseCollection");
-                        }
-
-                        //点击第5个按钮，下载按钮，弹框确认是否下载
-                        if(childposition == 4) {
-                            new AlertDialog.Builder(NewAlbumActivity.this).setTitle("确定下载该歌曲吗？")
+                            new AlertDialog.Builder(CreatedCollectionActivity.this).setTitle("确定取消收藏该歌曲吗？")
                                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             //下载该歌曲
-                                            presenter.performDownLoadMusicClick(position - 1);
+                                            presenter.peformCancelCollection(CreatedCollectionActivity.this.id, musicInfo);
                                             if (popupWindow != null) {
                                                 popupWindow.dismiss();
                                             }
+                                            //刷新界面
+                                            presenter.onCreate(CreatedCollectionActivity.this.id);
+                                            Toast.makeText(CreatedCollectionActivity.this, "取消成功", Toast.LENGTH_SHORT).show();
                                         }
                                     })
                                     .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
-                                            if (popupWindow != null) {
-                                                popupWindow.dismiss();
-                                            }
                                         }
                                     })
                                     .show();
@@ -515,7 +417,7 @@ public class NewAlbumActivity extends BaseActivity implements ObservableScrollVi
                     }
                 });
                 //初始化并弹出popupWindow
-                popupWindow = CommonUtils.ShowPopUpWindow(NewAlbumActivity.this, popupWindow, view, layout);
+                popupWindow = CommonUtils.ShowPopUpWindow(CreatedCollectionActivity.this, popupWindow, view, layout);
             }
         });
 

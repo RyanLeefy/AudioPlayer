@@ -177,7 +177,7 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
 
             @Override
             public void onMoreClick(View view, int position) {
-                Toast.makeText(getActivity(), "更多", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "更多", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -217,6 +217,7 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
                                 new LeftMenuItem(R.drawable.icon_music_info, "时长 —— " + CommonUtils.makeTimeString(musicInfo.getDuration())
                                         + "                   " + "大小 —— " + (float) (Math.round((float) musicInfo.getSize() / (1024 * 1024) * 10)) / 10 + "M"),
                                 new LeftMenuItem(R.drawable.icon_music_location, "位置 —— " + musicInfo.getData()),
+                                new LeftMenuItem(R.drawable.icon_music_collect, "收藏到歌单"),
                                 new LeftMenuItem(R.drawable.icon_music_delete, "删除歌曲" )
                         ));
                 popuplistview.setAdapter(adapter);
@@ -226,8 +227,18 @@ public class LocalMusicFragment extends BaseFragment implements ILocalMusicView 
                     @Override
                     public void onItemClick(AdapterView<?> parent, View childview, int childposition, long id) {
 
-                        //点击第五个按钮，删除按钮，弹框确认是否删除
+                        //点击第6个按钮，收藏到歌单，弹出fragment选择添加到的歌单
                         if(childposition == 5) {
+                            //TODO 收藏
+                            if (popupWindow != null) {
+                                popupWindow.dismiss();
+                            }
+                            ChooseCollectionFragment chooseCollectionFragment = ChooseCollectionFragment.newInstance(musicInfo);
+                            chooseCollectionFragment.show(getFragmentManager(), "chooseCollection");
+                        }
+
+                        //点击第7个按钮，删除按钮，弹框确认是否删除
+                        if(childposition == 6) {
                             new AlertDialog.Builder(getActivity()).setTitle("确定删除该歌曲吗？")
                                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override

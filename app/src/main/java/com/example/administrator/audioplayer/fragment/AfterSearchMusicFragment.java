@@ -189,6 +189,7 @@ public class AfterSearchMusicFragment extends BaseFragment {
                         Arrays.asList( new LeftMenuItem(R.drawable.icon_music_name, "歌曲 —— " + musicInfo.getMusicName()),
                                 new LeftMenuItem(R.drawable.icon_music_artist, "歌手 —— " + musicInfo.getArtist()),
                                 new LeftMenuItem(R.drawable.icon_music_album, "专辑 —— " + albumname),
+                                new LeftMenuItem(R.drawable.icon_music_collect, "收藏到歌单"),
                                 new LeftMenuItem(R.drawable.icon_music_download, "下载歌曲" )
                         ));
                 popuplistview.setAdapter(adapter);
@@ -198,8 +199,20 @@ public class AfterSearchMusicFragment extends BaseFragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View childview, int childposition, long id) {
 
-                        //点击第四个按钮，下载按钮，弹框确认是否下载
+
+                        //点击第4个按钮，收藏到歌单，弹出fragment选择添加到的歌单
                         if(childposition == 3) {
+                            //TODO 收藏
+                            if (popupWindow != null) {
+                                popupWindow.dismiss();
+                            }
+                            ChooseCollectionFragment chooseCollectionFragment = ChooseCollectionFragment.newInstance(musicInfo);
+                            chooseCollectionFragment.show(getFragmentManager(), "chooseCollection");
+                        }
+
+
+                        //点击第5个按钮，下载按钮，弹框确认是否下载
+                        if(childposition == 4) {
                             new AlertDialog.Builder(getActivity()).setTitle("确定下载该歌曲吗？")
                                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override

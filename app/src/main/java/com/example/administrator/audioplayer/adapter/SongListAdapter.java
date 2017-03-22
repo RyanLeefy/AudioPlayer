@@ -24,6 +24,9 @@ import java.util.List;
 
 public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemViewTag> {
 
+    //歌单项有没有more图片，用于添加歌曲到歌单时候选择歌单界面去除more图标，默认为有图标
+    private boolean collectionHasMore = true;
+
     private Context mContext;
     private LayoutInflater mInflater;
 
@@ -55,8 +58,17 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
         this.onSongCollectionItemClickListener = listener;
     }
 
+    public List getList() {
+        return allItems;
+    }
+
+
     public void updateAdapter(List allItems) {
        this.allItems = allItems;
+    }
+
+    public void setCollectionHasMore(boolean hasMore){
+        this.collectionHasMore = hasMore;
     }
 
 
@@ -107,11 +119,19 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                 String albumArt = create_songCollectionItems.getAlbumArt();
                 if(albumArt != null && albumArt.length() != 0) {
                     holder.cover.setImageURI(Uri.parse(albumArt));
+                } else {
+                    holder.cover.setImageResource(R.drawable.cover_faveriate_songcollection);
                 }
 
                 holder.name.setText(create_songCollectionItems.getCollectionName());
                 holder.songcount.setText(create_songCollectionItems.getSongCount() + "首");
-                holder.songcollectionmore.setImageResource(R.drawable.list_icn_more);
+
+                if(collectionHasMore) {
+                    //如果有more图标的话，显示more图标
+                    holder.songcollectionmore.setImageResource(R.drawable.list_icn_more);
+                } else {
+                    holder.songcollectionmore.setVisibility(View.GONE);
+                }
 
                 //回调点击事件
                 if(onSongCollectionItemClickListener != null) {
@@ -121,12 +141,14 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ItemVi
                             onSongCollectionItemClickListener.onItemClick(holder.itemView, position);
                         }
                     });
-                    holder.songcollectionmore.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onSongCollectionItemClickListener.onMoreClick(holder.itemView, position);
-                        }
-                    });
+                    if(collectionHasMore) {
+                        holder.songcollectionmore.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onSongCollectionItemClickListener.onMoreClick(holder.itemView, position);
+                            }
+                        });
+                    }
                 }
                 break;
             default:

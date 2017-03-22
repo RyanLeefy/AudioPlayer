@@ -178,14 +178,16 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         if (mOrientation == VERTICAL_LIST) {
             View child = parent.getChildAt(itemPosition);
             //SongListAdapter.ItemViewTag itemViewTag = (SongListAdapter.ItemViewTag)parent.getChildViewHolder(child);
-            if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0 ) {
-                outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
-            } else if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1 ) {
-                outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
-            } else if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 2 ) {
-                outRect.set(0, 0, 0, 0);
-            } else {
-                outRect.set(0, 0, 0, 0);
+            if(parent.getChildAdapterPosition(child) > 0 ) {
+                if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 0) {
+                    outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
+                } else if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 1) {
+                    outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
+                } else if (parent.getAdapter().getItemViewType(parent.getChildAdapterPosition(child)) == 2) {
+                    outRect.set(0, 0, 0, 0);
+                } else {
+                    outRect.set(0, 0, 0, 0);
+                }
             }
         } else {
             outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);

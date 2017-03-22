@@ -120,7 +120,7 @@ public class AfterSearchAlbumFragment extends BaseFragment {
             public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
                 SearchAlbumAdapter.CommonItemViewHolder holder = ((SearchAlbumAdapter.CommonItemViewHolder)viewHolder);
                 NewAlbumActivity.startActivity(MyApplication.getContext(),
-                        holder.albumid, holder.pic, holder.title, holder.author, holder.artist_id, holder.publishtime);
+                        holder.albumid, holder.pic, holder.title, holder.author, holder.publishtime);
             }
         });
         recyclerView.setAdapter(adapter);

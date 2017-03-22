@@ -9,5 +9,5 @@ public interface IMusicPresenter {
     void onCreateView();
     boolean createNewCollection(String name);
     boolean updateCollection(int id, String newName);
-    void deleteCollection(long id);
+    void deleteCollection(int id);
 }

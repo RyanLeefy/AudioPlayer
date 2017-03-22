@@ -256,5 +256,10 @@ public class NewAlbumPresenter implements INewAlbumPresenter {
         }
     }
 
+    @Override
+    public boolean peformCollect(String albumid, String name, int count, String albumart, String author, String publish_time) {
+        return model.peformCollect(albumid, name, count, albumart, author, publish_time);
+    }
+
 
 }

@@ -8,11 +8,13 @@ import com.example.administrator.audioplayer.Imodel.ILocalSearchModel;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.administrator.audioplayer.modelImp.LocalMusicModel.FILTER_DURATION;
 import static com.example.administrator.audioplayer.modelImp.LocalMusicModel.FILTER_SIZE;
+import static com.example.administrator.audioplayer.modelImp.LocalMusicModel.getAlbumArtUri;
 
 
 /**
@@ -30,16 +32,21 @@ public class LocalSearchModel implements ILocalSearchModel {
         ArrayList arrayList = new ArrayList();
         if ((cursor != null) && (cursor.moveToFirst()))
             do {
-                MusicInfo musicInfo = new MusicInfo();
-                musicInfo.setAudioId((int) cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                musicInfo.setAlbumId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
-                musicInfo.setMusicName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-                musicInfo.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
-                musicInfo.setAlbumName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
-                musicInfo.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
-                musicInfo.setSize(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)));
-                musicInfo.setData(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
-                arrayList.add(musicInfo);
+                MusicInfo music = new MusicInfo();
+                music.setAudioId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+                music.setAlbumId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
+                music.setAlbumName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM)));
+                music.setAlbumData(getAlbumArtUri(music.getAlbumId()) + "");
+                music.setDuration(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+                music.setMusicName(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+                music.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+                music.setArtistId(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID)));
+                String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                music.setData(filePath);
+                music.setFolder(filePath.substring(0, filePath.lastIndexOf(File.separator)));
+                music.setSize(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)));
+                music.setIslocal(true);
+                arrayList.add(music);
             }
             while (cursor.moveToNext());
         if (cursor != null)

@@ -25,6 +25,7 @@ public class CollectionInfo {
     private String collectionName;
     private int songCount;
     private String collectionTag;
+    private String listenCount;
     private String albumArt;
     private String author;
     private String publishTime;
@@ -71,6 +72,14 @@ public class CollectionInfo {
 
     public void setCollectionTag(String collectionTag) {
         this.collectionTag = collectionTag;
+    }
+
+    public String getListenCount() {
+        return listenCount;
+    }
+
+    public void setListenCount(String listenCount) {
+        this.listenCount = listenCount;
     }
 
     public String getAuthor() {

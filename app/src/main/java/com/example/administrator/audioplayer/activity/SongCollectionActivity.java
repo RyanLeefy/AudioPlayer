@@ -44,7 +44,9 @@ import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
 import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.db.SongCollectionDB;
 import com.example.administrator.audioplayer.download.DownloadService;
+import com.example.administrator.audioplayer.fragment.ChooseCollectionFragment;
 import com.example.administrator.audioplayer.http.HttpMethods;
 import com.example.administrator.audioplayer.http.HttpUtils;
 import com.example.administrator.audioplayer.jsonbean.SongCollection;
@@ -124,7 +126,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
 
     //创建activity时需要传入的数据
     //是不是本地歌单
-    private Boolean isLocal;
+    private boolean isLocal;
     //歌单id
     private String songListId;
     //图片地址
@@ -148,7 +150,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
      * @param tag
      */
     public static void startActivity(Context context, Boolean islocal, String listid,
-                                     String pic, String listenum, String title,String tag) {
+                                     String pic, String listenum, String title, String tag) {
         Intent intent = new Intent(context, SongCollectionActivity.class);
         intent.putExtra("islocal", islocal);
         intent.putExtra("listid", listid);
@@ -213,6 +215,8 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         //share_layout = (LinearLayout) findViewById(R.id.ll_songcollection_share);
         dowm_layout = (LinearLayout) findViewById(R.id.ll_songcollection_down);
 
+        collection_text = (TextView) findViewById(R.id.tv_songcollection_collect_state);
+
         recyclerView = (ObserableRecyclerViewWithEmptyView) findViewById(R.id.orv_songcollection);
         recyclerView.setScrollViewCallbacks(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -247,6 +251,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         setHeaderBlurBackground();
         setHeaderView();
         setHeaderViewListener();
+        setCollection();
 
         presenter = new SongCollectionPresenter(this);
         presenter.onCreate(songListId);
@@ -346,6 +351,17 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
         collection_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(presenter.peformCollect(title, adapter.getList().size(), pic, songListId, tag, songCollectionCount)) {
+                    //收藏
+                    //文字变已收藏
+                    collection_text.setText("已收藏");
+                    Toast.makeText(SongCollectionActivity.this, "收藏成功", Toast.LENGTH_SHORT).show();
+                } else {
+                    //取消收藏
+                    //文字变收藏
+                    collection_text.setText("收藏");
+                    Toast.makeText(SongCollectionActivity.this, "已取消收藏", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -380,6 +396,15 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
                         .show();
             }
         });
+    }
+
+
+    public void setCollection() {
+        int result = SongCollectionDB.getInstance(MyApplication.getContext()).isCollected(songListId);
+        if(result != -1) {
+            //已经收藏，则显示已收藏
+            collection_text.setText("已收藏");
+        }
     }
 
 
@@ -474,6 +499,7 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
                         Arrays.asList( new LeftMenuItem(R.drawable.icon_music_name, "歌曲 —— " + musicInfo.getMusicName()),
                                 new LeftMenuItem(R.drawable.icon_music_artist, "歌手 —— " + musicInfo.getArtist()),
                                 new LeftMenuItem(R.drawable.icon_music_album, "专辑 —— " + albumname),
+                                new LeftMenuItem(R.drawable.icon_music_collect, "收藏到歌单"),
                                 new LeftMenuItem(R.drawable.icon_music_download, "下载歌曲" )
                                 ));
                 popuplistview.setAdapter(adapter);
@@ -483,17 +509,28 @@ public class SongCollectionActivity extends BaseActivity implements ObservableSc
                     @Override
                     public void onItemClick(AdapterView<?> parent, View childview, int childposition, long id) {
 
-                        //点击第四个按钮，下载按钮，弹框确认是否下载
+                        //点击第4个按钮，收藏到歌单，弹出fragment选择添加到的歌单
                         if(childposition == 3) {
+                            //TODO 收藏
+                            if (popupWindow != null) {
+                                popupWindow.dismiss();
+                            }
+                            ChooseCollectionFragment chooseCollectionFragment = ChooseCollectionFragment.newInstance(musicInfo);
+                            chooseCollectionFragment.show(getSupportFragmentManager(), "chooseCollection");
+                        }
+
+
+                        //点击第五个按钮，下载按钮，弹框确认是否下载
+                        if(childposition == 4) {
+                            if (popupWindow != null) {
+                                popupWindow.dismiss();
+                            }
                             new AlertDialog.Builder(SongCollectionActivity.this).setTitle("确定下载该歌曲吗？")
                                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             //下载该歌曲
                                             presenter.performDownLoadMusicClick(position - 1);
-                                            if (popupWindow != null) {
-                                                popupWindow.dismiss();
-                                            }
                                         }
                                     })
                                     .setNegativeButton("取消", new DialogInterface.OnClickListener() {

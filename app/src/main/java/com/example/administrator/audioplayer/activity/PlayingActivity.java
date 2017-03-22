@@ -35,6 +35,8 @@ import android.widget.Toast;
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.RoundFragmentPagerAdapter;
+import com.example.administrator.audioplayer.db.SongCollectionDB;
+import com.example.administrator.audioplayer.db.SongCollectionSongDB;
 import com.example.administrator.audioplayer.fragment.PlayQueueFragment;
 import com.example.administrator.audioplayer.fragment.RoundFragment;
 import com.example.administrator.audioplayer.lrc.DefaultLrcParser;
@@ -402,7 +404,7 @@ public class PlayingActivity extends BaseActivity {
         } else {
             mPlayorPause.setImageResource(R.drawable.play_rdi_btn_play);
         }
-
+        setHeaderBlurBackground();
     }
 
     @Override
@@ -547,8 +549,10 @@ public class PlayingActivity extends BaseActivity {
         ab.setDisplayHomeAsUpEnabled(true);
     }
 
+
+
     /**
-     * 创建菜单，toolbar上的分享按钮
+     * 创建菜单，toolbar上的喜欢按钮
      * @param menu
      * @return
      */
@@ -580,14 +584,9 @@ public class PlayingActivity extends BaseActivity {
             this.startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.shared_to)));
 
         }*/
-         /*
+
+        /*
         if (item.getItemId() == R.id.menu_love) {
-            MusicInfo musicInfo = MusicUtils.getMusicInfo(PlayingActivity.this, MusicPlayer.getCurrentAudioId());
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + musicInfo.data));
-            shareIntent.setType("audio/*");
-            this.startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.shared_to)));
 
         }*/
 

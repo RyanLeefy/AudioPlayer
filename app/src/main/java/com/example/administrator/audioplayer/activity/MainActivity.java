@@ -34,7 +34,7 @@ import java.util.ArrayList;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     //是否重新启动的应用，用来判断要不要显示引导页
-    private Boolean isInit = false;
+    private boolean isInit = false;
 
     private Handler mHandler = new Handler();
 

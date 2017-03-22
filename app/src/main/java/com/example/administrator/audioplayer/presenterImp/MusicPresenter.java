@@ -178,7 +178,7 @@ public class MusicPresenter implements IMusicPresenter {
     }
 
     @Override
-    public void deleteCollection(long id) {
+    public void deleteCollection(int id) {
         SongCollectionDB.getInstance(MyApplication.getContext()).deleteSongCollection(id);
     }
 }

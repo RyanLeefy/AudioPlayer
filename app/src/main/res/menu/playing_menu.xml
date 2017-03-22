@@ -10,9 +10,11 @@
         app:showAsAction="ifRoom|collapseActionView"></item>
     -->
 
+    <!--
     <item
         android:id="@+id/menu_love"
         android:icon="@drawable/actionbar_whitelove"
         android:title=""
         app:showAsAction="ifRoom|collapseActionView"></item>
+        -->
 </menu>

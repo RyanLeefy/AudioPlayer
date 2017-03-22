@@ -177,7 +177,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendView {
             public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
                 RecommendNewAlbumAdapter.ViewHolder holder = ((RecommendNewAlbumAdapter.ViewHolder)viewHolder);
                 NewAlbumActivity.startActivity(MyApplication.getContext(),
-                        holder.albumid, holder.pic, holder.title, holder.author, holder.artist_id, holder.publishtime);
+                        holder.albumid, holder.pic, holder.title, holder.author, holder.publishtime);
             }
         });
         mNewAlbumRecycle.setAdapter(albumAdapter);

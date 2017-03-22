@@ -37,6 +37,7 @@
         <activity android:name=".activity.RecentActivity" />
         <activity android:name=".activity.DownActivity" />
         <activity android:name=".activity.MyArtistActivity" />
+        <activity android:name=".activity.CreatedCollectionActivity" />
         <activity android:name=".activity.PlayingActivity" />
         <activity android:name=".activity.SongCollectionActivity" />
         <activity android:name=".activity.NewAlbumActivity" />
