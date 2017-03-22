@@ -1,26 +1,15 @@
 package com.example.administrator.audioplayer.presenterImp;
 
-import android.content.Intent;
-import android.net.Uri;
-
 import com.example.administrator.audioplayer.Imodel.IRecentModel;
 import com.example.administrator.audioplayer.Ipresenter.IRecentPresenter;
 import com.example.administrator.audioplayer.Iview.IRecentView;
 import com.example.administrator.audioplayer.activity.RecentActivity;
-import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.download.DownloadService;
-import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.modelImp.RecentModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
-import com.example.administrator.audioplayer.utils.GetDownloadLink;
-import com.example.administrator.audioplayer.utils.PrintLog;
-import com.example.administrator.audioplayer.utils.RequestThreadPool;
 import com.orhanobut.logger.Logger;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;

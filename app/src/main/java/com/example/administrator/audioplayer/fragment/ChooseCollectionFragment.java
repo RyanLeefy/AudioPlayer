@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.audioplayer.MyApplication;
@@ -20,8 +19,6 @@ import com.example.administrator.audioplayer.bean.CollectionInfo;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.db.SongCollectionDB;
 import com.example.administrator.audioplayer.db.SongCollectionSongDB;
-import com.example.administrator.audioplayer.utils.CommonUtils;
-import com.example.administrator.audioplayer.utils.PreferencesUtils;
 
 import java.util.List;
 

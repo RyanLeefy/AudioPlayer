@@ -8,7 +8,6 @@ import com.example.administrator.audioplayer.Ipresenter.ILocalSearchPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalSearchView;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.fragment.LocalSearchFragment;
 import com.example.administrator.audioplayer.modelImp.LocalSearchModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;

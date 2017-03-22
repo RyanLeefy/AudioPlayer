@@ -20,7 +20,6 @@ import android.widget.TextView;
 import com.example.administrator.audioplayer.Ipresenter.IPreSearchPresenter;
 import com.example.administrator.audioplayer.Iview.IPreSearchView;
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.activity.NetSearchActivity;
 import com.example.administrator.audioplayer.activity.SearchCallBack;
 import com.example.administrator.audioplayer.adapter.SearchHistoryAdapter;
 import com.example.administrator.audioplayer.db.SearchHistory;

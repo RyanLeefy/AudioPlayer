@@ -1,9 +1,6 @@
 package com.example.administrator.audioplayer.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +14,8 @@ import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.bean.DownLoadInfo;
 import com.example.administrator.audioplayer.db.DownLoadDB;
-import com.example.administrator.audioplayer.download.DownloadService;
 import com.example.administrator.audioplayer.utils.PrintLog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

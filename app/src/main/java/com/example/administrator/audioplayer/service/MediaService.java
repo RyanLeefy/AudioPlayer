@@ -37,7 +37,6 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.bean.MusicInfo;

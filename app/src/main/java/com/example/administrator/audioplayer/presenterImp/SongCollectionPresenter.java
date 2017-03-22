@@ -1,8 +1,6 @@
 package com.example.administrator.audioplayer.presenterImp;
 
 import android.content.Intent;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.example.administrator.audioplayer.Imodel.ISongCollectionModel;
 import com.example.administrator.audioplayer.Ipresenter.ISongCollectionPresenter;
@@ -13,20 +11,14 @@ import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
 import com.example.administrator.audioplayer.download.DownloadService;
 import com.example.administrator.audioplayer.http.HttpMethods;
-import com.example.administrator.audioplayer.http.HttpUtils;
 import com.example.administrator.audioplayer.jsonbean.SongBaseInfo;
-import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
-import com.example.administrator.audioplayer.jsonbean.SongExtraInfo;
 import com.example.administrator.audioplayer.modelImp.SongCollectionModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.utils.GetDownloadLink;
-import com.example.administrator.audioplayer.utils.PreferencesUtils;
 import com.example.administrator.audioplayer.utils.PrintLog;
 import com.example.administrator.audioplayer.utils.RequestThreadPool;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;

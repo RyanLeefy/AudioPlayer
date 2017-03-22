@@ -2,7 +2,6 @@ package com.example.administrator.audioplayer.Iview;
 
 import com.example.administrator.audioplayer.adapter.SongListAdapter;
 import com.example.administrator.audioplayer.bean.CollectionInfo;
-
 import com.example.administrator.audioplayer.bean.MusicFragmentExpandItem;
 
 import java.util.List;

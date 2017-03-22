@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.db.SearchHistory;

@@ -18,8 +18,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.activity.NewAlbumActivity;
-import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;

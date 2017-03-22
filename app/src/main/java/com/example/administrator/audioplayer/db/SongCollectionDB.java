@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.administrator.audioplayer.bean.CollectionInfo;
-import com.example.administrator.audioplayer.bean.DownLoadInfo;
 
 import java.util.ArrayList;
 import java.util.List;

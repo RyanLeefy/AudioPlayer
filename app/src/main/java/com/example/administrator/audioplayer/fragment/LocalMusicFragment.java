@@ -2,11 +2,8 @@ package com.example.administrator.audioplayer.fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +26,6 @@ import android.widget.Toast;
 import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
 import com.example.administrator.audioplayer.R;
-import com.example.administrator.audioplayer.activity.SongCollectionActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.adapter.PopUpWindowMenuAdapter;
 import com.example.administrator.audioplayer.bean.LeftMenuItem;
@@ -39,7 +35,6 @@ import com.example.administrator.audioplayer.utils.CommonUtils;
 import com.example.administrator.audioplayer.widget.DividerItemDecoration;
 import com.example.administrator.audioplayer.widget.RecycleViewWithEmptyView;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 

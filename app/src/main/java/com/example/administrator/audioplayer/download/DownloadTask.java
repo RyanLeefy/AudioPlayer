@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.example.administrator.audioplayer.bean.DownLoadInfo;
 import com.example.administrator.audioplayer.db.DownLoadDB;
 
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;

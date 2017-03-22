@@ -24,7 +24,6 @@ import com.example.administrator.audioplayer.adapter.RecommendNewAlbumAdapter;
 import com.example.administrator.audioplayer.adapter.RecommendSongCollectionAdapter;
 import com.example.administrator.audioplayer.presenterImp.RecommendPresenter;
 import com.example.administrator.audioplayer.widget.CarouselFigureView;
-import com.example.administrator.audioplayer.widget.FullyGridLayoutManager;
 
 /**
  * Netfragment下的新曲推荐fragment

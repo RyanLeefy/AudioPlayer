@@ -8,17 +8,12 @@ import com.example.administrator.audioplayer.Ipresenter.ILocalMusicPresenter;
 import com.example.administrator.audioplayer.Iview.ILocalMusicView;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
-import com.example.administrator.audioplayer.download.DownloadService;
 import com.example.administrator.audioplayer.fragment.LocalMusicFragment;
 import com.example.administrator.audioplayer.modelImp.LocalMusicModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
-import com.example.administrator.audioplayer.utils.GetDownloadLink;
-import com.example.administrator.audioplayer.utils.PrintLog;
-import com.example.administrator.audioplayer.utils.RequestThreadPool;
 import com.orhanobut.logger.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
