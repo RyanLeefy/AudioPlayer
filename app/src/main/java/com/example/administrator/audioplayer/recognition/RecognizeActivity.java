@@ -109,7 +109,8 @@ public class RecognizeActivity extends BaseActivity {
                             //HttpUtils.post(filepath);
                             //upload(new File(filepath));
                             //uploadbysocket(new File(filepath));
-                            uploadFileAndRecognize(filepath);
+                            //uploadFileAndRecognize(filepath);
+                            upload2(new File(filepath));
                         }
 
 
@@ -368,6 +369,100 @@ public class RecognizeActivity extends BaseActivity {
                 Logger.e("上传失败!!");
                 }
             }).start();
+
+    }
+
+
+    private void upload2(final File file){
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    String httpAction = "http://10.42.0.1:5000/recognize";
+                    String end = "\r\n";
+                    String hyphens = "--";
+                    //String boundary = "*****";
+                    String boundary = "FlPm4LpSXsE";
+                    URL url = new URL(httpAction);
+                    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			/* 允许使用输入流，输出流，不允许使用缓存*/
+                    conn.setReadTimeout(20000);
+                    conn.setConnectTimeout(20000);
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                    conn.setUseCaches(false);
+			/* 请求方式*/
+                    conn.setRequestMethod("POST");
+                    //conn.setRequestProperty("Charset", "UTF-8");
+                    conn.setRequestProperty("Charset", "utf-8");
+                    //conn.setRequestProperty("Connection", "Keep-Alive");
+                    conn.setRequestProperty("Connection", "keep-alive");
+                    conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+
+			/* 当文件不为空，把文件包装并且上传*/
+                    Log.e(TAG, file.toString());
+                    if(file != null){
+                        DataOutputStream ds = new DataOutputStream(conn.getOutputStream());
+				/* name里面的值为服务器端需要key   只有这个key 才可以得到对应的文件
+				 * filename是文件的名字，包含后缀名的   比如:abc.png*/
+                        //file内容
+                        StringBuffer sb = new StringBuffer();
+                        sb.append(hyphens);
+                        sb.append(boundary);
+                        sb.append(end);
+
+                        sb.append("Content-Disposition: form-data; name=\"data\";filename=" + "\"" + file.getName() + "\"" + end);
+                        sb.append("Content-Type: image/jpg"+end);
+                        sb.append(end);
+                        ds.write(sb.toString().getBytes());
+
+/*
+                        ds.writeBytes(hyphens + boundary + end);
+                        ds.writeBytes("Content-Disposition: form-data; " + "name=\"file1\";filename=\"" +
+                                file.getName() +"\"" + end);
+                        ds.writeBytes("Content-Type: application/octet-stream"+end);
+                        ds.writeBytes(end);
+*/
+                        InputStream input = new FileInputStream(file);
+                        int size = 1024;
+                        byte[] buffer = new byte[size];
+                        int length = 0;
+				/* 从文件读取数据至缓冲区*/
+                        while((length = input.read(buffer)) != -1){
+                            ds.write(buffer, 0, length);
+                        }
+                        input.close();
+                        //ds.writeBytes(end);
+                        //ds.writeBytes(hyphens + boundary + hyphens + end);
+                        //写入文件二进制内容
+                        ds.write(end.getBytes());
+                        //写入end data
+                        byte[] end_data = (hyphens+boundary+hyphens+end).getBytes();
+                        ds.write(end_data);
+                        ds.flush();
+
+				/* 获取响应码*/
+                        Log.e(TAG, conn.getResponseCode() + "=======");
+                        if(conn.getResponseCode() == 200){
+                            Logger.e("上传成功!!" + 200);
+                        } else {
+                            Logger.e("上传失败!!" + conn.getResponseCode());
+                        }
+                    }
+
+                } catch (MalformedURLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    Logger.e("上传失败!!" );
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    Logger.e("上传失败!!" );
+                }
+                Logger.e("上传失败!!");
+            }
+        }).start();
 
     }
 
