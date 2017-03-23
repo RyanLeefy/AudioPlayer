@@ -15,12 +15,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.adapter.LeftMenuItemAdapter;
 import com.example.administrator.audioplayer.adapter.MainPagerAdapter;
 import com.example.administrator.audioplayer.fragment.DownLoadConfigFragment;
 import com.example.administrator.audioplayer.fragment.MusicFragment;
 import com.example.administrator.audioplayer.fragment.NetFragment;
+import com.example.administrator.audioplayer.recognition.RecognizeActivity;
 import com.example.administrator.audioplayer.utils.ActivityManager;
 import com.example.administrator.audioplayer.widget.SplashScreen;
 
@@ -184,6 +186,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 switch (position){
                     case 1:
                         //听歌识曲
+                        RecognizeActivity.startActivity(MyApplication.getContext());
                         drawer.closeDrawers();
                         break;
                     //case 2:

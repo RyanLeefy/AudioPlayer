@@ -5,13 +5,20 @@
     <!--手机权限-->
     <!--锁屏cpu-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--网络全线-->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--存储相关-->
+    <!-- 录音权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!--读取SD卡文件权限-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!--写入SD卡文件权限-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <!-- 在SDCard中创建与删除文件权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <!--获知网络状况-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 
     <application
         android:name=".MyApplication"
@@ -44,6 +51,8 @@
         <activity android:name=".activity.BillBoardActivity" />
         <activity android:name=".activity.NetSearchActivity"
             android:windowSoftInputMode="adjustPan|adjustResize|stateVisible"/>
+
+        <activity android:name=".recognition.RecognizeActivity" />
 
 
         <service

@@ -10,12 +10,17 @@ import com.google.gson.JsonParser;
 import com.orhanobut.logger.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -91,6 +96,27 @@ public class HttpUtils {
         }
 
         return null;
+    }
+
+
+    public static void postFile(String url, String filepath, Callback callback) {
+        builder.connectTimeout(10000, TimeUnit.MINUTES)
+                .readTimeout(10000, TimeUnit.MINUTES);
+
+        //创建File
+        File file = new File(filepath);
+
+        RequestBody body = RequestBody.create(MediaType.parse("text/plain; charset=utf-8"), file);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        Call call = builder.build().newCall(request);
+        //传入回调函数
+        call.enqueue(callback);
+
     }
 
 }
