@@ -4,35 +4,20 @@ package com.example.administrator.audioplayer.http;
 import android.content.Context;
 import android.util.Log;
 
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.orhanobut.logger.Logger;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -128,110 +113,7 @@ public class HttpUtils {
 
 
 
-    public static void postFile(String url, String filepath, Callback callback) {
-        builder.connectTimeout(10000, TimeUnit.MINUTES)
-                .readTimeout(10000, TimeUnit.MINUTES);
 
-        byte[] bytes = File2byte(filepath);
-        StringBuilder sb = new StringBuilder();
-        for(int j = 0; j <bytes.length; j++) {
-            if(sb.length() == 0) {
-                sb.append(bytes[j]);
-            } else {
-                sb.append("," + bytes[j]);
-            }
-        }
-        JSONObject json = new JSONObject();
-        try {
-            json.put("fileString", sb.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        RequestBody body = RequestBody.create(MediaType.parse("application/json;"), json.toString());
-
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-
-        Call call = builder.build().newCall(request);
-        //传入回调函数
-        call.enqueue(callback);
-
-    }
-
-
-    public static byte[] File2byte(String filePath)
-    {
-        byte[] buffer = null;
-        try
-        {
-            File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] b = new byte[1024];
-            int n;
-            while ((n = fis.read(b)) != -1)
-            {
-                bos.write(b, 0, n);
-            }
-            fis.close();
-            bos.close();
-            buffer = bos.toByteArray();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        return buffer;
-
-    }
-
-
-    public static void post(final String filepath) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("http://10.42.0.1:5000/recognize");
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setDoInput(true);
-                    con.setDoOutput(true);
-                    con.setConnectTimeout(10000);
-                    con.setReadTimeout(10000);
-                    con.setRequestMethod("POST");
-
-                    String fileString = File2byte(filepath).toString();
-                    DataOutputStream outputStream = new DataOutputStream(con.getOutputStream());
-                    outputStream.writeUTF(fileString);
-                    outputStream.flush();
-
-                    ObjectInputStream inputStream = new ObjectInputStream(con.getInputStream());
-                    String result = (String) inputStream.readObject();
-                    Logger.e(result);
-                    outputStream.close();
-                    inputStream.close();
-                    con.disconnect();
-
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-
-                }
-
-
-            }
-        }).start();
-
-    }
 
 
 }
