@@ -17,7 +17,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.R;
 import com.example.administrator.audioplayer.activity.BaseActivity;
 import com.example.administrator.audioplayer.http.HttpUtils;
@@ -149,7 +151,7 @@ public class RecognizeActivity extends BaseActivity {
         //采样率
         mediaRecorder.setAudioSamplingRate(44100);
         //双声道
-        mediaRecorder.setAudioChannels(2);
+        //mediaRecorder.setAudioChannels(2);
 
         //文件地址
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audioplayer/recoginze/";
@@ -307,6 +309,17 @@ public class RecognizeActivity extends BaseActivity {
 			        	/* 获取响应码*/
                         Log.e(TAG, conn.getResponseCode() + "=======");
                         if (conn.getResponseCode() == 200) {
+                            String json = getResponseBody(conn.getInputStream());
+                            JSONObject jsonObject = new JSONObject(json);
+                            JSONObject object = jsonObject.getJSONObject("result");
+                            final String songName = object.getString("song_name");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MyApplication.getContext(), "识别到的歌曲为:" + songName, Toast.LENGTH_LONG);
+                                    tv_state.setText(songName);
+                                }
+                            });
                             Logger.e("上传成功!!" + 200);
                         } else {
                             Logger.e("上传失败!!" + conn.getResponseCode());
@@ -321,9 +334,29 @@ public class RecognizeActivity extends BaseActivity {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                     Logger.e("上传失败!!");
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
+
+    }
+
+
+    public String getResponseBody(InputStream stream) {
+        StringBuffer sb = new StringBuffer();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        try {
+            while((len = stream.read(buffer)) != -1) {
+                sb.append(buffer);
+            }
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
 
     }
 
