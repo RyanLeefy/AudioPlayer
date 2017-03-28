@@ -1,5 +1,7 @@
 package com.example.administrator.audioplayer.presenterImp;
 
+import android.content.Intent;
+
 import com.example.administrator.audioplayer.Imodel.IBillBoardModel;
 import com.example.administrator.audioplayer.Ipresenter.IBillBoardPresenter;
 import com.example.administrator.audioplayer.Iview.IBillBoardView;
@@ -7,10 +9,14 @@ import com.example.administrator.audioplayer.MyApplication;
 import com.example.administrator.audioplayer.activity.BillBoardActivity;
 import com.example.administrator.audioplayer.adapter.MusicAdapter;
 import com.example.administrator.audioplayer.bean.MusicInfo;
+import com.example.administrator.audioplayer.download.DownloadService;
 import com.example.administrator.audioplayer.jsonbean.BillBoard;
 import com.example.administrator.audioplayer.modelImp.BillBoardModel;
 import com.example.administrator.audioplayer.service.MusicPlayer;
 import com.example.administrator.audioplayer.utils.CommonUtils;
+import com.example.administrator.audioplayer.utils.GetDownloadLink;
+import com.example.administrator.audioplayer.utils.PrintLog;
+import com.example.administrator.audioplayer.utils.RequestThreadPool;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -29,6 +35,8 @@ public class BillBoardPresenter implements IBillBoardPresenter{
 
     private IBillBoardView view;
     private IBillBoardModel model;
+
+    private MusicAdapter adapter;
 
     private List<MusicInfo> mList = new ArrayList<>();
 
@@ -87,6 +95,7 @@ public class BillBoardPresenter implements IBillBoardPresenter{
                 adapter.setHasTopPadding(true);
                 //设置有序号
                 adapter.setHasTrackNumber(true);
+                BillBoardPresenter.this.adapter = adapter;
                 view.setAdapter(adapter);
 
             }
@@ -104,7 +113,7 @@ public class BillBoardPresenter implements IBillBoardPresenter{
     }
 
     @Override
-    public void peformMusicClick(int position) {
+    public void peformMusicClick(final int position) {
         //position应该大于等于1
         if(position == 0) {
             //点击播放全部按钮
@@ -114,5 +123,64 @@ public class BillBoardPresenter implements IBillBoardPresenter{
             //position - 1 对应歌单中的位置
             MusicPlayer.playAll(mList, position - 1, false);
         }
+    }
+
+    @Override
+    public void performDownLoadMusicClick(final int position) {
+        final List list = adapter.getList();
+        final String[] names = new String[list.size()];
+        final String[] artists = new String[list.size()];
+        final ArrayList<String> urls = new ArrayList<String>();
+
+
+        ((BillBoardActivity)view).addSubscription(
+                Observable.create(new Observable.OnSubscribe<String>() {
+                    @Override
+                    public void call(Subscriber<? super String> subscriber) {
+
+                        RequestThreadPool.post(new GetDownloadLink(list, position, names, artists, urls, 1));
+
+
+                        //等待所有请求结束
+                        int tryCount = 0;
+                        while (urls.size() != 1 && tryCount < 1000) {
+                            tryCount++;
+                            try {
+                                Thread.sleep(30);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        PrintLog.e("urls.size() = " + urls.size());
+
+                        subscriber.onNext("onNext");
+                        subscriber.onCompleted();
+                    }
+                })
+                        .subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io())
+                        .subscribe(new Subscriber<String>() {
+                            @Override
+                            public void onCompleted() {}
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Logger.e(e.toString());
+                            }
+
+                            @Override
+                            public void onNext(String s) {
+                                //调用后台服务开始下载
+                                Intent intent = new Intent();
+                                intent.setAction(DownloadService.ADD_DOWNTASK);
+                                intent.putExtra("name", names[0]);
+                                intent.putExtra("artist", artists[0]);
+                                intent.putExtra("url", urls.get(0));
+                                intent.setPackage(DownloadService.PACKAGE);
+                                ((BillBoardActivity)view).startService(intent);
+                            }
+                        })
+        );
     }
 }

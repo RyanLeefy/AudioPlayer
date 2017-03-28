@@ -3,6 +3,7 @@ package com.example.administrator.audioplayer.http;
 import com.example.administrator.audioplayer.jsonbean.Artist;
 
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -22,6 +23,7 @@ public interface ArtistService {
      * @param artistid
      * @return
      */
+    @Headers("User-Agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
     @GET("v1/restserver/ting")
     Observable<Artist> artistInfo(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                  @Query("method") String method, @Query("tinguid") String tinguid, @Query("artistid") String artistid);

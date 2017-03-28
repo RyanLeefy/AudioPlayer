@@ -5,6 +5,7 @@ import com.example.administrator.audioplayer.jsonbean.SongCollection;
 import com.example.administrator.audioplayer.jsonbean.SongCollectionInfo;
 
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -24,6 +25,7 @@ public interface SongCollectionService {
      * @param page_no
      * @return
      */
+    @Headers("User-Agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
     @GET("v1/restserver/ting")
     Observable<SongCollection> geDan(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                      @Query("method") String method, @Query("page_no") int page_no, @Query("page_size") int page_size);
@@ -38,6 +40,7 @@ public interface SongCollectionService {
      * @param listid
      * @return
      */
+    @Headers("User-Agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
     @GET("v1/restserver/ting")
     Observable<SongCollectionInfo> geDanInfo(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                              @Query("method") String method, @Query("listid") String listid);
@@ -52,6 +55,7 @@ public interface SongCollectionService {
      * @param num
      * @return
      */
+    @Headers("User-Agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
     @GET("v1/restserver/ting")
     Observable<RecommendSongCollection> hotGeDan(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                                  @Query("method") String method, @Query("num") int num);

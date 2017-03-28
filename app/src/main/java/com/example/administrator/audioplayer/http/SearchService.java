@@ -6,6 +6,7 @@ import com.example.administrator.audioplayer.jsonbean.Lru;
 import com.example.administrator.audioplayer.jsonbean.SearchMeageResult;
 
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -26,6 +27,7 @@ public interface SearchService {
      * @param method
      * @return
      */
+    @Headers("User-Agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
     @GET("v1/restserver/ting")
     Observable<HotWord> hotWord(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                 @Query("method") String method);
@@ -43,6 +45,7 @@ public interface SearchService {
      * @param e
      * @return
      */
+    @Headers("User-Agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
     @GET("v1/restserver/ting")
     Observable<Lru> searchLrcPic(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                  @Query("method") String method, @Query("query") String query, @Query("ts") String ts,
@@ -62,6 +65,7 @@ public interface SearchService {
      * @param data_source
      * @return
      */
+    @Headers("User-Agent:Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
     @GET("v1/restserver/ting")
     Observable<SearchMeageResult> searchMerge(@Query("from") String from, @Query("version") String version, @Query("format") String format,
                                               @Query("method") String method, @Query("query") String query, @Query("page_no") String page_no,

@@ -19,6 +19,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.http.Headers;
 
 /**
  * Created by on 2017/2/22 0022.
@@ -39,6 +40,7 @@ public class HttpUtils {
             builder.connectTimeout(10000, TimeUnit.MINUTES);
             builder.readTimeout(10000, TimeUnit.MINUTES);
             Request request = new Request.Builder()
+                    .addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
                     .url(action1)
                     .build();
             Response response = builder.build().newCall(request).execute();
@@ -73,6 +75,7 @@ public class HttpUtils {
             builder.connectTimeout(10000, TimeUnit.MINUTES);
             builder.readTimeout(10000, TimeUnit.MINUTES);
             Request.Builder requestBuilder = new Request.Builder()
+                    .addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
                     .url(action1);
             if (forceCache) {
                 requestBuilder.cacheControl(CacheControl.FORCE_CACHE);

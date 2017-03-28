@@ -7,4 +7,5 @@ package com.example.administrator.audioplayer.Ipresenter;
 public interface IBillBoardPresenter {
     void onCreate(int tyoe);
     void peformMusicClick(int position);
+    void performDownLoadMusicClick(int position);
 }
